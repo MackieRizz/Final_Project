@@ -1,0 +1,633 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <title>Welcome To EVSU VOTING</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600;700&family=Montserrat:wght@600;700&display=swap');
+    html {
+        scroll-behavior: smooth;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Karla', sans-serif;
+    }
+
+    body {
+        background: linear-gradient(to bottom right, #C46B02, #800000, #7F0404, #4D1414, #000000);
+        background-size: cover;
+        color: #FDDE54;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column; 
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 0;
+        margin: 0;
+    }
+    body.fade-in {
+        opacity: 0;
+        animation: fadeInAnimation 1s forwards;
+    }
+    @keyframes fadeInAnimation {
+        to {
+            opacity: 1;
+        }
+    }
+
+    header {
+        width: 100%;
+        padding: 10px 8%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: transparent;
+        z-index: 100;
+        border-bottom: 4px solid #FDDE54; /* yellow underline */
+        transition: all 0.3s ease;
+    }
+
+    /* 2) Scrolled header style */
+    header.scrolled {
+        width: calc(100% - 40px);    /* leave padding space */
+        margin: 10px 20px;           /* float away from edges */
+        padding: 10px 20px;
+        background: rgba(0,0,0,0.8);
+        border-radius: 12px;
+        border-bottom: none;         /* hide the yellow line */
+        box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        animation: float 4s ease-in-out infinite;
+    }
+    /* Size and align the EVSU logo */
+    .evsu-logo-nav img {
+        width: 50px;           /* adjust as needed */
+        height: auto;
+        vertical-align: middle;
+        border-radius: 4px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Hover effect on the logo */
+    .evsu-logo-nav img:hover {
+        transform: scale(1.1);
+    }
+
+    /* Make sure the li spacing still feels balanced */
+    nav ul li.evsu-logo-nav {
+        margin-left: 20px;
+        margin-right: -10px;
+    }
+
+    /* 3) Float animation */
+    @keyframes float {
+        0%,100% { transform: translateY(0); }
+        50%      { transform: translateY(-5px); }
+    }
+    header nav ul {
+        transition: max-height 0.3s ease;
+    }
+    @media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        max-height: 0;
+        overflow: hidden;
+    }
+
+    nav ul.active {
+        max-height: 300px; /* enough for menu to show */
+    }
+
+    nav ul li {
+        margin: 10px 0;
+    }
+
+    /* Hamburger menu icon */
+    .menu-toggle {
+        display: block;
+        cursor: pointer;
+        font-size: 26px;
+        color: #FDDE54;
+    }
+    }
+
+    @media (min-width: 769px) {
+    .menu-toggle {
+        display: none;
+    }
+    }
+
+    .home {
+        width: 100%;
+        height: 100vh;           
+        display: flex;           
+        justify-content: center;    
+        align-items: center;         
+        text-align: center;          
+        padding: 20px;               
+    }
+
+    .container {
+        width: 100%;
+        padding: 20px 8%; 
+        margin: 0;
+        max-width: none;
+    }
+
+    nav {
+      padding: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo a {
+      font-size: 40px;
+      text-decoration: none;
+      color: #FDDE54;
+      font-weight: 600;
+    }
+
+    .logo span {
+      color: #F4BB00;
+    }
+
+    nav ul {
+      list-style: none;
+    }
+
+    nav ul li {
+      display: inline-block;
+      margin: 0 15px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      font-weight: 900;
+      font-size: 20px;
+      color: #FDDE54;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+      
+    }
+    nav ul li a i {
+        margin-right: 6px;
+    }
+    .logo a i {
+        font-size: 1.2em;
+        color: #FDDE54;
+        vertical-align: middle;
+    }
+
+    nav ul li a:hover {
+      color: rgb(255, 255, 0);
+      transform: scale(1.1);
+    }
+
+    .content {
+      margin-top: 0;
+      max-width: 100%;
+    }
+
+    .content h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 72px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #FDDE54;
+    }
+
+    .content p {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
+      font-size: 18px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+      color: #f5f5f5;
+      opacity: 0.95;
+    }
+
+    .link {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+        position: relative;
+        display: inline-block;
+        padding: 20px 50px; /* Bigger size */
+        font-size: 22px;
+        font-weight: 700;
+        border-radius: 40px;
+        text-decoration: none;
+        color: #fff;
+        cursor: pointer;
+        overflow: hidden;
+        z-index: 1;
+
+        background-size: 200% 200%;
+        animation: float 6s ease-in-out infinite, gradientMove 6s ease infinite;
+
+        transition: all 0.4s ease-in-out;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        border: 3px solid transparent;
+    }
+    .btn i {
+        margin-right: 10px;
+        font-size: 1.2em;
+        vertical-align: middle;
+    }
+
+    /* Unique gradient per button */
+    .btn-primary {
+        background-image: linear-gradient(135deg, #FDDE54, #F4BB00, #FDDE54);
+    }
+
+    .btn-secondary {
+        background-image: linear-gradient(135deg, #7F0404, #C46B02, #7F0404);
+    }
+
+    /* Hover Effects */
+    .btn:hover {
+        transform: scale(1.1);
+        background-size: 300% 300%;
+        box-shadow: 0 12px 35px rgba(255, 223, 0, 0.6), 0 0 15px rgba(255, 255, 255, 0.2);
+        border: 3px solid #FDDE54;
+    }
+
+    /* Floating animation */
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
+
+    /* Gradient shift animation */
+    @keyframes gradientMove {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    a {
+      color: #FDDE54;
+      text-decoration: none;
+    }
+
+    .about {
+        width: 100%;
+        height: 88vh;
+        padding: 20px 8%;
+        box-sizing: border-box;
+        color: #fdde54;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .about-content {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        gap: 60px;
+    }
+
+    .about-img img {
+        width: 650px;
+        max-width: 100%;
+        height: auto;
+        border-radius: 20px;
+        animation: float 6s ease-in-out infinite, gradientMove 6s ease infinite;
+    }
+
+    .about-text {
+        flex: 1;
+        color: #f5f5f5;
+        text-align: left;
+    }
+
+    .about-text h2 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 68px;
+        font-weight: 700;
+        margin-top: 40px;
+        margin-bottom: 60px;
+        color: #fdde54;
+    }
+
+    .about-text p {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 1.7;
+        max-width: 100%;
+        opacity: 0.9;
+    }
+
+    @media (max-width: 768px) {
+    .about-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .about-text h2 {
+        font-size: 36px;
+    }
+
+    .about p {
+        font-size: 16px;
+        max-width: 100%;
+    }
+
+    .about-img img {
+        width: 300px;
+    }
+    }
+    .services {
+        height: 90vh;
+        padding: 20px 8%;
+        color: #FDDE54;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .services-content {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        gap: 60px;
+    }
+
+    .services-text {
+        flex: 1;
+        text-align: left;
+    }
+
+    .services-text h2 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 70px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #FDDE54;
+    }
+
+    .services-text p {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 500;
+        font-size: 23px;
+        line-height: 1.7;
+        max-width: 100%;
+        color: #f5f5f5;
+        opacity: 0.95;
+    }
+
+    .services-img img {
+        width: 650px;
+        max-width: 100%;
+        height: auto;
+        border-radius: 20px;
+        animation: float 6s ease-in-out infinite, gradientMove 6s ease infinite;
+
+    }
+    @media (max-width: 768px) {
+    .services-content {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .services-text {
+        text-align: center;
+    }
+
+    .services-text h2 {
+        font-size: 36px;
+    }
+
+    .services-text p {
+        font-size: 16px;
+    }
+
+    .services-img img {
+        width: 300px;
+    }
+    }
+    .contact-footer {
+        height: 90vh; 
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        justify-content: space-between; 
+        padding: 40px 8%;
+        color: #FDDE54;
+    }
+
+    .contact-container {
+        text-align: center;
+        margin-top: 31px;
+    }
+
+    .contact-container h2 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 60px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    .contact-img {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+
+    .contact-img img {
+        width: 300px;
+        max-width: 100%;
+        height: auto;
+        border-radius: 20px;
+        animation: float 6s ease-in-out infinite, gradientMove 6s ease infinite;
+    }
+
+    .contact-container p {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 500;
+        font-size: 18px;
+        line-height: 1.7;
+        max-width: 700px;
+        margin: 0 auto;
+        color: #f5f5f5;
+        opacity: 0.95;
+    }
+
+    .contact-container a {
+        color: #FDDE54;
+        text-decoration: underline;
+    }
+
+    footer {
+        margin-bottom: -30px;
+        border-top: 1px solid #FDDE54;
+        padding: 15px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        font-weight: 400;
+        color: #FDDE54;
+        font-family: 'Karla', sans-serif;
+    }
+
+    footer nav a {
+        color: #FDDE54;
+        text-decoration: none;
+        margin-left: 15px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: color 0.3s ease;
+    }
+
+    footer nav a:hover {
+        color: #f4bb00;
+    }
+    @media (max-width: 768px) {
+    .contact-container h2 {
+        font-size: 36px;
+    }
+
+    .contact-container p {
+        font-size: 16px;
+    }
+
+    .contact-img img {
+        width: 300px;
+    }
+    }
+  </style>
+</head>
+<body>  
+<header>
+  <nav>
+    <div class="menu-toggle">&#9776;</div>
+    <div class="logo">
+      <a href="#"><i class="fas fa-sun" style="margin-right: 8px;"></i>SAR<span>JAGA.</span></a>
+    </div>
+    <ul>
+        <li><a href="#home"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="#about"><i class="fas fa-user"></i> About</a></li>
+        <li><a href="#services"><i class="fas fa-cogs"></i> Services</a></li>
+        <li><a href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
+        <!-- New EVSU logo nav item -->
+        <li class="evsu-logo-nav">
+            <a href="#"><!-- Padung admindashboard-->
+            <img src="Images/EvsuLogo.png" alt="EVSU Logo">
+            </a>
+        </li>
+    </ul>
+  </nav>
+</header>
+  <section class="home" id="home">
+    <div class="container">
+      <div class="content">
+        <h2>Welcome To<br>EVSU VOTING PAGE</h2>
+        <p>
+          This is the official voting system of Eastern Visayas State University – Ormoc Campus.  
+          Our platform introduces a fast, secure, and modern way of voting through the use of QR code authentication.  
+          Students simply scan their assigned QR code to cast votes for campus officers and candidates.
+        </p>
+      </div>
+        <div class="link">
+            <a href="#" class="btn btn-primary"><i class="fas fa-user-plus"></i> Get Started</a>
+            <a href="#" class="btn btn-secondary"><i class="fas fa-vote-yea"></i> Vote Now</a>
+        </div>
+    </div>
+  </section>
+  <section id="about" class="about">
+  <div class="about-content">
+    <div class="about-img">
+      <img src="images/aboutus.png" alt="About EVSU Voting">
+    </div>
+    <div class="about-text">
+      <h2>About EVSU Voting System</h2>
+      <p>
+        The EVSU Voting System is designed to provide a secure, efficient, and transparent election process
+        for students and campus organizations. Utilizing modern QR code technology, this platform minimizes
+        fraud, speeds up vote counting, and enhances accessibility for all eligible voters. Our goal is to
+        foster democratic participation and ensure every student's voice is heard in a trusted environment.
+      </p>
+    </div>
+  </div>
+</section>
+<section class="services" id="services">
+  <div class="services-content">
+    <div class="services-text">
+      <h2>Our Services</h2>
+      <p>
+        We offer a secure and seamless voting experience, including QR code authentication,
+        real-time result tracking, and user support to ensure every student's voice is heard.
+      </p>
+    </div>
+    <div class="services-img">
+      <img src="images/Services.png" alt="Our Services">
+    </div>
+  </div>
+</section>
+<section class="contact-footer" id="contact">
+    <div class="contact-container">
+        <h2>Contact Us</h2>
+        <div class="contact-img">
+            <img src="images/Contact.png" alt="Contact Us">
+        </div>
+        <p>
+             For inquiries, support, or feedback, please reach out to us at:
+            <br>
+            <a href="mailto:support@evsu-voting.edu.ph">support@evsu-voting.edu.ph</a> | Phone: (053) 123-4567
+        </p>
+    </div>
+  <footer>
+    <p>&copy; 2025 EVSU Voting System. All rights reserved.</p>
+    <nav>
+      <a href="#">Privacy Policy </a> | <a href="#">Terms of Use </a> | <a href="#">Help</a>
+    </nav>
+  </footer>
+</section>
+
+
+
+</body>
+<script>
+  // Page load fade-in
+    document.body.classList.add('fade-in');
+
+    // Mobile menu toggle
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navUl = document.querySelector('nav ul');
+
+    menuToggle.addEventListener('click', () => {
+        navUl.classList.toggle('active');
+    });
+
+    // Close mobile menu on link click and smooth scroll handled by CSS scroll-behavior
+    document.querySelectorAll('nav ul li a').forEach(link => {
+        link.addEventListener('click', () => {
+        navUl.classList.remove('active');
+        });
+    });
+
+    const header = document.querySelector('header');
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 20) {
+        header.classList.add('scrolled');
+        } else {
+        header.classList.remove('scrolled');
+        }
+    });
+</script>
+</html>
