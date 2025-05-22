@@ -277,6 +277,7 @@
       color: #FDDE54;
       text-decoration: none;
     }
+
     /* PROMO BOX */
     .promo-container {
         position: fixed;
@@ -330,6 +331,7 @@
         0%,100% { transform: translateY(0); }
         50%     { transform: translateY(-6px); }
     }
+
 
     .about {
         width: 100%;
@@ -599,12 +601,14 @@
             <a href="#" class="btn btn-primary"><i class="fas fa-user-plus"></i> Get Started</a>
             <a href="#" class="btn btn-secondary"><i class="fas fa-vote-yea"></i> Vote Now</a>
         </div>
+
         <div class="promo-container">
             <p>
                 If you want to see the voting process or results, 
                 <a href="results.php">Just Click Here.</a>
             </p>
         </div>
+
     </div>
   </section>
   <section id="about" class="about">
@@ -689,6 +693,7 @@
         }
     });
 
+
       const promo = document.querySelector('.promo-container');
 
     function togglePromo() {
@@ -703,5 +708,6 @@
     // run on load and on scroll
     window.addEventListener('scroll', togglePromo);
     window.addEventListener('load', togglePromo);
+
 </script>
 </html>
