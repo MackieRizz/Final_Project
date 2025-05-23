@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 session_start();
 include 'db.php';
 
-$passcode    = '1234';
+$passcode    = '12345678'; // 8 digits now
 $secretKey   = '6LcWBTsrAAAAAHsAxa7FJ9S0Am3V95OnX54R9Cmg';
 $maxAttempts = 3;
 
@@ -16,16 +16,17 @@ $error = '';
 $lockout = false;
 $showAlert = false;
 
+
 if ($_SESSION['admin_attempts'] >= $maxAttempts) {
     $lockout = true;
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $digits = '';
-    for ($i = 1; $i <= 4; $i++) {
+    for ($i = 1; $i <= 8; $i++) { // Loop for 8 digits
         $digits .= $_POST["digit{$i}"] ?? '';
     }
 
-    if (strlen($digits) < 4) {
-        $error = "Please enter all four digits. Attempts left: " . ($maxAttempts - $_SESSION['admin_attempts']);
+    if (strlen($digits) < 8) { // Require 8 digits
+        $error = "Please enter all eight digits. Attempts left: " . ($maxAttempts - $_SESSION['admin_attempts']);
         $showAlert = true;
     } elseif (empty($_POST['g-recaptcha-response'])) {
         $error = "Please complete the reCAPTCHA challenge. Attempts left: " . ($maxAttempts - $_SESSION['admin_attempts']);
@@ -133,7 +134,7 @@ if ($_SESSION['admin_attempts'] >= $maxAttempts) {
     margin-bottom: 24px;
     margin-top: -20px;
     width: 100%;
-    max-width: 420px;
+    max-width: 550px;
     overflow: visible;
 }
 
@@ -228,6 +229,7 @@ if ($_SESSION['admin_attempts'] >= $maxAttempts) {
 
 .g-recaptcha {
     margin-top: 30px;
+    margin-left: 70px;
 }
 
 @media (max-width: 700px) {
@@ -368,6 +370,10 @@ footer p {
           <input name="digit2" type="password" maxlength="1" />
           <input name="digit3" type="password" maxlength="1" />
           <input name="digit4" type="password" maxlength="1" />
+          <input name="digit5" type="password" maxlength="1" />
+          <input name="digit6" type="password" maxlength="1" />
+          <input name="digit7" type="password" maxlength="1" />
+          <input name="digit8" type="password" maxlength="1" />
         </div>
         <div id="recaptchaBox" class="g-recaptcha" data-sitekey="6LcWBTsrAAAAAACTAfiByoo40so_poPc4r8M7c5Z" style="display:none;"></div>
         <button type="submit" class="btn btn-primary w-100">VERIFY</button>

@@ -319,7 +319,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         font-family: 'Karla', sans-serif;
         font-weight: 600;
         margin-bottom: 18px;
-        padding: 10px 0px;
+        padding: 10px 16px;
         transition: border 0.2s, box-shadow 0.2s;
         box-shadow: 0 2px 8px rgba(253,222,84,0.08);
     }
