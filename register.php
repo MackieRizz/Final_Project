@@ -586,10 +586,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             gap: 10px;
         }
     }
+    .back-icon {
+    position: fixed;
+    top: 20px;
+    left: 38px;
+    z-index: 200;
+    background: rgba(253, 222, 84, 0.85);
+    border: 2.5px solid #C46B02;
+    border-radius: 45%;
+    width: 58px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7F0404;
+    font-size: 2.0rem;
+    box-shadow: 0 2px 10px rgba(124,4,4,0.13);
+    transition: 
+        background 0.25s,
+        border 0.25s,
+        box-shadow 0.25s,
+        transform 0.25s;
+    cursor: pointer;
+    text-decoration: none;
+}
+.back-icon:hover {
+    background: #C46B02;
+    border: 2.5px solid #FDDE54;
+    color: #fffbe6;
+    box-shadow: 0 8px 32px 0 rgba(124,4,4,0.28), 0 1.5px 6px rgba(253,222,84,0.18);
+    transform: scale(1.13) translateY(-2px);
+}
+.entrance-animate {
+    opacity: 0;
+    transform: translateY(40px) scale(0.98);
+    animation: entranceFadeUp 0.8s cubic-bezier(.77,0,.18,1) 0.2s forwards;
+}
+
+@keyframes entranceFadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
     </style>
 </head>
 <body>
-<header>
+<!-- Back Icon Button -->
+<a href="Homepage.html" class="back-icon entrance-animate" title="Back to Homepage">
+    <i class="fas fa-arrow-left"></i>
+</a>
+<header class="entrance-animate">
   <nav>
     <div class="menu-toggle">&#9776;</div>
     <div class="logo">
@@ -604,7 +651,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </ul>
   </nav>
 </header>
-<div class="flex-container">
+<div class="flex-container entrance-animate">
     <div class="main-container">
         <div class="form-section">
             <h2 class="mb-4 text-center">Student Registration</h2>
@@ -651,7 +698,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         </div>
 
-        <div class="qr-section">
+        <div class="qr-section entrance-animate">
             <div class="qr-box">
                 <h4 style="font-weight: bold;">Generated QR Code</h4>
                 <img src="<?= $qrCodeUrl ?>" alt="QR Code">
@@ -664,7 +711,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 </div>
-  <footer>
+  <footer class="entrance-animate">
     <p>&copy; 2025 EVSU Voting System. All rights reserved.</p>
     <nav>
       <a href="#">Privacy Policy </a> | <a href="#">Terms of Use </a> | <a href="#">Help</a>
