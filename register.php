@@ -591,7 +591,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <nav>
     <div class="menu-toggle">&#9776;</div>
     <div class="logo">
-      <a href="#"><i class="fas fa-sun" style="margin-right: 8px;"></i>SAR<span>JAGA.</span></a>
+      <a href="Homepage.html"><i class="fas fa-sun" style="margin-right: 8px;"></i>SAR<span>JAGA.</span></a>
     </div>
     <ul>
         <li class="evsu-logo-nav">
