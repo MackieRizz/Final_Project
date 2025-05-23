@@ -1,4 +1,3 @@
-
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -43,6 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Name:$fullname,ID:$studentId";
     $qrCodeFileName = "QRCode_" . $studentId . ".png";
     $fullQrCodePath = $qrCodeSavePath . $qrCodeFileName;
+
+    // Ensure QR code directory exists
+    if (!is_dir($qrCodeSavePath)) {
+        mkdir($qrCodeSavePath, 0777, true);
+    }
 
     $ch = curl_init($qrCodeUrl);
     $fp = fopen($fullQrCodePath, 'wb');
@@ -728,6 +732,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             timer: 1500
         });
     }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const studentIdInput = document.querySelector('input[name="student_id"]');
+    if (studentIdInput) {
+        studentIdInput.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, ''); // Remove non-digits
+            if (value.length > 9) value = value.slice(0, 9); // Max 9 digits
+            if (value.length > 4) {
+                value = value.slice(0, 4) + '-' + value.slice(4);
+            }
+            this.value = value;
+        });
+    }
+});
     </script>
 
 </body>
