@@ -467,6 +467,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     box-shadow: 0 8px 32px 0 rgba(124,4,4,0.28), 0 1.5px 6px rgba(253,222,84,0.18);
     transform: scale(1.13) translateY(-2px);
 }
+.entrance-animate {
+    opacity: 0;
+    transform: translateY(40px) scale(0.98);
+    animation: entranceFadeUp 0.8s cubic-bezier(.77,0,.18,1) 0.2s forwards;
+}
+
+@keyframes entranceFadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
     </style>
 </head>
 <body>
@@ -489,7 +501,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </ul>
   </nav>
 </header>
-    <div class="main-container">
+    <div class="main-container entrance-animate">
         <div class="scanner-section">
             <h2>QR code Scanner to VOTE </h2>
              <div class="current-time-info">
@@ -501,7 +513,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-  <footer class="entrance-animate">
+  <footer class="entrance-animate entrance-animate">
     <p>&copy; 2025 EVSU Voting System. All rights reserved.</p>
     <nav>
       <a href="#">Privacy Policy </a> | <a href="#">Terms of Use </a> | <a href="#">Help</a>
