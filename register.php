@@ -625,7 +625,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- ✅ NEW: Section Field -->
                 <div class="mb-3">
-                    <label for="section" class="form-label">Year/Section</label>
+                    <label for="section" class="form-label">Section</label>
                     <input type="text" name="section" value="<?= htmlspecialchars($section ?? '') ?>" required class="form-control">
                 </div>
 
