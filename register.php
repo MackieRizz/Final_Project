@@ -33,14 +33,14 @@ if (isset($_GET['id'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fullname = $conn->real_escape_string($_POST['fullname']);
-    $studentId = $conn->real_escape_string($_POST['student_id']);
-    
+    $student_id = $conn->real_escape_string($_POST['student_id']); // <-- use $student_id
+
     // ✅ NEW FIELDS: sanitize input
     $gender = $conn->real_escape_string($_POST['gender']);
     $section = $conn->real_escape_string($_POST['section']);
 
-    $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Name:$fullname,ID:$studentId";
-    $qrCodeFileName = "QRCode_" . $studentId . ".png";
+    $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Name:$fullname,ID:$student_id";
+    $qrCodeFileName = "QRCode_" . $student_id . ".png";
     $fullQrCodePath = $qrCodeSavePath . $qrCodeFileName;
 
     $ch = curl_init($qrCodeUrl);
@@ -52,8 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     fclose($fp);
 
     if ($update_mode) {
-        // You can add update logic for gender/section here later if needed.
-        $sql = "UPDATE students_registration SET fullname='$fullname', student_id='$studentId', qr_code_path='$fullQrCodePath' WHERE id=$id";
+        $sql = "UPDATE students_registration SET fullname='$fullname', student_id='$student_id', qr_code_path='$fullQrCodePath' WHERE id=$id";
         if ($conn->query($sql) === TRUE) {
             echo "<script>
                 setTimeout(function() {
@@ -71,18 +70,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errorMessage = "Error updating record: " . $conn->error;
         }
     } else {
-        // ✅ INSERT NEW FIELDS (section and gender)
-        $sql = "INSERT INTO students_registration (fullname, student_id, qr_code_path)
-                VALUES ('$fullname', '$studentId', '$fullQrCodePath')";
-        
-        if ($conn->query($sql) === TRUE) {
-            // Insert section & gender into separate query or update students_registration structure
-            $new_id = $conn->insert_id;
-            $conn->query("UPDATE students_registration SET gender='$gender', section='$section' WHERE id=$new_id");
+        // Check if student_id already exists
+        $checkSql = "SELECT id FROM students_registration WHERE student_id = '$student_id'";
+        $checkResult = $conn->query($checkSql);
 
-            $successMessage = "Registration Successful!";
+        if ($checkResult && $checkResult->num_rows > 0) {
+            // Student ID already exists
+            $successMessage = "Registration Failed! Student ID $student_id is already registered.";
+            $student_id = ""; // Clear the student ID field
+            $qrCodeUrl = "";  // Do not generate QR code
+            $qrCodeFileName = "";
+            $fullQrCodePath = "";
         } else {
-            $errorMessage = "Error: " . $conn->error;
+            $sql = "INSERT INTO students_registration (fullname, student_id, qr_code_path)
+                    VALUES ('$fullname', '$student_id', '$fullQrCodePath')";
+            
+            if ($conn->query($sql) === TRUE) {
+                // Insert section & gender into separate query or update students_registration structure
+                $new_id = $conn->insert_id;
+                $conn->query("UPDATE students_registration SET gender='$gender', section='$section' WHERE id=$new_id");
+
+                $successMessage = "Registration Successful!";
+            } else {
+                $errorMessage = "Error: " . $conn->error;
+            }
         }
     }
 }
@@ -703,7 +714,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <img src="<?= $qrCodeUrl ?>" alt="QR Code">
                 <div class="qr-info">
                     <h5><?= htmlspecialchars($fullname) ?></h5>
-                    <p>ID: <?= htmlspecialchars($studentId) ?></p>
+                    <p>ID: <?= htmlspecialchars($student_id) ?></p>
                     <a href="download_qr.php?filename=<?= urlencode($qrCodeFileName) ?>" class="btn btn-primary btn-block" onclick="showDownloadAlert()">Download QR Code</a>
                 </div>
             </div>
