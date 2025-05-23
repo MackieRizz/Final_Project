@@ -2,7 +2,7 @@
 
 $host = 'localhost'; 
 $username = 'root'; 
-$password = 'My_Chaeyoung01!'; 
+$password = ''; 
 $database = 'Final_Project'; 
 
 
