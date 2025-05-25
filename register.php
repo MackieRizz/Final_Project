@@ -457,15 +457,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     color: #4D1414;
     font-family: 'Montserrat', 'Karla', sans-serif;
     border: 2px solid #C46B02;
-    min-height: unset;$department = $conn->real_escape_string($_POST['department']);
-    $program = $conn->real_escape_string($_POST['program']);$updateSql = "UPDATE students_registration 
-                 SET department='$department', 
-                     program='$program',
-                     gender='$gender',
-                     section='$section'
-                 WHERE id=$new_id";if ($conn->query($updateSql) !== TRUE) {
-                     $errorMessage = "Error updating additional fields: " . $conn->error;
-                 }
+    min-height: unset;
     text-align: center;
     margin-top: 0;
 }
