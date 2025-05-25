@@ -276,7 +276,7 @@
         <div class="menu-item" onclick="scrollToSection('analytics')"><i class="fas fa-chart-line"></i><span class="label1">Analytics</span></div>
         <div class="menu-item" onclick="window.location.href='standing.php'"><i class="fas fa-trophy"></i><span class="label1">Standings</span>
       </div>
-        <div class="menu-item" onclick="window.location.href='add_candidate_dashboard.html'"><i class="fas fa-users"></i><span class="label">Add Candidates</span></div>
+        <div class="menu-item" onclick="window.location.href='add_candidate_dashboard.php'"><i class="fas fa-users"></i><span class="label">Add Candidates</span></div>
       </div>
     </div>
     <div class="logout-btn"><i class="fas fa-sign-out-alt"></i><span class="label">Logout</span></div>
