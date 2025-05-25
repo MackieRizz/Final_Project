@@ -334,10 +334,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     background: rgba(77, 20, 20, 0.92);
     border-radius: 18px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-    margin-top: -50px;
+    margin-top: -70px;
     margin-bottom: 50px;
     width: 100%;
-    max-width: 420px;
+    max-width: 950px;
     overflow: visible;
 }
 
@@ -345,7 +345,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     width: 100%;
     background: linear-gradient(135deg, #fffbe6 60%, #FDDE54 100%);
     border-radius: 14px;
-    padding: 24px 16px 18px 16px;
+    padding: 32px 32px 24px 32px; 
     box-shadow: 0 4px 16px rgba(124, 4, 4, 0.13), 0 1.5px 6px rgba(253,222,84,0.08);
     color: #4D1414;
     font-family: 'Montserrat', 'Karla', sans-serif;
@@ -353,13 +353,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 .form-section h2 {
-    font-size: 1.5rem;
+    font-size: 2.1rem;
     margin-bottom: 18px;
+}    
+.form-section form .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+@media (max-width: 700px) {
+.form-section form .row .col-md-6, .form-section form .row .col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
 }
 
 .form-label {
     font-size: 1rem;
     margin-bottom: 4px;
+    font-weight: 600;
 }
 
     .form-control, .form-select {
@@ -386,7 +397,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .btn-primary, .btn-warning {
         font-family: 'Montserrat', sans-serif;
         font-weight: 800;
-        font-size: 1rem;
+        font-size: 1.2rem;
         border-radius: 8px;
         padding: 10px 0;
         margin-top: 8px;
@@ -726,56 +737,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="alert alert-danger text-center"><?= $errorMessage ?></div>
             <?php endif; ?>
 
-            <form method="POST" action="">
-                <div class="mb-3">
-                    <label for="fullname" class="form-label">Full Name</label>
-                    <input type="text" class="form-control" id="fullname" name="fullname" value="<?php echo htmlspecialchars($fullname); ?>" required>
-                </div>
-                <div class="mb-3">
-                    <label for="student_id" class="form-label">Student ID</label>
-                    <input type="text" class="form-control" id="student_id" name="student_id" value="<?php echo htmlspecialchars($student_id); ?>" required>
-                </div>
-                <div class="mb-3">
-                    <label for="department" class="form-label">Department</label>
-                    <select class="form-select" id="department" name="department" required onchange="updateProgramOptions()">
-                        <option value="">Select Department</option>
-                        <option value="Teacher Education Department">Teacher Education Department</option>
-                        <option value="Engineering Department">Engineering Department</option>
-                        <option value="Computer Studies Department">Computer Studies Department</option>
-                        <option value="Industrial Technology Department">Industrial Technology Department</option>
-                        <option value="Business and Management Department">Business and Management Department</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="program" class="form-label">Program</label>
-                    <select class="form-select" id="program" name="program" required>
-                        <option value="">Select Program</option>
-                    </select>
-                </div>
-
-                <!-- ✅ NEW: Section Field -->
-                <div class="mb-3">
-                    <label for="section" class="form-label">Year & Section</label>
-                    <input type="text" name="section" value="<?= htmlspecialchars($section ?? '') ?>" required class="form-control">
-                </div>
-
-                <!-- ✅ NEW: Gender Field -->
-                <div class="mb-3">
-                    <label for="gender" class="form-label">Gender</label>
-                    <select name="gender" required class="form-select">
-                        <option value="">-- Select Gender --</option>
-                        <option value="Male" <?= (isset($gender) && $gender === "Male") ? 'selected' : '' ?>>Male</option>
-                        <option value="Female" <?= (isset($gender) && $gender === "Female") ? 'selected' : '' ?>>Female</option>
-                    </select>
-                </div>
-
-                <?php if ($update_mode): ?>
-                    <input type="hidden" name="id" value="<?= $id ?>">
-                    <button type="submit" class="btn btn-warning w-100" onclick="return confirm('Are you sure you want to update this record?')">Update</button>
-                <?php else: ?>
-                    <button type="submit" class="btn btn-primary w-100">Register</button>
-                <?php endif; ?>
-            </form>
+        <form method="POST" action="">
+        <div class="row gx-3 gy-2">
+            <div class="col-md-6">
+            <label for="fullname" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="fullname" name="fullname" value="<?php echo htmlspecialchars($fullname); ?>" required>
+            </div>
+            <div class="col-md-6">
+            <label for="student_id" class="form-label">Student ID</label>
+            <input type="text" class="form-control" id="student_id" name="student_id" value="<?php echo htmlspecialchars($student_id); ?>" required>
+            </div>
+            <div class="col-md-6">
+            <label for="department" class="form-label">Department</label>
+            <select class="form-select" id="department" name="department" required onchange="updateProgramOptions()">
+                <option value="">Select Department</option>
+                <option value="Teacher Education Department">Teacher Education Department</option>
+                <option value="Engineering Department">Engineering Department</option>
+                <option value="Computer Studies Department">Computer Studies Department</option>
+                <option value="Industrial Technology Department">Industrial Technology Department</option>
+                <option value="Business and Management Department">Business and Management Department</option>
+            </select>
+            </div>
+            <div class="col-md-6">
+            <label for="program" class="form-label">Program</label>
+            <select class="form-select" id="program" name="program" required>
+                <option value="">Select Program</option>
+            </select>
+            </div>
+            <div class="col-md-6">
+            <label for="section" class="form-label">Year & Section</label>
+            <input type="text" name="section" value="<?= htmlspecialchars($section ?? '') ?>" required class="form-control">
+            </div>
+            <div class="col-md-6">
+            <label for="gender" class="form-label">Gender</label>
+            <select name="gender" required class="form-select">
+                <option value="">-- Select Gender --</option>
+                <option value="Male" <?= (isset($gender) && $gender === "Male") ? 'selected' : '' ?>>Male</option>
+                <option value="Female" <?= (isset($gender) && $gender === "Female") ? 'selected' : '' ?>>Female</option>
+            </select>
+            </div>
+            <div class="col-12 d-flex justify-content-center mt-2">
+            <?php if ($update_mode): ?>
+                <input type="hidden" name="id" value="<?= $id ?>">
+                <button type="submit" class="btn btn-warning w-50" onclick="return confirm('Are you sure you want to update this record?')">Update</button>
+            <?php else: ?>
+                <button type="submit" class="btn btn-primary w-50">Register</button>
+            <?php endif; ?>
+            </div>
+        </div>
+        </form>
         </div>
         </div>
 
