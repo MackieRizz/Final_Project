@@ -712,7 +712,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
     <ul>
         <li class="evsu-logo-nav">
-            <a href="#"><!-- Padung admindashboard-->
+            <a href="#">
             <img src="Images/EvsuLogo.png" alt="EVSU Logo">
             </a>
         </li>
