@@ -3,6 +3,11 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 include 'db.php';
 
+// Ensure database connection is successful
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
 $qrCodeUrl = '';
 $successMessage = '';
 $errorMessage = '';
@@ -15,6 +20,11 @@ $section = "";
 
 // Path to save QR code images
 $qrCodeSavePath = "../qr_codes/";
+
+// Create QR code directory if it doesn't exist
+if (!file_exists($qrCodeSavePath)) {
+    mkdir($qrCodeSavePath, 0777, true);
+}
 
 // Check if an ID is passed for updating an existing record
 if (isset($_GET['id'])) {
@@ -32,24 +42,59 @@ if (isset($_GET['id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $fullname = $conn->real_escape_string($_POST['fullname']);
-    $student_id = $conn->real_escape_string($_POST['student_id']); // <-- use $student_id
+    // Get all form data
+    $fullname = isset($_POST['fullname']) ? $conn->real_escape_string($_POST['fullname']) : '';
+    $student_id = isset($_POST['student_id']) ? $conn->real_escape_string($_POST['student_id']) : '';
+    $department = isset($_POST['department']) ? $conn->real_escape_string($_POST['department']) : '';
+    $program = isset($_POST['program']) ? $conn->real_escape_string($_POST['program']) : '';
+    $gender = isset($_POST['gender']) ? $conn->real_escape_string($_POST['gender']) : '';
+    $section = isset($_POST['section']) ? $conn->real_escape_string($_POST['section']) : '';
 
-    // ✅ NEW FIELDS: sanitize input
-    $gender = $conn->real_escape_string($_POST['gender']);
-    $section = $conn->real_escape_string($_POST['section']);
-
-    $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Name:$fullname,ID:$student_id";
+    // Generate QR code URL
+    $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" . urlencode("Name:" . $fullname . ",ID:" . $student_id);
     $qrCodeFileName = "QRCode_" . $student_id . ".png";
     $fullQrCodePath = $qrCodeSavePath . $qrCodeFileName;
 
-    $ch = curl_init($qrCodeUrl);
-    $fp = fopen($fullQrCodePath, 'wb');
-    curl_setopt($ch, CURLOPT_FILE, $fp);
-    curl_setopt($ch, CURLOPT_HEADER, 0);
-    curl_exec($ch);
-    curl_close($ch);
-    fclose($fp);
+    // Create QR code directory if it doesn't exist
+    if (!file_exists($qrCodeSavePath)) {
+        mkdir($qrCodeSavePath, 0777, true);
+        chmod($qrCodeSavePath, 0777); // Ensure directory is writable
+    }
+
+    // Generate QR code
+    try {
+        // Initialize cURL
+        $ch = curl_init($qrCodeUrl);
+        
+        // Set cURL options
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        
+        // Execute cURL and get response
+        $response = curl_exec($ch);
+        
+        if (curl_errno($ch)) {
+            throw new Exception("cURL error: " . curl_error($ch));
+        }
+        
+        // Close cURL
+        curl_close($ch);
+        
+        // Save the image
+        if (file_put_contents($fullQrCodePath, $response) === false) {
+            throw new Exception("Failed to save QR code image");
+        }
+        
+        // Set proper permissions
+        chmod($fullQrCodePath, 0666);
+        
+    } catch (Exception $e) {
+        $errorMessage = "Error generating QR code: " . $e->getMessage();
+        $qrCodeUrl = "";
+        $qrCodeFileName = "";
+        $fullQrCodePath = "";
+    }
 
     if ($update_mode) {
         $sql = "UPDATE students_registration SET fullname='$fullname', student_id='$student_id', qr_code_path='$fullQrCodePath' WHERE id=$id";
@@ -82,15 +127,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $qrCodeFileName = "";
             $fullQrCodePath = "";
         } else {
-            $sql = "INSERT INTO students_registration (fullname, student_id, qr_code_path)
-                    VALUES ('$fullname', '$student_id', '$fullQrCodePath')";
+            $sql = "INSERT INTO students_registration (fullname, student_id, qr_code_path, department, program, gender, section)
+                    VALUES ('$fullname', '$student_id', '$fullQrCodePath', '$department', '$program', '$gender', '$section')";
             
             if ($conn->query($sql) === TRUE) {
-                // Insert section & gender into separate query or update students_registration structure
-                $new_id = $conn->insert_id;
-                $conn->query("UPDATE students_registration SET gender='$gender', section='$section' WHERE id=$new_id");
-
                 $successMessage = "Registration Successful!";
+                $new_id = $conn->insert_id;
             } else {
                 $errorMessage = "Error: " . $conn->error;
             }
@@ -125,10 +167,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         background: linear-gradient(to bottom right, #C46B02, #800000, #7F0404, #4D1414, #000000);
         background-size: cover;
         color: #FDDE54;
-        height: 100vh;
+        min-height: 100vh;
         display: flex;
         flex-direction: column; 
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
         text-align: center;
         padding: 0;
@@ -274,28 +316,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 .flex-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     gap: 32px;
     width: 100%;
     max-width: 900px;
-    margin: 110px auto 0 auto;
-    min-height: calc(100vh - 200px);
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 120px 20px 100px 20px;
 }
 
 .main-container {
-    min-height: unset;
-    max-height: calc(100vh - 120px); /* 120px = header + footer + margin */
+    min-height: auto;
+    max-height: none;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     padding: 24px 24px 24px 24px;
     background: rgba(77, 20, 20, 0.92);
     border-radius: 18px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-    margin-top: -50px;
-    margin-bottom: 24px;
+    margin: 0;
     width: 100%;
-    max-width: 420px;
+    max-width: 950px;
     overflow: visible;
 }
 
@@ -303,7 +345,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     width: 100%;
     background: linear-gradient(135deg, #fffbe6 60%, #FDDE54 100%);
     border-radius: 14px;
-    padding: 24px 16px 18px 16px;
+    padding: 32px 32px 24px 32px; 
     box-shadow: 0 4px 16px rgba(124, 4, 4, 0.13), 0 1.5px 6px rgba(253,222,84,0.08);
     color: #4D1414;
     font-family: 'Montserrat', 'Karla', sans-serif;
@@ -311,13 +353,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 .form-section h2 {
-    font-size: 1.5rem;
+    font-size: 2.1rem;
     margin-bottom: 18px;
+}    
+.form-section form .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+@media (max-width: 700px) {
+.form-section form .row .col-md-6, .form-section form .row .col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
 }
 
 .form-label {
     font-size: 1rem;
     margin-bottom: 4px;
+    font-weight: 600;
 }
 
     .form-control, .form-select {
@@ -344,7 +397,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .btn-primary, .btn-warning {
         font-family: 'Montserrat', sans-serif;
         font-weight: 800;
-        font-size: 1rem;
+        font-size: 1.2rem;
         border-radius: 8px;
         padding: 10px 0;
         margin-top: 8px;
@@ -533,16 +586,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     @media (max-width: 900px) {
-    .flex-container {
-        flex-direction: column;
-        align-items: center;
-        gap: 24px;
-        margin-top: 90px;
+        .flex-container {
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            margin: 0;
+            padding: 100px 20px 100px 20px;
+            min-height: 100vh;
+        }
+        .main-container {
+            max-width: 98vw;
+            width: 95%;
+            margin: 0 auto;
+        }
+        .form-section {
+            padding: 2rem;
+            max-height: none;
+            overflow-y: visible;
+        }
+        .qr-section {
+            padding: 2rem;
+            max-height: none;
+            overflow-y: visible;
+        }
     }
-    .main-container, .qr-section {
-        max-width: 98vw;
-    }
-}
     footer {
         border-top: 1px solid #FDDE54;
         padding: 18px 8% 10px 8%;
@@ -566,7 +633,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         position: fixed;
         right: 110px;
         bottom: 20px;
-
     }
     footer nav a {
         color: #FDDE54;
@@ -594,6 +660,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         footer nav {
             margin-top: 6px;
             gap: 10px;
+            position: static;
         }
     }
     .back-icon {
@@ -654,7 +721,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
     <ul>
         <li class="evsu-logo-nav">
-            <a href="#"><!-- Padung admindashboard-->
+            <a href="#">
             <img src="Images/EvsuLogo.png" alt="EVSU Logo">
             </a>
         </li>
@@ -672,50 +739,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="alert alert-danger text-center"><?= $errorMessage ?></div>
             <?php endif; ?>
 
-            <form method="POST" action="">
-                <div class="mb-3">
-                    <label for="fullname" class="form-label">Full Name</label>
-                    <input type="text" name="fullname" value="<?= htmlspecialchars($fullname) ?>" required class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label for="student_id" class="form-label">Student ID</label>
-                    <input type="text" name="student_id" value="<?= htmlspecialchars($student_id) ?>" required class="form-control">
-                </div>
-
-                <!-- ✅ NEW: Section Field -->
-                <div class="mb-3">
-                    <label for="section" class="form-label">Section</label>
-                    <input type="text" name="section" value="<?= htmlspecialchars($section ?? '') ?>" required class="form-control">
-                </div>
-
-                <!-- ✅ NEW: Gender Field -->
-                <div class="mb-3">
-                    <label for="gender" class="form-label">Gender</label>
-                    <select name="gender" required class="form-select">
-                        <option value="">-- Select Gender --</option>
-                        <option value="Male" <?= (isset($gender) && $gender === "Male") ? 'selected' : '' ?>>Male</option>
-                        <option value="Female" <?= (isset($gender) && $gender === "Female") ? 'selected' : '' ?>>Female</option>
-                    </select>
-                </div>
-
-                <?php if ($update_mode): ?>
-                    <input type="hidden" name="id" value="<?= $id ?>">
-                    <button type="submit" class="btn btn-warning w-100" onclick="return confirm('Are you sure you want to update this record?')">Update</button>
-                <?php else: ?>
-                    <button type="submit" class="btn btn-primary w-100">Register</button>
-                <?php endif; ?>
-            </form>
+        <form method="POST" action="">
+        <div class="row gx-3 gy-2">
+            <div class="col-md-6">
+            <label for="fullname" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="fullname" name="fullname" value="<?php echo htmlspecialchars($fullname); ?>" required>
+            </div>
+            <div class="col-md-6">
+            <label for="student_id" class="form-label">Student ID</label>
+            <input type="text" class="form-control" id="student_id" name="student_id" value="<?php echo htmlspecialchars($student_id); ?>" required>
+            </div>
+            <div class="col-md-6">
+            <label for="department" class="form-label">Department</label>
+            <select class="form-select" id="department" name="department" required onchange="updateProgramOptions()">
+                <option value="">Select Department</option>
+                <option value="Teacher Education Department">Teacher Education Department</option>
+                <option value="Engineering Department">Engineering Department</option>
+                <option value="Computer Studies Department">Computer Studies Department</option>
+                <option value="Industrial Technology Department">Industrial Technology Department</option>
+                <option value="Business and Management Department">Business and Management Department</option>
+            </select>
+            </div>
+            <div class="col-md-6">
+            <label for="program" class="form-label">Program</label>
+            <select class="form-select" id="program" name="program" required>
+                <option value="">Select Program</option>
+            </select>
+            </div>
+            <div class="col-md-6">
+            <label for="section" class="form-label">Year & Section</label>
+            <input type="text" name="section" value="<?= htmlspecialchars($section ?? '') ?>" required class="form-control">
+            </div>
+            <div class="col-md-6">
+            <label for="gender" class="form-label">Gender</label>
+            <select name="gender" required class="form-select">
+                <option value="">-- Select Gender --</option>
+                <option value="Male" <?= (isset($gender) && $gender === "Male") ? 'selected' : '' ?>>Male</option>
+                <option value="Female" <?= (isset($gender) && $gender === "Female") ? 'selected' : '' ?>>Female</option>
+            </select>
+            </div>
+            <div class="col-12 d-flex justify-content-center mt-2">
+            <?php if ($update_mode): ?>
+                <input type="hidden" name="id" value="<?= $id ?>">
+                <button type="submit" class="btn btn-warning w-50" onclick="return confirm('Are you sure you want to update this record?')">Update</button>
+            <?php else: ?>
+                <button type="submit" class="btn btn-primary w-50">Register</button>
+            <?php endif; ?>
+            </div>
+        </div>
+        </form>
         </div>
         </div>
 
         <div class="qr-section entrance-animate">
             <div class="qr-box">
                 <h4 style="font-weight: bold;">Generated QR Code</h4>
-                <img src="<?= $qrCodeUrl ?>" alt="QR Code">
+                <?php if ($qrCodeUrl): ?>
+                    <img src="<?= $qrCodeUrl ?>" alt="QR Code" style="width: 200px; height: 200px;">
+                <?php else: ?>
+                    <p style="color: #FDDE54;">No QR code generated yet</p>
+                <?php endif; ?>
                 <div class="qr-info">
                     <h5><?= htmlspecialchars($fullname) ?></h5>
                     <p>ID: <?= htmlspecialchars($student_id) ?></p>
-                    <a href="download_qr.php?filename=<?= urlencode($qrCodeFileName) ?>" class="btn btn-primary btn-block" onclick="showDownloadAlert()">Download QR Code</a>
+                    <?php if ($qrCodeUrl): ?>
+                        <a href="download_qr.php?filename=<?= urlencode($qrCodeFileName) ?>" class="btn btn-primary btn-block" onclick="showDownloadAlert()">Download QR Code</a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -729,6 +818,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </footer>
 
     <script>
+    const programs = {
+        'Teacher Education Department': [
+            'Bachelor of Elementary Education (BEED)',
+            'Bachelor of Secondary Education (BSEd) major in Mathematics',
+            'Bachelor of Secondary Education (BSEd) major in Science',
+            'Bachelor of Physical Education (BPEd)',
+            'Bachelor of Technical-Vocational Teacher Education (BTVTEd)'
+        ],
+        'Business and Management Department': [
+            'Bachelor of Science in Hospitality Management (BSHM)'
+        ],
+        'Engineering Department': [
+            'Bachelor of Science in Civil Engineering (BSCE)',
+            'Bachelor of Science in Electrical Engineering (BSEE)',
+            'Bachelor of Science in Mechanical Engineering (BSME)'
+        ],
+        'Computer Studies Department': [
+            'Bachelor of Science in Information Technology (BSIT)'
+        ],
+        'Industrial Technology Department': [
+            'Bachelor of Industrial Technology (BIT) with major in Culinary Arts (CA)',
+            'Bachelor of Industrial Technology (BIT) with major in Electronics (ET)'
+        ]
+    };
+
+    function updateProgramOptions() {
+        const department = document.getElementById('department').value;
+        const programSelect = document.getElementById('program');
+        programSelect.innerHTML = '<option value="">Select Program</option>';
+        
+        if (department && programs[department]) {
+            programs[department].forEach(program => {
+                const option = document.createElement('option');
+                option.value = program;
+                option.textContent = program;
+                programSelect.appendChild(option);
+            });
+        }
+    }
+
     function showDownloadAlert() {
         Swal.fire({
             icon: 'success',
@@ -739,23 +868,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const studentIdInput = document.querySelector('input[name="student_id"]');
-    if (studentIdInput) {
-        studentIdInput.addEventListener('input', function(e) {
-            let value = this.value.replace(/\D/g, ''); // Remove non-digits
-            if (value.length > 9) value = value.slice(0, 9); // Max 9 digits
-            if (value.length > 4) {
-                value = value.slice(0, 4) + '-' + value.slice(4);
-            }
-            this.value = value;
-        });
-    }
-});
-    </script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const studentIdInput = document.querySelector('input[name="student_id"]');
+        if (studentIdInput) {
+            studentIdInput.addEventListener('input', function(e) {
+                let value = this.value.replace(/\D/g, ''); // Remove non-digits
+                if (value.length > 9) value = value.slice(0, 9); // Max 9 digits
+                if (value.length > 4) {
+                    value = value.slice(0, 4) + '-' + value.slice(4);
+                }
+                this.value = value;
+            });
+        }
+    });
+</script>
 
 </body>
 </html>
-
-
-
