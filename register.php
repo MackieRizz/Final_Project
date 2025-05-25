@@ -167,10 +167,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         background: linear-gradient(to bottom right, #C46B02, #800000, #7F0404, #4D1414, #000000);
         background-size: cover;
         color: #FDDE54;
-        height: 100vh;
+        min-height: 100vh;
         display: flex;
         flex-direction: column; 
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
         text-align: center;
         padding: 0;
@@ -320,13 +320,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     gap: 32px;
     width: 100%;
     max-width: 900px;
-    margin: 110px auto 0 auto;
-    min-height: calc(100vh - 200px);
+    margin: 110px auto 50px auto;
+    min-height: auto;
+    padding-bottom: 30px;
 }
 
 .main-container {
-    min-height: unset;
-    max-height: calc(120vh - 120px); 
+    min-height: auto;
+    max-height: none;
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -575,28 +576,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     @media (max-width: 900px) {
-    .flex-container {
-        flex-direction: column;
-        align-items: center;
-        gap: 24px;
-        margin-top: 90px;
+        .flex-container {
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            margin-top: 90px;
+            margin-bottom: 30px;
+        }
+        .main-container {
+            max-width: 98vw;
+            width: 95%;
+            margin: 0 auto 30px auto;
+        }
+        .form-section {
+            padding: 2rem;
+            max-height: none;
+            overflow-y: visible;
+        }
+        .qr-section {
+            padding: 2rem;
+            max-height: none;
+            overflow-y: visible;
+        }
     }
-    .main-container {
-        max-width: 98vw;
-        width: 95%;
-        margin: 0 auto;
-    }
-    .form-section {
-        padding: 2rem;
-        max-height: 80vh;
-        overflow-y: auto;
-    }
-    .qr-section {
-        padding: 2rem;
-        max-height: 80vh;
-        overflow-y: auto;
-    }
-}
     footer {
         border-top: 1px solid #FDDE54;
         padding: 18px 8% 10px 8%;
@@ -607,9 +609,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         font-family: 'Karla', sans-serif;
         background: transparent;
         width: 84%;
-        position: fixed;
-        bottom: 0;
-        left: 8%;
+        position: relative;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        left: 0;
         right: 0;
         z-index: 100;
         box-sizing: border-box;
@@ -617,26 +620,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     footer nav {
         display: flex;
         align-items: center;
-        position: fixed;
-        right: 110px;
-        bottom: 20px;
-
-    }
-    footer nav a {
-        color: #FDDE54;
-        text-decoration: none;
-        margin-left: 0;
-        margin-right: 0;
-        padding: 0 8px;
-        transition: color 0.3s ease;
-    }
-    footer nav a:hover {
-        color: #f4bb00;
+        position: relative;
+        right: 0;
+        bottom: 0;
     }
     footer p {
-        margin: 10px;
+        margin: 10px 0;
         font-size: 14px;
-        margin-left: -118px;
         color: #FDDE54;
     }
     @media (max-width: 768px) {
@@ -644,10 +634,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flex-direction: column;
             text-align: center;
             padding: 14px 4% 8px 4%;
+            margin-top: 30px;
+            margin-bottom: 10px;
         }
         footer nav {
             margin-top: 6px;
             gap: 10px;
+            position: relative;
         }
     }
     .back-icon {
