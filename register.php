@@ -3,6 +3,11 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 include 'db.php';
 
+// Ensure database connection is successful
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
 $qrCodeUrl = '';
 $successMessage = '';
 $errorMessage = '';
@@ -15,6 +20,11 @@ $section = "";
 
 // Path to save QR code images
 $qrCodeSavePath = "../qr_codes/";
+
+// Create QR code directory if it doesn't exist
+if (!file_exists($qrCodeSavePath)) {
+    mkdir($qrCodeSavePath, 0777, true);
+}
 
 // Check if an ID is passed for updating an existing record
 if (isset($_GET['id'])) {
@@ -32,24 +42,59 @@ if (isset($_GET['id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $fullname = $conn->real_escape_string($_POST['fullname']);
-    $student_id = $conn->real_escape_string($_POST['student_id']); // <-- use $student_id
+    // Get all form data
+    $fullname = isset($_POST['fullname']) ? $conn->real_escape_string($_POST['fullname']) : '';
+    $student_id = isset($_POST['student_id']) ? $conn->real_escape_string($_POST['student_id']) : '';
+    $department = isset($_POST['department']) ? $conn->real_escape_string($_POST['department']) : '';
+    $program = isset($_POST['program']) ? $conn->real_escape_string($_POST['program']) : '';
+    $gender = isset($_POST['gender']) ? $conn->real_escape_string($_POST['gender']) : '';
+    $section = isset($_POST['section']) ? $conn->real_escape_string($_POST['section']) : '';
 
-    // ✅ NEW FIELDS: sanitize input
-    $gender = $conn->real_escape_string($_POST['gender']);
-    $section = $conn->real_escape_string($_POST['section']);
-
-    $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Name:$fullname,ID:$student_id";
+    // Generate QR code URL
+    $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" . urlencode("Name:" . $fullname . ",ID:" . $student_id);
     $qrCodeFileName = "QRCode_" . $student_id . ".png";
     $fullQrCodePath = $qrCodeSavePath . $qrCodeFileName;
 
-    $ch = curl_init($qrCodeUrl);
-    $fp = fopen($fullQrCodePath, 'wb');
-    curl_setopt($ch, CURLOPT_FILE, $fp);
-    curl_setopt($ch, CURLOPT_HEADER, 0);
-    curl_exec($ch);
-    curl_close($ch);
-    fclose($fp);
+    // Create QR code directory if it doesn't exist
+    if (!file_exists($qrCodeSavePath)) {
+        mkdir($qrCodeSavePath, 0777, true);
+        chmod($qrCodeSavePath, 0777); // Ensure directory is writable
+    }
+
+    // Generate QR code
+    try {
+        // Initialize cURL
+        $ch = curl_init($qrCodeUrl);
+        
+        // Set cURL options
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        
+        // Execute cURL and get response
+        $response = curl_exec($ch);
+        
+        if (curl_errno($ch)) {
+            throw new Exception("cURL error: " . curl_error($ch));
+        }
+        
+        // Close cURL
+        curl_close($ch);
+        
+        // Save the image
+        if (file_put_contents($fullQrCodePath, $response) === false) {
+            throw new Exception("Failed to save QR code image");
+        }
+        
+        // Set proper permissions
+        chmod($fullQrCodePath, 0666);
+        
+    } catch (Exception $e) {
+        $errorMessage = "Error generating QR code: " . $e->getMessage();
+        $qrCodeUrl = "";
+        $qrCodeFileName = "";
+        $fullQrCodePath = "";
+    }
 
     if ($update_mode) {
         $sql = "UPDATE students_registration SET fullname='$fullname', student_id='$student_id', qr_code_path='$fullQrCodePath' WHERE id=$id";
@@ -82,15 +127,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $qrCodeFileName = "";
             $fullQrCodePath = "";
         } else {
-            $sql = "INSERT INTO students_registration (fullname, student_id, qr_code_path)
-                    VALUES ('$fullname', '$student_id', '$fullQrCodePath')";
+            $sql = "INSERT INTO students_registration (fullname, student_id, qr_code_path, department, program, gender, section)
+                    VALUES ('$fullname', '$student_id', '$fullQrCodePath', '$department', '$program', '$gender', '$section')";
             
             if ($conn->query($sql) === TRUE) {
-                // Insert section & gender into separate query or update students_registration structure
-                $new_id = $conn->insert_id;
-                $conn->query("UPDATE students_registration SET gender='$gender', section='$section' WHERE id=$new_id");
-
                 $successMessage = "Registration Successful!";
+                $new_id = $conn->insert_id;
             } else {
                 $errorMessage = "Error: " . $conn->error;
             }
@@ -284,7 +326,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 .main-container {
     min-height: unset;
-    max-height: calc(100vh - 120px); /* 120px = header + footer + margin */
+    max-height: calc(120vh - 120px); 
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -293,7 +335,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     border-radius: 18px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.18);
     margin-top: -50px;
-    margin-bottom: 24px;
+    margin-bottom: 50px;
     width: 100%;
     max-width: 420px;
     overflow: visible;
@@ -415,7 +457,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     color: #4D1414;
     font-family: 'Montserrat', 'Karla', sans-serif;
     border: 2px solid #C46B02;
-    min-height: unset;
+    min-height: unset;$department = $conn->real_escape_string($_POST['department']);
+    $program = $conn->real_escape_string($_POST['program']);$updateSql = "UPDATE students_registration 
+                 SET department='$department', 
+                     program='$program',
+                     gender='$gender',
+                     section='$section'
+                 WHERE id=$new_id";if ($conn->query($updateSql) !== TRUE) {
+                     $errorMessage = "Error updating additional fields: " . $conn->error;
+                 }
     text-align: center;
     margin-top: 0;
 }
@@ -539,8 +589,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         gap: 24px;
         margin-top: 90px;
     }
-    .main-container, .qr-section {
+    .main-container {
         max-width: 98vw;
+        width: 95%;
+        margin: 0 auto;
+    }
+    .form-section {
+        padding: 2rem;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    .qr-section {
+        padding: 2rem;
+        max-height: 80vh;
+        overflow-y: auto;
     }
 }
     footer {
@@ -675,16 +737,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" action="">
                 <div class="mb-3">
                     <label for="fullname" class="form-label">Full Name</label>
-                    <input type="text" name="fullname" value="<?= htmlspecialchars($fullname) ?>" required class="form-control">
+                    <input type="text" class="form-control" id="fullname" name="fullname" value="<?php echo htmlspecialchars($fullname); ?>" required>
                 </div>
                 <div class="mb-3">
                     <label for="student_id" class="form-label">Student ID</label>
-                    <input type="text" name="student_id" value="<?= htmlspecialchars($student_id) ?>" required class="form-control">
+                    <input type="text" class="form-control" id="student_id" name="student_id" value="<?php echo htmlspecialchars($student_id); ?>" required>
+                </div>
+                <div class="mb-3">
+                    <label for="department" class="form-label">Department</label>
+                    <select class="form-select" id="department" name="department" required onchange="updateProgramOptions()">
+                        <option value="">Select Department</option>
+                        <option value="Teacher Education Department">Teacher Education Department</option>
+                        <option value="Engineering Department">Engineering Department</option>
+                        <option value="Computer Studies Department">Computer Studies Department</option>
+                        <option value="Industrial Technology Department">Industrial Technology Department</option>
+                        <option value="Business and Management Department">Business and Management Department</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="program" class="form-label">Program</label>
+                    <select class="form-select" id="program" name="program" required>
+                        <option value="">Select Program</option>
+                    </select>
                 </div>
 
                 <!-- ✅ NEW: Section Field -->
                 <div class="mb-3">
-                    <label for="section" class="form-label">Section</label>
+                    <label for="section" class="form-label">Year & Section</label>
                     <input type="text" name="section" value="<?= htmlspecialchars($section ?? '') ?>" required class="form-control">
                 </div>
 
@@ -711,11 +790,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="qr-section entrance-animate">
             <div class="qr-box">
                 <h4 style="font-weight: bold;">Generated QR Code</h4>
-                <img src="<?= $qrCodeUrl ?>" alt="QR Code">
+                <?php if ($qrCodeUrl): ?>
+                    <img src="<?= $qrCodeUrl ?>" alt="QR Code" style="width: 200px; height: 200px;">
+                <?php else: ?>
+                    <p style="color: #FDDE54;">No QR code generated yet</p>
+                <?php endif; ?>
                 <div class="qr-info">
                     <h5><?= htmlspecialchars($fullname) ?></h5>
                     <p>ID: <?= htmlspecialchars($student_id) ?></p>
-                    <a href="download_qr.php?filename=<?= urlencode($qrCodeFileName) ?>" class="btn btn-primary btn-block" onclick="showDownloadAlert()">Download QR Code</a>
+                    <?php if ($qrCodeUrl): ?>
+                        <a href="download_qr.php?filename=<?= urlencode($qrCodeFileName) ?>" class="btn btn-primary btn-block" onclick="showDownloadAlert()">Download QR Code</a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -729,6 +814,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </footer>
 
     <script>
+    const programs = {
+        'Teacher Education Department': [
+            'Bachelor of Elementary Education (BEED)',
+            'Bachelor of Secondary Education (BSEd) major in Mathematics',
+            'Bachelor of Secondary Education (BSEd) major in Science',
+            'Bachelor of Physical Education (BPEd)',
+            'Bachelor of Technical-Vocational Teacher Education (BTVTEd)'
+        ],
+        'Business and Management Department': [
+            'Bachelor of Science in Hospitality Management (BSHM)'
+        ],
+        'Engineering Department': [
+            'Bachelor of Science in Civil Engineering (BSCE)',
+            'Bachelor of Science in Electrical Engineering (BSEE)',
+            'Bachelor of Science in Mechanical Engineering (BSME)'
+        ],
+        'Computer Studies Department': [
+            'Bachelor of Science in Information Technology (BSIT)'
+        ],
+        'Industrial Technology Department': [
+            'Bachelor of Industrial Technology (BIT) with major in Culinary Arts (CA)',
+            'Bachelor of Industrial Technology (BIT) with major in Electronics (ET)'
+        ]
+    };
+
+    function updateProgramOptions() {
+        const department = document.getElementById('department').value;
+        const programSelect = document.getElementById('program');
+        programSelect.innerHTML = '<option value="">Select Program</option>';
+        
+        if (department && programs[department]) {
+            programs[department].forEach(program => {
+                const option = document.createElement('option');
+                option.value = program;
+                option.textContent = program;
+                programSelect.appendChild(option);
+            });
+        }
+    }
+
     function showDownloadAlert() {
         Swal.fire({
             icon: 'success',
@@ -739,23 +864,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const studentIdInput = document.querySelector('input[name="student_id"]');
-    if (studentIdInput) {
-        studentIdInput.addEventListener('input', function(e) {
-            let value = this.value.replace(/\D/g, ''); // Remove non-digits
-            if (value.length > 9) value = value.slice(0, 9); // Max 9 digits
-            if (value.length > 4) {
-                value = value.slice(0, 4) + '-' + value.slice(4);
-            }
-            this.value = value;
-        });
-    }
-});
-    </script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const studentIdInput = document.querySelector('input[name="student_id"]');
+        if (studentIdInput) {
+            studentIdInput.addEventListener('input', function(e) {
+                let value = this.value.replace(/\D/g, ''); // Remove non-digits
+                if (value.length > 9) value = value.slice(0, 9); // Max 9 digits
+                if (value.length > 4) {
+                    value = value.slice(0, 4) + '-' + value.slice(4);
+                }
+                this.value = value;
+            });
+        }
+    });
+</script>
 
 </body>
 </html>
-
-
-
