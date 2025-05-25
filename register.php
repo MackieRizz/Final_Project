@@ -316,13 +316,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 .flex-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     gap: 32px;
     width: 100%;
     max-width: 900px;
-    margin: 110px auto 50px auto;
-    min-height: auto;
-    padding-bottom: 30px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 120px 20px 100px 20px;
 }
 
 .main-container {
@@ -330,13 +330,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     max-height: none;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     padding: 24px 24px 24px 24px;
     background: rgba(77, 20, 20, 0.92);
     border-radius: 18px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-    margin-top: -70px;
-    margin-bottom: 50px;
+    margin: 0;
     width: 100%;
     max-width: 950px;
     overflow: visible;
@@ -591,13 +590,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flex-direction: column;
             align-items: center;
             gap: 24px;
-            margin-top: 90px;
-            margin-bottom: 30px;
+            margin: 0;
+            padding: 100px 20px 100px 20px;
+            min-height: 100vh;
         }
         .main-container {
             max-width: 98vw;
             width: 95%;
-            margin: 0 auto 30px auto;
+            margin: 0 auto;
         }
         .form-section {
             padding: 2rem;
@@ -620,10 +620,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         font-family: 'Karla', sans-serif;
         background: transparent;
         width: 84%;
-        position: relative;
-        margin-top: 10px;
-        margin-bottom: 20px;
-        left: 0;
+        position: fixed;
+        bottom: 0;
+        left: 8%;
         right: 0;
         z-index: 100;
         box-sizing: border-box;
@@ -631,13 +630,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     footer nav {
         display: flex;
         align-items: center;
-        position: relative;
-        right: 0;
-        bottom: 0;
+        position: fixed;
+        right: 110px;
+        bottom: 20px;
+    }
+    footer nav a {
+        color: #FDDE54;
+        text-decoration: none;
+        margin-left: 0;
+        margin-right: 0;
+        padding: 0 8px;
+        transition: color 0.3s ease;
+    }
+    footer nav a:hover {
+        color: #f4bb00;
     }
     footer p {
-        margin: 10px 0;
+        margin: 10px;
         font-size: 14px;
+        margin-left: -118px;
         color: #FDDE54;
     }
     @media (max-width: 768px) {
@@ -645,13 +656,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flex-direction: column;
             text-align: center;
             padding: 14px 4% 8px 4%;
-            margin-top: 30px;
-            margin-bottom: 10px;
         }
         footer nav {
             margin-top: 6px;
             gap: 10px;
-            position: relative;
+            position: static;
         }
     }
     .back-icon {
