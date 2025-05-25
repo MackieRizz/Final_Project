@@ -39,6 +39,15 @@ CREATE TABLE `students_registration` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+CREATE TABLE `candidate_positions` (
+  `id` int(11) NOT NULL,
+  `position_id` int(255) NOT NULL,
+  `position` varchar(100) DEFAULT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `year` varchar(20) DEFAULT NULL,
+  `program` varchar(255) NOT NULL,
+  `image` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 --
 -- Dumping data for table `students_registration`
 --
