@@ -327,10 +327,14 @@
 
     #addCandidateModal {
     position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.7);
-    display: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     z-index: 10000;
   }
 
@@ -338,13 +342,13 @@
     background: #2d0808;
     color: #FDDE54;
     width: 400px;
-    max-height: 90vh;
+    max-height: 80vh;
     overflow-y: auto;
     padding: 25px;
     border-radius: 12px;
-    margin: 10% auto;
     position: relative;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+    margin: 0;
   }
 
   .modal-content h3 {
@@ -819,7 +823,8 @@
 let nameCount = 1;
 
 function openAddModal() {
-  document.getElementById("addCandidateModal").style.display = "block";
+  const modal = document.getElementById("addCandidateModal");
+  modal.style.display = "flex";
   document.getElementById("nameFieldsContainer").innerHTML = `
     <div class="input-group">
       <label>1.</label>
