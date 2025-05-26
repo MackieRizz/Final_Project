@@ -13,6 +13,7 @@ if (isset($_GET['position_id'])) {
     $candidates = array();
     while ($row = $result->fetch_assoc()) {
         $candidates[] = array(
+            'id' => $row['id'],
             'name' => $row['name'],
             'year' => $row['year'],
             'program' => $row['program'],

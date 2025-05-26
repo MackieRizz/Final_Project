@@ -716,11 +716,11 @@
     <div id="addCandidateModal" style="display: none;">
       <div class="modal-content">
         <h3>Add Candidates</h3>
-        <form method="post" action="save_position.php" id="candidateForm">
+        <form method="post" action="save_position.php" id="candidateForm" enctype="multipart/form-data">
           <div class="input-group">
             <label>Position</label>
-            <input type="text" id="positionInput" name="position_id[]" placeholder="Position ID" required>
-            <input type="text" id="positionInput" name="position[]" placeholder="Role" required>
+            <input type="text" id="positionInput" name="position_id" placeholder="Position ID" required>
+            <input type="text" id="positionInput" name="position" placeholder="Role" required>
           </div>
           <div id="nameFieldsContainer">
             <div class="input-group">
@@ -729,6 +729,7 @@
               <input type="text" name="year[]" placeholder="Year" required>
               <input type="text" name="program[]" placeholder="Program" required>
               <input type="file" name="image[]" accept="image/*" required>
+              <input type="hidden" name="is_new[]" value="1">
             </div>
           </div>
           <button type="button" class="add-field" onclick="addNameField()">Add Candidate</button>
@@ -785,7 +786,7 @@
                     <p class="program"><?php echo htmlspecialchars($candidate['program']); ?></p>
                     <p class="year"><?php echo htmlspecialchars($candidate['year']); ?> Year</p>
                   </div>
-                  <i class="fas fa-trash delete-icon" onclick="deleteCandidate('<?php echo htmlspecialchars($candidate['id']); ?>', '<?php echo htmlspecialchars($candidate['name']); ?>')"></i>
+                  <i class="fas fa-trash delete-icon" onclick="deleteCandidate('<?php echo htmlspecialchars($candidate['id']); ?>', '<?php echo htmlspecialchars($candidate['name']); ?>', '<?php echo htmlspecialchars($candidate['position_id']); ?>')"></i>
                 </div>
                 <?php
               }
@@ -858,6 +859,13 @@ let nameCount = 1;
 function openAddModal() {
   const modal = document.getElementById("addCandidateModal");
   modal.style.display = "flex";
+  
+  // Show the Add Candidate button
+  document.querySelector('.add-field').style.display = 'block';
+  
+  // Update form title
+  modal.querySelector('h3').textContent = 'Add Candidates';
+  
   document.getElementById("nameFieldsContainer").innerHTML = `
     <div class="input-group">
       <label>1.</label>
@@ -865,9 +873,14 @@ function openAddModal() {
       <input type="text" name="year[]" placeholder="Year" required>
       <input type="text" name="program[]" placeholder="Program" required>
       <input type="file" name="image[]" accept="image/*" required>
+      <input type="hidden" name="is_new[]" value="1">
     </div>
   `;
   nameCount = 1;
+  
+  // Clear position inputs
+  document.querySelector('input[name="position_id"]').value = '';
+  document.querySelector('input[name="position"]').value = '';
 }
 
 function closeModal() {
@@ -881,6 +894,7 @@ function closeModal() {
       <input type="text" name="year[]" placeholder="Year" required>
       <input type="text" name="program[]" placeholder="Program" required>
       <input type="file" name="image[]" accept="image/*" required>
+      <input type="hidden" name="is_new[]" value="1">
     </div>
   `;
   nameCount = 1;
@@ -898,6 +912,7 @@ function addNameField() {
     <input type="text" name="year[]" placeholder="Year" required>
     <input type="text" name="program[]" placeholder="Program" required>
     <input type="file" name="image[]" accept="image/*" required>
+    <input type="hidden" name="is_new[]" value="1">
   `;
   
   container.appendChild(group);
@@ -911,8 +926,11 @@ function openEditModal(positionId, position) {
   modal.querySelector('h3').textContent = 'Edit Position';
   
   // Fill in position details
-  document.querySelector('input[name="position_id[]"]').value = positionId;
-  document.querySelector('input[name="position[]"]').value = position;
+  document.querySelector('input[name="position_id"]').value = positionId;
+  document.querySelector('input[name="position"]').value = position;
+  
+  // Hide the Add Candidate button when editing
+  document.querySelector('.add-field').style.display = 'none';
   
   // Fetch candidates for this position
   fetch(`get_candidates.php?position_id=${positionId}`)
@@ -932,6 +950,8 @@ function openEditModal(positionId, position) {
           <input type="file" name="image[]" accept="image/*">
           ${candidate.image ? `<small>Current image: ${candidate.image}</small>` : ''}
           <input type="hidden" name="existing_image[]" value="${candidate.image || ''}">
+          <input type="hidden" name="candidate_id[]" value="${candidate.id}">
+          <input type="hidden" name="is_new[]" value="0">
         `;
         container.appendChild(group);
       });
@@ -943,49 +963,26 @@ function validateAndSubmit(event) {
   event.preventDefault();
   
   const form = document.getElementById('candidateForm');
-  const formData = new FormData();
+  const formData = new FormData(form);
   
-  // Add position data
-  const positionId = document.querySelector('input[name="position_id[]"]').value;
-  const position = document.querySelector('input[name="position[]"]').value;
-  
-  // Append position data
-  formData.append('position_id', positionId);
-  formData.append('position', position);
-  
-  // Get all input arrays
-  const names = Array.from(document.getElementsByName('name[]')).map(input => input.value);
-  const years = Array.from(document.getElementsByName('year[]')).map(input => input.value);
-  const programs = Array.from(document.getElementsByName('program[]')).map(input => input.value);
-  const images = Array.from(document.getElementsByName('image[]'));
-  const existingImages = Array.from(document.getElementsByName('existing_image[]')).map(input => input.value);
-  
-  // Add all data to FormData
-  names.forEach((name, index) => {
-    formData.append('name[]', name);
-    formData.append('year[]', years[index]);
-    formData.append('program[]', programs[index]);
-    formData.append('existing_image[]', existingImages[index] || '');
-    if (images[index].files[0]) {
-      formData.append('image[]', images[index].files[0]);
-    } else {
-      formData.append('image[]', '');
-    }
-  });
-
   // Send form data using fetch
   fetch('save_position.php', {
     method: 'POST',
     body: formData
   })
-  .then(response => response.text())
+  .then(response => response.json())
   .then(data => {
     console.log('Server response:', data);
-    closeModal();
-    window.location.reload();
+    if (data.success) {
+      closeModal();
+      window.location.reload();
+    } else {
+      alert('Error saving data: ' + data.messages.join('\n'));
+    }
   })
   .catch(error => {
     console.error('Error:', error);
+    alert('Error saving data. Please try again.');
   });
 }
 
@@ -1013,19 +1010,23 @@ function deletePosition(positionId) {
   }
 }
 
-function deleteCandidate(candidateId, candidateName) {
+function deleteCandidate(candidateId, candidateName, positionId) {
   if (confirm('Are you sure you want to delete ' + candidateName + '?')) {
     fetch('delete_candidate.php', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: 'candidate_id=' + encodeURIComponent(candidateId)
+      body: 'candidate_id=' + encodeURIComponent(candidateId) + '&position_id=' + encodeURIComponent(positionId)
     })
-    .then(response => response.text())
+    .then(response => response.json())
     .then(data => {
       console.log('Server response:', data);
-      window.location.reload();
+      if (data.success) {
+        window.location.reload();
+      } else {
+        alert('Error deleting candidate: ' + data.messages.join('\n'));
+      }
     })
     .catch(error => {
       console.error('Error:', error);

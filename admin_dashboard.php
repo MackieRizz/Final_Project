@@ -198,37 +198,53 @@
       top: 0; left: 0;
       width: 100vw;
       height: 100vh;
-      z-index: 9999;
+      z-index: 99999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    #logoutModal.show {
+      opacity: 1;
+      visibility: visible;
     }
 
     .modal-overlay {
-      position: absolute;
+      position: fixed;
       top: 0; left: 0;
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(2px);
     }
 
     .modal-box {
-      position: absolute;
+      position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(0.8);
       background: #2d0808;
       color: #FDDE54;
       padding: 30px;
       border-radius: 12px;
       text-align: center;
       width: 320px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+      transition: transform 0.3s ease;
+    }
+
+    #logoutModal.show .modal-box {
+      transform: translate(-50%, -50%) scale(1);
     }
 
     .modal-box h2 {
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      font-size: 1.5em;
     }
 
     .modal-box p {
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      font-size: 1.1em;
     }
 
     .modal-actions {
@@ -238,12 +254,14 @@
     }
 
     .modal-actions .btn {
-      padding: 10px 20px;
+      padding: 12px 25px;
       font-weight: bold;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: all 0.3s ease;
+      font-size: 1em;
+      min-width: 100px;
     }
 
     .confirm-btn {
@@ -254,6 +272,7 @@
     .confirm-btn:hover {
       background-color: #ff4d4d;
       color: #fff;
+      transform: translateY(-2px);
     }
 
     .cancel-btn {
@@ -264,6 +283,7 @@
     .cancel-btn:hover {
       background-color: #666;
       color: #fff;
+      transform: translateY(-2px);
     }
 
 
@@ -366,7 +386,7 @@
       </div>
 
     </div>
-    <div id="logoutModal" style="display: none;">
+    <div id="logoutModal">
       <div class="modal-overlay"></div>
       <div class="modal-box">
         <h2>Confirm Logout</h2>
@@ -491,18 +511,29 @@
 
 
     //logout modal
-    document.querySelector('.logout-btn').addEventListener('click', function () {
-    document.getElementById('logoutModal').style.display = 'block';
-  });
+    document.querySelector('.logout-btn').addEventListener('click', function() {
+      const modal = document.getElementById('logoutModal');
+      modal.classList.add('show');
+    });
 
-  function closeLogoutModal() {
-    document.getElementById('logoutModal').style.display = 'none';
-  }
+    // Close modal when clicking overlay
+    document.querySelector('.modal-overlay').addEventListener('click', closeLogoutModal);
 
-  function confirmLogout() {
-    
-    window.location.href = 'logout.php'; // Replace with actual logout logic
-  }
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeLogoutModal();
+      }
+    });
+
+    function closeLogoutModal() {
+      const modal = document.getElementById('logoutModal');
+      modal.classList.remove('show');
+    }
+
+    function confirmLogout() {
+      window.location.href = 'logout.php';
+    }
 
 
   </script>
