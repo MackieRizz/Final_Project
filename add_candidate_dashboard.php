@@ -481,6 +481,22 @@
     min-height: 40px;
   }
 
+  .position-header .icons {
+    position: absolute;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .position-header .icons i {
+    color: #7a3535;
+    cursor: pointer;
+  }
+
+  .position-header .icons i:hover {
+    color: #4a1010;
+  }
+
   .candidate-list {
     padding: 10px;
     display: flex;
@@ -567,6 +583,7 @@
     padding: 8px;
     gap: 12px;
     align-items: center;
+    position: relative;
   }
 
   .candidate-card:hover {
@@ -645,6 +662,17 @@
 
   .program {
     color: #FDDE54 !important;
+  }
+
+  .candidate-card .delete-icon {
+    position: absolute;
+    right: 15px;
+    color: #FDDE54;
+    cursor: pointer;
+  }
+
+  .candidate-card .delete-icon:hover {
+    color: #ff4d4d;
   }
 
   </style>
@@ -728,7 +756,10 @@
             <div class="position-header">
               <span class="position-id"><?php echo htmlspecialchars($position_id); ?></span>
               <span class="position-title"><?php echo htmlspecialchars($position); ?></span>
-              <i class="fas fa-edit" style="position: absolute; right: 20px; color: #7a3535; cursor: pointer;" onclick="openEditModal('<?php echo htmlspecialchars($position_id); ?>', '<?php echo htmlspecialchars($position); ?>')"></i>
+              <div class="icons">
+                <i class="fas fa-edit" onclick="openEditModal('<?php echo htmlspecialchars($position_id); ?>', '<?php echo htmlspecialchars($position); ?>')"></i>
+                <i class="fas fa-minus-circle" onclick="deletePosition('<?php echo htmlspecialchars($position_id); ?>')"></i>
+              </div>
             </div>
             <div class="candidates-section">
               <?php
@@ -754,6 +785,7 @@
                     <p class="program"><?php echo htmlspecialchars($candidate['program']); ?></p>
                     <p class="year"><?php echo htmlspecialchars($candidate['year']); ?> Year</p>
                   </div>
+                  <i class="fas fa-trash delete-icon" onclick="deleteCandidate('<?php echo htmlspecialchars($candidate['id']); ?>', '<?php echo htmlspecialchars($candidate['name']); ?>')"></i>
                 </div>
                 <?php
               }
@@ -960,6 +992,47 @@ function validateAndSubmit(event) {
 // Update the form submission
 document.getElementById('candidateForm').addEventListener('submit', validateAndSubmit);
 
+function deletePosition(positionId) {
+  if (confirm('Are you sure you want to delete this position and all its candidates?')) {
+    fetch('delete_position.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'position_id=' + encodeURIComponent(positionId)
+    })
+    .then(response => response.text())
+    .then(data => {
+      console.log('Server response:', data);
+      window.location.reload();
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error deleting position');
+    });
+  }
+}
+
+function deleteCandidate(candidateId, candidateName) {
+  if (confirm('Are you sure you want to delete ' + candidateName + '?')) {
+    fetch('delete_candidate.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'candidate_id=' + encodeURIComponent(candidateId)
+    })
+    .then(response => response.text())
+    .then(data => {
+      console.log('Server response:', data);
+      window.location.reload();
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error deleting candidate');
+    });
+  }
+}
 
    
 
