@@ -803,7 +803,7 @@
             <div class="candidates-section">
               <?php
               // Get candidates for this position
-              $candidates_query = "SELECT * FROM candidate_positions WHERE position_id = ? ORDER BY name";
+              $candidates_query = "SELECT * FROM candidate_positions WHERE position_id = ? ORDER BY candidate_id";
               $stmt = $conn->prepare($candidates_query);
               $stmt->bind_param("s", $position_id);
               $stmt->execute();
