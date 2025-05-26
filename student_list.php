@@ -145,6 +145,7 @@
       text-align: center;
       color: #FDDE54;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      z-index: 1000;
     }
     .profile:hover .profile-modal {
       display: block;
@@ -342,6 +343,34 @@
     #studentTable tbody tr td {
       color: #fff;
     }
+
+    .edit-passcode-btn {
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+      background: transparent;
+      border: 1px solid #FDDE54;
+      color: #FDDE54;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .edit-passcode-btn:hover {
+      background: rgba(253, 222, 84, 0.1);
+      box-shadow: 0 0 10px rgba(253, 222, 84, 0.2);
+      transform: scale(1.1);
+    }
+
+    .edit-passcode-btn i {
+      font-size: 14px;
+      color: #FDDE54;
+    }
   </style>
 </head>
 <body>
@@ -365,10 +394,13 @@
         <i class="fas fa-user-circle"></i>
         <div class="profile-modal">
           <div class="cover-photo"></div>
-          <img src="https://via.placeholder.com/80" alt="Profile">
+          <img src="https://i.pinimg.com/564x/b4/ba/ab/b4baab4d57a5d0d4bbb3455ad57bda80.jpg" alt="Profile">
           <br><br>
-          <p id="name">Tirzo Charles Apuya</p>
+          <p id="name">SARJAGA</p>
           <p id="role">Administrator</p>
+          <button class="edit-passcode-btn" title="Edit Passcode">
+            <i class="fas fa-key"></i>
+          </button>
         </div>
       </div>
     </div>
@@ -620,6 +652,30 @@
             }
           });
         }
+      });
+    });
+
+    // Profile Modal Toggle
+    document.addEventListener('DOMContentLoaded', function() {
+      const profileIcon = document.querySelector('.profile i');
+      const profileModal = document.querySelector('.profile-modal');
+      
+      // Toggle modal on profile icon click
+      profileIcon.addEventListener('click', function(e) {
+        e.stopPropagation();
+        profileModal.style.display = profileModal.style.display === 'block' ? 'none' : 'block';
+      });
+
+      // Close modal when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!profileModal.contains(e.target) && e.target !== profileIcon) {
+          profileModal.style.display = 'none';
+        }
+      });
+
+      // Prevent modal from closing when clicking inside it
+      profileModal.addEventListener('click', function(e) {
+        e.stopPropagation();
       });
     });
   </script>
