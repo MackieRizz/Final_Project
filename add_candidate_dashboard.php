@@ -759,6 +759,8 @@
               <input type="text" name="year[]" placeholder="Year" required>
               <input type="text" name="program[]" placeholder="Program" required>
               <input type="file" name="image[]" accept="image/*" required>
+              <button type="button" class="remove-field-btn" onclick="removeNameField(this)"
+                style="display:none;">×</button>
             </div>
           </div>
           <button type="button" class="add-field" onclick="addNameField()">Add Candidate</button>
@@ -898,6 +900,7 @@
       <input type="text" name="year[]" placeholder="Year" required>
       <input type="text" name="program[]" placeholder="Program" required>
       <input type="file" name="image[]" accept="image/*" required>
+      <button type="button" class="remove-field" onclick="removeNameField(this)" style="position:absolute;top:5px;right:5px;background:none;border:none;color:#FDDE54;font-size:18px;cursor:pointer;">&times;</button>
     </div>
   `;
         nameCount = 1;
@@ -914,6 +917,8 @@
       <input type="text" name="year[]" placeholder="Year" required>
       <input type="text" name="program[]" placeholder="Program" required>
       <input type="file" name="image[]" accept="image/*" required>
+      <button type="button" class="remove-field" onclick="removeNameField(this)" style="position:absolute;top:5px;right:5px;background:none;border:none;color:#FDDE54;font-size:18px;cursor:pointer;">&times;</button>
+
     </div>
   `;
         nameCount = 1;
@@ -924,36 +929,46 @@
         const container = document.getElementById("nameFieldsContainer");
         const group = document.createElement("div");
         group.classList.add("input-group");
-
         group.innerHTML = `
     <label>${nameCount}.</label>
     <input type="text" name="name[]" placeholder="Name" required>
     <input type="text" name="year[]" placeholder="Year" required>
     <input type="text" name="program[]" placeholder="Program" required>
     <input type="file" name="image[]" accept="image/*" required>
-  `;
+    <button type="button" class="remove-field" onclick="removeNameField(this)" style="position:absolute;top:5px;right:5px;background:none;border:none;color:#FDDE54;font-size:18px;cursor:pointer;">&times;</button>
 
+  `;
         container.appendChild(group);
+        updateCandidateLabels();
+      }
+
+      function removeNameField(btn) {
+        const container = document.getElementById("nameFieldsContainer");
+        if (container.children.length > 1) {
+          btn.parentElement.remove();
+          nameCount = container.children.length;
+          updateCandidateLabels();
+        }
+      }
+
+      function updateCandidateLabels() {
+        const groups = document.querySelectorAll('#nameFieldsContainer .input-group label');
+        groups.forEach((label, idx) => {
+          label.textContent = (idx + 1) + '.';
+        });
       }
 
       function openEditModal(positionId, position) {
         const modal = document.getElementById("addCandidateModal");
         modal.style.display = "flex";
-
-        // Update form title
         modal.querySelector('h3').textContent = 'Edit Position';
-
-        // Fill in position details
         document.querySelector('input[name="position_id[]"]').value = positionId;
         document.querySelector('input[name="position[]"]').value = position;
-
-        // Fetch candidates for this position
         fetch(`get_candidates.php?position_id=${positionId}`)
           .then(response => response.json())
           .then(candidates => {
             const container = document.getElementById("nameFieldsContainer");
-            container.innerHTML = ''; // Clear existing fields
-
+            container.innerHTML = '';
             candidates.forEach((candidate, index) => {
               const group = document.createElement("div");
               group.classList.add("input-group");
@@ -965,10 +980,13 @@
           <input type="file" name="image[]" accept="image/*">
           ${candidate.image ? `<small>Current image: ${candidate.image}</small>` : ''}
           <input type="hidden" name="existing_image[]" value="${candidate.image || ''}">
+          <button type="button" class="remove-field-btn" onclick="removeNameField(this)" ${candidates.length === 1 ? 'style=\"display:none;\"' : ''}>×</button>
         `;
               container.appendChild(group);
             });
             nameCount = candidates.length;
+            updateRemoveButtons();
+            updateCandidateLabels();
           });
       }
 
