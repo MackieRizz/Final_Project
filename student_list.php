@@ -532,12 +532,13 @@
               <th>Department</th>
               <th>Program</th>
               <th>Year & Section</th>
+              <th>Gender</th>
             </tr>
           </thead>
           <tbody>
             <?php
               include 'db.php';
-              $sql = "SELECT student_id, fullname, department, program, section 
+              $sql = "SELECT student_id, fullname, department, program, section, gender 
                      FROM students_registration 
                      ORDER BY student_id DESC";
               $result = $conn->query($sql);
@@ -551,10 +552,11 @@
                   echo "<td>" . htmlspecialchars($row['department']) . "</td>";
                   echo "<td>" . htmlspecialchars($row['program']) . "</td>";
                   echo "<td>" . htmlspecialchars($row['section']) . "</td>";
+                  echo "<td>" . htmlspecialchars($row['gender']) . "</td>";
                   echo "</tr>";
                 }
               } else {
-                echo "<tr><td colspan='6'>No students found</td></tr>";
+                echo "<tr><td colspan='7'>No students found</td></tr>";
               }
               $conn->close();
             ?>
@@ -648,7 +650,7 @@
 
         for (let row of rows) {
           const cells = row.getElementsByTagName('td');
-          if (cells.length < 6) continue; // Skip if not a data row
+          if (cells.length < 7) continue; // Skip if not a data row
 
           // Adjusted indices due to added checkbox column
           const studentId = cells[1].textContent.toLowerCase();
@@ -656,12 +658,14 @@
           const department = cells[3].textContent;
           const program = cells[4].textContent;
           const section = cells[5].textContent;
+          const gender = cells[6].textContent;
 
           const matchesSearch = studentId.includes(searchTerm) || 
                               fullName.includes(searchTerm) ||
                               department.toLowerCase().includes(searchTerm) ||
                               program.toLowerCase().includes(searchTerm) ||
-                              section.toLowerCase().includes(searchTerm);
+                              section.toLowerCase().includes(searchTerm) ||
+                              gender.toLowerCase().includes(searchTerm);
 
           const matchesDepartment = !departmentFilter || department === departmentFilter;
           const matchesProgram = !programFilter || program === programFilter;
