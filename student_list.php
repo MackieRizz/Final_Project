@@ -7,6 +7,7 @@
   <link rel="icon" type="image/png" href="Images/EvsuLogo.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -371,6 +372,81 @@
       font-size: 14px;
       color: #FDDE54;
     }
+
+    .passcode-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+    }
+
+    .passcode-modal-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #2d0808;
+      padding: 35px;
+      border-radius: 15px;
+      width: 100%;
+      max-width: 500px;
+      z-index: 2001;
+      border: 1px solid rgba(253, 222, 84, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .passcode-modal-container h3 {
+      color: #FDDE54;
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+
+    .passcode-input-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 25px;
+    }
+
+    .passcode-input-group input {
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      border: 2px solid #FDDE54;
+      background: rgba(253, 222, 84, 0.1);
+      border-radius: 8px;
+      color: #FDDE54;
+      font-size: 1.2em;
+      outline: none;
+    }
+
+    .passcode-input-group input:focus {
+      border-color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .update-passcode-btn {
+      width: 100%;
+      padding: 12px;
+      background: #FDDE54;
+      border: none;
+      border-radius: 8px;
+      color: #2d0808;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .update-passcode-btn:hover {
+      background: #fff;
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 <body>
@@ -507,6 +583,24 @@
         <div class="modal-actions">
           <button class="btn confirm-btn" onclick="closeNotificationModal()">OK</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Passcode Update Modal -->
+    <div id="passcodeModal" class="passcode-modal-overlay">
+      <div class="passcode-modal-container">
+        <h3>Update Admin Passcode</h3>
+        <div class="passcode-input-group">
+          <input type="text" maxlength="1" class="passcode-input" />
+          <input type="text" maxlength="1" class="passcode-input" />
+          <input type="text" maxlength="1" class="passcode-input" />
+          <input type="text" maxlength="1" class="passcode-input" />
+          <input type="text" maxlength="1" class="passcode-input" />
+          <input type="text" maxlength="1" class="passcode-input" />
+          <input type="text" maxlength="1" class="passcode-input" />
+          <input type="text" maxlength="1" class="passcode-input" />
+        </div>
+        <button class="update-passcode-btn" onclick="updatePasscode()">Update Passcode</button>
       </div>
     </div>
 
@@ -678,6 +772,101 @@
         e.stopPropagation();
       });
     });
+
+    // Add this to your existing script
+    document.querySelector('.edit-passcode-btn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      Swal.fire({
+        title: 'Change Admin Passcode',
+        text: 'Are you sure you want to change the admin passcode?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#FDDE54',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, change it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          document.getElementById('passcodeModal').style.display = 'block';
+        }
+      });
+    });
+
+    // Handle input navigation for passcode update
+    const passcodeInputs = document.querySelectorAll('.passcode-input');
+    passcodeInputs.forEach((input, index) => {
+      input.addEventListener('input', function() {
+        if (this.value.length === 1 && index < passcodeInputs.length - 1) {
+          passcodeInputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace' && !this.value && index > 0) {
+          passcodeInputs[index - 1].focus();
+        }
+      });
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('passcodeModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.style.display = 'none';
+        // Clear inputs
+        passcodeInputs.forEach(input => input.value = '');
+      }
+    });
+
+    function updatePasscode() {
+      let newPasscode = '';
+      passcodeInputs.forEach(input => {
+        newPasscode += input.value;
+      });
+
+      if (newPasscode.length !== 8) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Passcode',
+          text: 'Please enter all 8 digits of the new passcode.'
+        });
+        return;
+      }
+
+      // Send the update request to the server
+      fetch('update_passcode.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'new_passcode=' + newPasscode
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('passcodeModal').style.display = 'none';
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: 'Admin passcode has been updated successfully.'
+          }).then(() => {
+            document.getElementById('passcodeModal').style.display = 'none';
+            passcodeInputs.forEach(input => input.value = '');
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.message || 'Failed to update passcode. Please try again.'
+          });
+        }
+      })
+      .catch(error => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'An error occurred. Please try again.'
+        });
+      });
+    }
   </script>
 </body>
 </html>
