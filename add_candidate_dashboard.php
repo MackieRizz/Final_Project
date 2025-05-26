@@ -691,6 +691,12 @@
       color: #FDDE54 !important;
     }
 
+    .candidate-number {
+      color: #FDDE54 !important;
+      font-size: 0.8em;
+      margin-top: 2px;
+    }
+
     .candidate-card .delete-icon {
       position: absolute;
       right: 15px;
@@ -817,6 +823,7 @@
                     <h2><?php echo htmlspecialchars($candidate['name']); ?></h2>
                     <p class="program"><?php echo htmlspecialchars($candidate['program']); ?></p>
                     <p class="year"><?php echo htmlspecialchars($candidate['year']); ?> Year</p>
+                    <p class="candidate-number">Candidate #<?php echo htmlspecialchars($candidate['candidate_id']); ?></p>
                   </div>
                   <i class="fas fa-trash delete-icon"
                     onclick="deleteCandidate('<?php echo htmlspecialchars($candidate['id']); ?>', '<?php echo htmlspecialchars($candidate['name']); ?>', '<?php echo htmlspecialchars($candidate['position_id']); ?>')"></i>

@@ -41,6 +41,7 @@ CREATE TABLE `students_registration` (
 
 CREATE TABLE `candidate_positions` (
   `id` int(11) NOT NULL,
+  `candidate_id` int(11) NOT NULL,
   `position_id` int(255) NOT NULL,
   `position` varchar(100) DEFAULT NULL,
   `name` varchar(100) DEFAULT NULL,

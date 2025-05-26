@@ -35,11 +35,23 @@ try {
         $max_id = intval($row['max_id']);
     }
 
+    // Get the maximum candidate_id for this position
+    $max_candidate_id_query = "SELECT MAX(candidate_id) as max_candidate_id FROM candidate_positions WHERE position_id = ?";
+    $stmt = $conn->prepare($max_candidate_id_query);
+    $stmt->bind_param("i", $position_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $max_candidate_id = 0;
+    if ($result && $row = $result->fetch_assoc()) {
+        $max_candidate_id = intval($row['max_candidate_id']);
+    }
+    $stmt->close();
+
     // Start transaction
     $conn->begin_transaction();
 
     // Prepare statements
-    $insert_stmt = $conn->prepare("INSERT INTO candidate_positions (id, position_id, position, name, year, program, image) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $insert_stmt = $conn->prepare("INSERT INTO candidate_positions (id, candidate_id, position_id, position, name, year, program, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     $update_stmt = $conn->prepare("UPDATE candidate_positions SET name = ?, year = ?, program = ?, image = ? WHERE id = ? AND position_id = ?");
 
     // Track processed candidates
@@ -75,8 +87,10 @@ try {
 
             // Insert new candidate
             $max_id++;
-            $insert_stmt->bind_param("iisssss",
+            $max_candidate_id++;
+            $insert_stmt->bind_param("iiisssss",
                 $max_id,
+                $max_candidate_id,
                 $position_id,
                 $position,
                 $name,
