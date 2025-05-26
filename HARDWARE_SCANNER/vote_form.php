@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="success-msg">Thank you, your vote has been recorded.</p>
         <p id="countdown">Returning to scanner in 5 seconds...</p>
         <audio autoplay>
-            <source src="success.mp3" type="audio/mpeg">
+            <source src="sound.mp3" type="audio/mpeg">
         </audio>
     </div>
     <script>
