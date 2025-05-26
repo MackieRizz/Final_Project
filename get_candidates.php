@@ -4,7 +4,7 @@ include 'db.php';
 if (isset($_GET['position_id'])) {
     $position_id = $_GET['position_id'];
     
-    $query = "SELECT * FROM candidate_positions WHERE position_id = ? ORDER BY name";
+    $query = "SELECT * FROM candidate_positions WHERE position_id = ? ORDER BY candidate_id";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $position_id);
     $stmt->execute();

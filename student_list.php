@@ -412,10 +412,13 @@
         </div>
       </div>
 
+      <button id="deleteSelected" style="background:#ff4d4d;color:#fff;padding:8px 16px;border:none;border-radius:5px;cursor:pointer;margin-bottom:10px;">Delete Selected</button>
+
       <div class="table-container">
         <table id="studentTable">
           <thead>
             <tr>
+              <th><input type="checkbox" id="selectAll"></th>
               <th>Student ID</th>
               <th>Full Name</th>
               <th>Department</th>
@@ -428,12 +431,13 @@
               include 'db.php';
               $sql = "SELECT student_id, fullname, department, program, section 
                      FROM students_registration 
-                     ORDER BY student_id";
+                     ORDER BY student_id DESC";
               $result = $conn->query($sql);
 
               if ($result->num_rows > 0) {
                 while($row = $result->fetch_assoc()) {
                   echo "<tr>";
+                  echo '<td><input type="checkbox" class="select-student" value="' . htmlspecialchars($row['student_id']) . '"></td>';
                   echo "<td>" . htmlspecialchars($row['student_id']) . "</td>";
                   echo "<td>" . htmlspecialchars($row['fullname']) . "</td>";
                   echo "<td>" . htmlspecialchars($row['department']) . "</td>";
@@ -442,7 +446,7 @@
                   echo "</tr>";
                 }
               } else {
-                echo "<tr><td colspan='5'>No students found</td></tr>";
+                echo "<tr><td colspan='6'>No students found</td></tr>";
               }
               $conn->close();
             ?>
@@ -459,6 +463,17 @@
         <div class="modal-actions">
           <button class="btn cancel-btn" onclick="closeLogoutModal()">Cancel</button>
           <button class="btn confirm-btn" onclick="confirmLogout()">Logout</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="notificationModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:10000;">
+      <div class="modal-overlay"></div>
+      <div class="modal-box" style="top:40%;">
+        <h2>Success</h2>
+        <p id="notificationMessage">Selected students deleted successfully.</p>
+        <div class="modal-actions">
+          <button class="btn confirm-btn" onclick="closeNotificationModal()">OK</button>
         </div>
       </div>
     </div>
@@ -484,6 +499,11 @@
       window.location.href = 'logout.php';
     }
 
+    // Make closeNotificationModal globally accessible
+    window.closeNotificationModal = function() {
+      document.getElementById('notificationModal').style.display = 'none';
+    }
+
     // Student list search and sort functionality
     document.addEventListener('DOMContentLoaded', function() {
       const searchInput = document.getElementById('searchInput');
@@ -502,13 +522,14 @@
 
         for (let row of rows) {
           const cells = row.getElementsByTagName('td');
-          if (cells.length === 0) continue; // Skip if no cells (like "No students found" row)
+          if (cells.length < 6) continue; // Skip if not a data row
 
-          const studentId = cells[0].textContent.toLowerCase();
-          const fullName = cells[1].textContent.toLowerCase();
-          const department = cells[2].textContent;
-          const program = cells[3].textContent;
-          const section = cells[4].textContent;
+          // Adjusted indices due to added checkbox column
+          const studentId = cells[1].textContent.toLowerCase();
+          const fullName = cells[2].textContent.toLowerCase();
+          const department = cells[3].textContent;
+          const program = cells[4].textContent;
+          const section = cells[5].textContent;
 
           const matchesSearch = studentId.includes(searchTerm) || 
                               fullName.includes(searchTerm) ||
@@ -529,6 +550,77 @@
       departmentSort.addEventListener('change', filterTable);
       programSort.addEventListener('change', filterTable);
       sectionSort.addEventListener('change', filterTable);
+
+      // Delete button functionality
+      tbody.addEventListener('click', function(e) {
+        let btn = e.target;
+        // If the icon is clicked, get the parent button
+        if (btn.tagName === 'I' && btn.parentElement.classList.contains('delete-btn')) {
+          btn = btn.parentElement;
+        }
+        if (btn.classList.contains('delete-btn')) {
+          const studentId = btn.getAttribute('data-id');
+          // Get the fullname from the same row (2nd cell)
+          const row = btn.closest('tr');
+          const fullname = row && row.children[1] ? row.children[1].textContent.trim() : '';
+          if (confirm('Are you sure you want to delete ' + fullname + '?')) {
+            fetch('delete_student.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: 'student_id=' + encodeURIComponent(studentId)
+            })
+            .then(response => response.text())
+            .then(data => {
+              if (data.trim() === 'success') {
+                btn.closest('tr').remove();
+              } else {
+                alert('Failed to delete student.');
+              }
+            });
+          }
+        }
+      });
+
+      // Multiple delete functionality
+      const selectAll = document.getElementById('selectAll');
+      const deleteSelected = document.getElementById('deleteSelected');
+      function getSelectedIds() {
+        return Array.from(document.querySelectorAll('.select-student:checked')).map(cb => cb.value);
+      }
+      selectAll.addEventListener('change', function() {
+        document.querySelectorAll('.select-student').forEach(cb => cb.checked = selectAll.checked);
+      });
+      tbody.addEventListener('change', function() {
+        const all = document.querySelectorAll('.select-student');
+        const checked = document.querySelectorAll('.select-student:checked');
+        selectAll.checked = all.length === checked.length;
+      });
+      deleteSelected.addEventListener('click', function() {
+        const ids = getSelectedIds();
+        if (ids.length === 0) {
+          alert('Please select at least one student to delete.');
+          return;
+        }
+        if (confirm('Are you sure you want to delete the selected students?')) {
+          fetch('delete_student.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'student_id=' + encodeURIComponent(ids.join(','))
+          })
+          .then(response => response.text())
+          .then(data => {
+            if (data.trim() === 'success') {
+              // Remove deleted rows
+              document.querySelectorAll('.select-student:checked').forEach(cb => cb.closest('tr').remove());
+              selectAll.checked = false;
+              document.getElementById('notificationMessage').textContent = 'Selected students deleted successfully.';
+              document.getElementById('notificationModal').style.display = 'block';
+            } else {
+              alert('Failed to delete selected students.');
+            }
+          });
+        }
+      });
     });
   </script>
 </body>
