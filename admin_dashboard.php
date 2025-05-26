@@ -405,59 +405,60 @@
       }
     }
 
-    const studentCounts = <?php echo json_encode($counts); ?>;
+  const studentCounts = <?php echo json_encode($counts); ?>;
 
-   const barCtx = document.getElementById('barChart').getContext('2d');
-new Chart(barCtx, {
-  type: 'bar',
-  data: {
-    labels: [
-      'Teacher Education',
-      'Engineering',
-      'Computer Studies',
-      'Industrial Tech',
-      'Business & Mgmt'
-    ],
-    datasets: [{
-      label: 'Students',
-      data: studentCounts,
-      backgroundColor: '#FDDE54'
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false
+  const barCtx = document.getElementById('barChart').getContext('2d');
+  new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: [
+        'Teacher Education',
+        'Engineering',
+        'Computer Studies',
+        'Industrial Tech',
+        'Business & Mgmt'
+      ],
+      datasets: [{
+        label: 'Students',
+        data: studentCounts, 
+        backgroundColor: '#FDDE54'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          enabled: true,
+          callbacks: {
+            label: function(context) {
+              console.log(context); 
+              const count = context.parsed.y ?? context.raw ?? 0;
+              return count + ' students';
+            }
+          }
+        }
       },
-      tooltip: {
-        enabled: true,
-        callbacks: {
-          label: function(context) {
-            // context.parsed.y contains the value (student count)
-            return context.parsed.y + ' students';
+      scales: {
+        x: {
+          ticks: {
+            color: '#fff'
+          }
+        },
+        y: {
+          min: 0,
+          max: 200,
+          ticks: {
+            color: '#fff',
+            stepSize: 10
           }
         }
       }
-    },
-    scales: {
-      x: {
-        ticks: {
-          color: '#fff'
-        }
-      },
-      y: {
-        min: 0,
-        max: 200,
-        ticks: {
-          color: '#fff',
-          stepSize: 10
-        }
-      }
     }
-  }
-});
+  });
 
 
     const pieCtx = document.getElementById('pieChart').getContext('2d');
