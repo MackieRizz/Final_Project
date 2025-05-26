@@ -357,7 +357,7 @@
         </div>
       <br>
 
-      <div class="charts-container">
+      <div class="charts-container" style="width: 100%;">
         <div class="chart-box">
           <h3>Voting Participation</h3>
           <canvas id="pieChart"></canvas>
