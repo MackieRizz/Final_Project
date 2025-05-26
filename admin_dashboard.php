@@ -204,14 +204,53 @@
       
     }
     .chart-box {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 20px;
-      border-radius: 10px;
+      background: linear-gradient(145deg, rgba(43, 8, 8, 0.9), rgba(74, 16, 16, 0.8));
+      border: 1px solid rgba(253, 222, 84, 0.1);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(4px);
+      border-radius: 20px;
+      padding: 15px;
+      position: relative;
+      overflow: hidden;
       flex: 1;
       flex: 1 1 500px;
       min-width: 300px;
       height: 300px;
       transition: flex-basis 0.3s ease;
+      transition: all 0.3s ease;
+    }
+
+    .chart-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.45);
+      border: 1px solid rgba(253, 222, 84, 0.2);
+      background: linear-gradient(145deg, rgba(53, 10, 10, 0.95), rgba(84, 18, 18, 0.85));
+    }
+
+    .chart-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(253, 222, 84, 0.3), transparent);
+    }
+
+    .chart-box h3 {
+      color: #FDDE54;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px rgba(253, 222, 84, 0.3);
+      position: relative;
+      display: inline-block;
+    }
+
+    .chart-box h4 {
+      color: rgba(255, 255, 255, 0.9) !important;
+      font-size: 1.1rem;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+      position: relative;
     }
 
     .chart-box canvas {
@@ -314,6 +353,85 @@
       transform: translateY(-2px);
     }
 
+    /* Style for the total number container */
+    .total-number {
+      background: linear-gradient(145deg, rgba(43, 8, 8, 0.9), rgba(74, 16, 16, 0.8));
+      border: 1px solid rgba(253, 222, 84, 0.1);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(4px);
+      border-radius: 20px;
+      padding: 15px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .total-number:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.45);
+      border: 1px solid rgba(253, 222, 84, 0.2);
+      background: linear-gradient(145deg, rgba(53, 10, 10, 0.95), rgba(84, 18, 18, 0.85));
+    }
+
+    .total-number:hover .number-display {
+      text-shadow: 0 0 25px rgba(253, 222, 84, 0.6);
+      color: #FFE584;
+    }
+
+    .total-number:hover h3, .chart-box:hover h3 {
+      text-shadow: 0 0 15px rgba(253, 222, 84, 0.4);
+      color: #FFE584;
+    }
+
+    .total-number:hover canvas {
+      filter: drop-shadow(0 0 15px rgba(253, 222, 84, 0.15));
+    }
+
+    .total-number::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, rgba(253, 222, 84, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      transform: translate(30%, -30%);
+    }
+
+    .total-number p {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Modern styling for numbers */
+    .number-display {
+      font-size: 60px;
+      font-weight: bold;
+      text-align: center;
+      color: #FDDE54;
+      text-shadow: 0 0 15px rgba(253, 222, 84, 0.4);
+      margin-top: 80px;
+      font-family: 'Arial', sans-serif;
+      letter-spacing: 2px;
+    }
+
+    /* Add glow effect to charts */
+    canvas {
+      filter: drop-shadow(0 0 10px rgba(253, 222, 84, 0.1));
+    }
+
+    /* Modernize the Welcome title */
+    #Welcome {
+      font-size: 2rem;
+      background: linear-gradient(90deg, #FDDE54, #FFA07A);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(253, 222, 84, 0.2);
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
 
   </style>
 </head>
@@ -338,9 +456,9 @@
         <i class="fas fa-user-circle"></i>
         <div class="profile-modal">
           <div class="cover-photo"></div>
-          <img src="https://via.placeholder.com/80" alt="Profile">
+          <img src="https://i.pinimg.com/564x/b4/ba/ab/b4baab4d57a5d0d4bbb3455ad57bda80.jpg" alt="Profile">
           <br><br>
-          <p id="name">Tirzo Charles Apuya</p>
+          <p id="name">SARJAGA</p>
           <p id="role">Administrator</p>
         </div>
       </div>
@@ -351,9 +469,9 @@
       <br>
 
        <div class="charts-container">
-        <div class="chart-box">
+        <div class="total-number">
           <h3>Total Number of Students</h3>
-           <p style="font-size: 60px; font-weight: bold; text-align: center; color: #fff; margin-top: 80px;">
+           <p class="number-display">
            <?php
               include 'db.php';
 
@@ -401,15 +519,34 @@
               $conn->close();
               ?>
           </ul>
-          <canvas id="barChart" style="max-height: 400px;"></canvas>
+          <canvas id="barChart" style="max-height: 220px; max-width: 90%; width: 100%;"></canvas>
           <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         </div>
       <br>
 
       <div class="charts-container" style="width: 100%;">
         <div class="chart-box">
-          <h3>Voting Participation</h3>
-          <canvas id="pieChart"></canvas>
+          <h3>Voting Statistics</h3>
+          <div style="display: flex; justify-content: space-between; gap: 20px;">
+            <div style="flex: 1; max-width: 25%;">
+              <h4 style="text-align: center; color: #fff; margin-bottom: -15px; ">Overall Participation</h4>
+              <div style="position: relative; width: 80%; margin: auto; padding-bottom: 10px;">
+                <canvas id="pieChart"></canvas>
+              </div>
+            </div>
+            <div style="flex: 1; max-width: 25%;">
+              <h4 style="text-align: center; color: #fff; margin-bottom: -15px; ">Votes per Department</h4>
+              <div style="position: relative; width: 80%; margin: auto; padding-bottom: 10px;">
+                <canvas id="departmentPieChart"></canvas>
+              </div>
+            </div>
+            <div style="flex: 1; max-width: 25%;">
+              <h4 style="text-align: center; color: #fff; margin-bottom: -15px; ">Gender-based Voting</h4>
+              <div style="position: relative; width: 80%; margin: auto; padding-bottom: 10px;">
+                <canvas id="genderPieChart"></canvas>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -522,21 +659,135 @@
       },
       options: {
         responsive: true,
+        maintainAspectRatio: true,
         plugins: {
           legend: {
+            position: 'bottom',
             labels: {
-              color: '#fff'
+              color: '#fff',
+              font: {
+                size: 11
+              },
+              padding: 10,
+              boxWidth: 15
             }
           }
-        }
+        },
+        layout: {
+          padding: {
+            bottom: 35,
+            top: 25
+          }
+        },
+        radius: '80%'
       }
-
     });
     
     Chart.helpers.each(Chart.instances, function(instance) {
       instance.resize();
     });
 
+    <?php
+      include 'db.php';
+      
+      // Fetch department data
+      $deptQuery = "SELECT department, COUNT(*) as count FROM students_registration GROUP BY department";
+      $deptResult = $conn->query($deptQuery);
+      $deptLabels = [];
+      $deptData = [];
+      
+      while($row = $deptResult->fetch_assoc()) {
+          $deptLabels[] = $row['department'];
+          $deptData[] = $row['count'];
+      }
+      
+      // Fetch gender data
+      $genderQuery = "SELECT gender, COUNT(*) as count FROM students_registration GROUP BY gender";
+      $genderResult = $conn->query($genderQuery);
+      $genderLabels = [];
+      $genderData = [];
+      
+      while($row = $genderResult->fetch_assoc()) {
+          $genderLabels[] = $row['gender'];
+          $genderData[] = $row['count'];
+      }
+      
+      $conn->close();
+    ?>
+
+    // Department Pie Chart
+    const deptPieCtx = document.getElementById('departmentPieChart').getContext('2d');
+    new Chart(deptPieCtx, {
+      type: 'pie',
+      data: {
+        labels: <?php echo json_encode($deptLabels); ?>,
+        datasets: [{
+          data: <?php echo json_encode($deptData); ?>,
+          backgroundColor: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#fff',
+              font: {
+                size: 11
+              },
+              padding: 10,
+              boxWidth: 15
+            }
+          }
+        },
+        layout: {
+          padding: {
+            bottom: 35,
+            top: 25
+          }
+        },
+        radius: '80%'
+      }
+    });
+
+    // Gender Pie Chart
+    const genderPieCtx = document.getElementById('genderPieChart').getContext('2d');
+    new Chart(genderPieCtx, {
+      type: 'pie',
+      data: {
+        labels: <?php echo json_encode($genderLabels); ?>,
+        datasets: [{
+          data: <?php echo json_encode($genderData); ?>,
+          backgroundColor: ['#007BFF', '#FF69B4']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#fff',
+              font: {
+                size: 11
+              },
+              padding: 10,
+              boxWidth: 15
+            }
+          }
+        },
+        layout: {
+          padding: {
+            bottom: 35,
+            top: 25
+          }
+        },
+        radius: '80%'
+      }
+    });
 
     //logout modal
     document.querySelector('.logout-btn').addEventListener('click', function() {
