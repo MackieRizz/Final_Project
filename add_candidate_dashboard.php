@@ -655,8 +655,8 @@
       <div class="menu">
         <div class="menu-title">Admin Dashboard</div>
         <div class="menu-item" onclick="window.location.href='admin_dashboard.php'"><i class="fas fa-chart-line"></i><span class="label1">Analytics</span></div>
-        <div class="menu-item"><i class="fas fa-trophy"></i><span class="label1">Standings</span>
-      </div>
+        <div class="menu-item"><i class="fas fa-trophy"></i><span class="label1">Standings</span></div>
+        <div class="menu-item" onclick="window.location.href='student_list.php'"><i class="fas fa-address-card"></i><span class="label1">Student List</span></div>
         <div class="menu-item"><i class="fas fa-users"></i><span class="label">Add Candidates</span></div>
       </div>
     </div>
@@ -685,7 +685,7 @@
     
 
     <!-- Modal -->
-    <div id="addCandidateModal">
+    <div id="addCandidateModal" style="display: none;">
       <div class="modal-content">
         <h3>Add Candidates</h3>
         <form method="post" action="save_position.php" id="candidateForm">
@@ -728,6 +728,7 @@
             <div class="position-header">
               <span class="position-id"><?php echo htmlspecialchars($position_id); ?></span>
               <span class="position-title"><?php echo htmlspecialchars($position); ?></span>
+              <i class="fas fa-edit" style="position: absolute; right: 20px; color: #7a3535; cursor: pointer;" onclick="openEditModal('<?php echo htmlspecialchars($position_id); ?>', '<?php echo htmlspecialchars($position); ?>')"></i>
             </div>
             <div class="candidates-section">
               <?php
@@ -870,6 +871,42 @@ function addNameField() {
   container.appendChild(group);
 }
 
+function openEditModal(positionId, position) {
+  const modal = document.getElementById("addCandidateModal");
+  modal.style.display = "flex";
+  
+  // Update form title
+  modal.querySelector('h3').textContent = 'Edit Position';
+  
+  // Fill in position details
+  document.querySelector('input[name="position_id[]"]').value = positionId;
+  document.querySelector('input[name="position[]"]').value = position;
+  
+  // Fetch candidates for this position
+  fetch(`get_candidates.php?position_id=${positionId}`)
+    .then(response => response.json())
+    .then(candidates => {
+      const container = document.getElementById("nameFieldsContainer");
+      container.innerHTML = ''; // Clear existing fields
+      
+      candidates.forEach((candidate, index) => {
+        const group = document.createElement("div");
+        group.classList.add("input-group");
+        group.innerHTML = `
+          <label>${index + 1}.</label>
+          <input type="text" name="name[]" placeholder="Name" value="${candidate.name}" required>
+          <input type="text" name="year[]" placeholder="Year" value="${candidate.year}" required>
+          <input type="text" name="program[]" placeholder="Program" value="${candidate.program}" required>
+          <input type="file" name="image[]" accept="image/*">
+          ${candidate.image ? `<small>Current image: ${candidate.image}</small>` : ''}
+          <input type="hidden" name="existing_image[]" value="${candidate.image || ''}">
+        `;
+        container.appendChild(group);
+      });
+      nameCount = candidates.length;
+    });
+}
+
 function validateAndSubmit(event) {
   event.preventDefault();
   
@@ -880,11 +917,7 @@ function validateAndSubmit(event) {
   const positionId = document.querySelector('input[name="position_id[]"]').value;
   const position = document.querySelector('input[name="position[]"]').value;
   
-  // Add these console.logs for debugging
-  console.log('Position ID:', positionId);
-  console.log('Position:', position);
-  
-  // Append position data - remove the array notation []
+  // Append position data
   formData.append('position_id', positionId);
   formData.append('position', position);
   
@@ -893,14 +926,18 @@ function validateAndSubmit(event) {
   const years = Array.from(document.getElementsByName('year[]')).map(input => input.value);
   const programs = Array.from(document.getElementsByName('program[]')).map(input => input.value);
   const images = Array.from(document.getElementsByName('image[]'));
+  const existingImages = Array.from(document.getElementsByName('existing_image[]')).map(input => input.value);
   
   // Add all data to FormData
   names.forEach((name, index) => {
     formData.append('name[]', name);
     formData.append('year[]', years[index]);
     formData.append('program[]', programs[index]);
+    formData.append('existing_image[]', existingImages[index] || '');
     if (images[index].files[0]) {
       formData.append('image[]', images[index].files[0]);
+    } else {
+      formData.append('image[]', '');
     }
   });
 
@@ -911,7 +948,7 @@ function validateAndSubmit(event) {
   })
   .then(response => response.text())
   .then(data => {
-    console.log('Server response:', data); // Add this for debugging
+    console.log('Server response:', data);
     closeModal();
     window.location.reload();
   })

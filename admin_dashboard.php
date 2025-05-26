@@ -274,8 +274,8 @@
       <div class="menu">
         <div class="menu-title">Admin Dashboard</div>
         <div class="menu-item" onclick="scrollToSection('analytics')"><i class="fas fa-chart-line"></i><span class="label1">Analytics</span></div>
-        <div class="menu-item" onclick="window.location.href='standing.php'"><i class="fas fa-trophy"></i><span class="label1">Standings</span>
-      </div>
+        <div class="menu-item" onclick="window.location.href='standing.php'"><i class="fas fa-trophy fa-solid fa-address-card"></i><span class="label1">Standings</span></div>
+        <div class="menu-item" onclick="window.location.href='student_list.php'"><i class="fas fa-address-card"></i><span class="label1">Student List</span></div>
         <div class="menu-item" onclick="window.location.href='add_candidate_dashboard.php'"><i class="fas fa-users"></i><span class="label">Add Candidates</span></div>
       </div>
     </div>
