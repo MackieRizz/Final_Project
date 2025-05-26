@@ -317,13 +317,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 .flex-container {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     gap: 32px;
     width: 100%;
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
     min-height: 100vh;
     padding: 120px 20px 100px 20px;
+    margin-top: -32px;
 }
 
 .main-container {
@@ -331,14 +332,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     max-height: none;
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: 24px 24px 24px 24px;
+    align-items: flex-start;
+    padding: 24px;
     background: rgba(77, 20, 20, 0.92);
     border-radius: 18px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.18);
     margin: 0;
     width: 100%;
-    max-width: 950px;
+    max-width: 850px;
     overflow: visible;
 }
 
@@ -452,13 +453,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 .qr-section {
     max-width: 420px;
     width: 100%;
-    margin: 0 auto 24px auto;
+    margin: 0;
     display: <?= $qrCodeUrl ? 'block' : 'none' ?>;
-    padding: 24px 8px 24px 8px;
+    padding: 24px 8px;
     background: rgba(77, 20, 20, 0.92);
     border-radius: 18px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-
 }
 
 .qr-box {
@@ -591,24 +591,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flex-direction: column;
             align-items: center;
             gap: 24px;
-            margin: 0;
             padding: 100px 20px 100px 20px;
-            min-height: 100vh;
         }
+        
         .main-container {
             max-width: 98vw;
             width: 95%;
-            margin: 0 auto;
         }
-        .form-section {
-            padding: 2rem;
-            max-height: none;
-            overflow-y: visible;
-        }
+        
         .qr-section {
-            padding: 2rem;
-            max-height: none;
-            overflow-y: visible;
+            width: 95%;
+            max-width: 98vw;
         }
     }
     footer {

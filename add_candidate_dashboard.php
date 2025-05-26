@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,12 +14,14 @@
       padding: 0;
       font-family: 'Karla', sans-serif;
     }
+
     body {
       background: linear-gradient(135deg, #1a0606, #f79f56);
       color: #FDDE54;
       min-height: 100vh;
       display: flex;
     }
+
     .sidebar {
       width: 250px;
       background-color: #2d0808;
@@ -30,12 +33,15 @@
       flex-direction: column;
       justify-content: space-between;
     }
+
     .sidebar.collapsed {
       width: 0px;
     }
+
     .sidebar .menu {
       padding: 20px;
     }
+
     .sidebar .menu-item {
       padding: 15px 10px;
       color: #FDDE54;
@@ -44,15 +50,19 @@
       gap: 10px;
       cursor: pointer;
     }
+
     .label {
       margin-left: 7px;
     }
+
     .label1 {
       margin-left: 10px;
     }
+
     .sidebar .menu-item:hover {
       background: #4a1010;
     }
+
     .logout-btn {
       padding: 15px 10px;
       color: #FDDE54;
@@ -64,23 +74,27 @@
       margin-left: 20px;
       width: 87%;
     }
+
     .logout-btn:hover {
       background: #4a1010;
     }
+
     .main-content {
       margin-left: 250px;
       transition: margin-left 0.3s ease;
       width: 100%;
     }
+
     .main-content.collapsed {
       margin-left: 0;
     }
+
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 25px 20px;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0, 0, 0, 0.6);
       position: sticky;
       top: 0;
       z-index: 10;
@@ -90,19 +104,23 @@
       margin: 7px 5px 5px 5px;
       border-radius: 5px;
     }
+
     .toggle-btn {
       font-size: 20px;
       cursor: pointer;
       color: #FDDE54;
     }
+
     .profile {
       position: relative;
       margin-left: auto;
     }
+
     .profile i {
       font-size: 24px;
       cursor: pointer;
     }
+
     .profile-modal {
       display: none;
       position: absolute;
@@ -117,9 +135,11 @@
       color: #FDDE54;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
+
     .profile:hover .profile-modal {
       display: block;
     }
+
     .profile-modal .cover-photo {
       width: 100%;
       height: 120px;
@@ -130,6 +150,7 @@
       margin-bottom: 10px;
       position: relative;
     }
+
     .profile-modal img {
       width: 130px;
       height: 130px;
@@ -141,19 +162,21 @@
       transform: translateX(-50%);
       background: #fff;
     }
+
     .profile-modal #role {
       margin-top: 35px;
       font-size: 12px;
       color: #fff;
-      
+
     }
+
     .profile-modal #name {
       position: relative;
       top: 30px;
       text-align: center;
       font-weight: bold;
-      
-      
+
+
     }
 
     .menu-title {
@@ -162,28 +185,30 @@
       padding: 15px 10px;
       color: #fff;
     }
+
     #Welcome {
       margin-left: 20px;
     }
-  
 
     #logoutModal {
       position: fixed;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       width: 100vw;
       height: 100vh;
       z-index: 9999;
     }
 
-    .modal-overlay {
+    .modal-overlayy {
       position: absolute;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.7);
     }
 
-    .modal-box {
+    .modal-boxx {
       position: absolute;
       top: 50%;
       left: 50%;
@@ -197,13 +222,14 @@
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
     }
 
-    .modal-box h2 {
+    .modal-boxx h2 {
       margin-bottom: 10px;
     }
 
-    .modal-box p {
+    .modal-boxx p {
       margin-bottom: 20px;
     }
+
 
     .modal-actions {
       display: flex;
@@ -230,18 +256,17 @@
       color: #fff;
     }
 
-    .cancel-btn {
+    .cancel-btnn {
       background-color: #aaa;
       color: #2d0808;
     }
 
-    .cancel-btn:hover {
+    .cancel-btnn:hover {
       background-color: #666;
       color: #fff;
     }
 
 
-  
 
 
 
@@ -259,432 +284,437 @@
 
 
 
-  .add-icon-container {
-    text-align: right;
-    margin: 10px 25px;
-    font-size: 20px;
-  }
 
-  .add-icon-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #FDDE54;
-    font-size: 24px;
-  }
+    .add-icon-container {
+      text-align: right;
+      margin: 10px 25px;
+      font-size: 20px;
+    }
 
-  .modal-container {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 10000;
-  }
+    .add-icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #FDDE54;
+      font-size: 24px;
+    }
 
-  .modal-overlay {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-  }
+    .modal-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 10000;
+    }
 
-  .modal-box {
-    position: relative;
-    margin: 5% auto;
-    background: #fff;
-    padding: 20px;
-    width: 90%;
-    max-width: 500px;
-    z-index: 10001;
-    border-radius: 10px;
-  }
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+    }
 
-  .position-group {
-    margin-bottom: 15px;
-  }
+    .modal-box {
+      position: relative;
+      margin: 5% auto;
+      background: #fff;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      z-index: 10001;
+      border-radius: 10px;
+    }
 
-  .position-input-row {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-bottom: 5px;
-    margin-bottom: 15px;
-  }
+    .position-group {
+      margin-bottom: 15px;
+    }
+
+    .position-input-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 5px;
+      margin-bottom: 15px;
+    }
 
 
 
 
-  .modal-input {
-    width: 100%;
-    margin-bottom: 10px;
-    padding: 8px;
-    box-sizing: border-box;
-  }
+    .modal-input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      box-sizing: border-box;
+    }
 
 
 
     #addCandidateModal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-  }
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
 
-  .modal-content {
-    background: #2d0808;
-    color: #FDDE54;
-    width: 400px;
-    max-height: 80vh;
-    overflow-y: auto;
-    padding: 25px;
-    border-radius: 12px;
-    position: relative;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
-    margin: 0;
-  }
+    .modal-content {
+      background: #2d0808;
+      color: #FDDE54;
+      width: 400px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 25px;
+      border-radius: 12px;
+      position: relative;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+      margin: 0;
+    }
 
-  .modal-content h3 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
+    .modal-content h3 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-  .input-group {
-    margin-bottom: 15px;
-    position: relative;
-  }
+    .input-group {
+      margin-bottom: 15px;
+      position: relative;
+    }
 
-  .input-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
 
-  .input-group input[type="text"],
-  .input-group input[type="file"] {
-    width: 100%;
-    padding: 8px;
-    background: #662d2d;
-    border: none;
-    border-radius: 5px;
-    color: #FDDE54;
-    margin-bottom: 8px;
-  }
+    .input-group input[type="text"],
+    .input-group input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      background: #662d2d;
+      border: none;
+      border-radius: 5px;
+      color: #FDDE54;
+      margin-bottom: 8px;
+    }
 
-  .input-group input[type="file"] {
-    background: #4a1010;
-    padding: 5px;
-    cursor: pointer;
-  }
+    .input-group input[type="file"] {
+      background: #4a1010;
+      padding: 5px;
+      cursor: pointer;
+    }
 
-  .input-group input[type="file"]::-webkit-file-upload-button {
-    background: #FDDE54;
-    color: #2d0808;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-right: 10px;
-  }
+    .input-group input[type="file"]::-webkit-file-upload-button {
+      background: #FDDE54;
+      color: #2d0808;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
 
-  .input-group input[type="file"]::-webkit-file-upload-button:hover {
-    background: #ffd700;
-  }
+    .input-group input[type="file"]::-webkit-file-upload-button:hover {
+      background: #ffd700;
+    }
 
-  .add-field {
-    background: #662d2d;
-    color: #FDDE54;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-    margin: 10px 0;
-    font-weight: bold;
-  }
+    .add-field {
+      background: #662d2d;
+      color: #FDDE54;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      margin: 10px 0;
+      font-weight: bold;
+    }
 
-  .add-field:hover {
-    background: #4a1010;
-  }
+    .add-field:hover {
+      background: #4a1010;
+    }
 
-  #nameFieldsContainer .input-group {
-    border: 1px solid #662d2d;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-  }
+    #nameFieldsContainer .input-group {
+      border: 1px solid #662d2d;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
 
-  #nameFieldsContainer label {
-    color: #FDDE54;
-    margin-bottom: 8px;
-  }
+    #nameFieldsContainer label {
+      color: #FDDE54;
+      margin-bottom: 8px;
+    }
 
-  .modal-content {
-    max-width: 500px;
-    width: 90%;
-  }
+    .modal-content {
+      max-width: 500px;
+      width: 90%;
+    }
 
-  .save-btn {
-    background: #FDDE54;
-    color: #2d0808;
-    font-weight: bold;
-    padding: 10px;
-    width: 100%;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-  }
+    .save-btn {
+      background: #FDDE54;
+      color: #2d0808;
+      font-weight: bold;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
 
-  .save-btn:hover {
-    background: #ff4d4d;
-    color: #fff;
-  }
+    .save-btn:hover {
+      background: #ff4d4d;
+      color: #fff;
+    }
 
-  .cancel-btn {
-    background: #aaa;
-    color: #2d0808;
-    font-weight: bold;
-    padding: 10px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 5px;
-  }
+    .cancel-btn {
+      background: #aaa;
+      color: #2d0808;
+      font-weight: bold;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 5px;
+    }
 
-  .cancel-btn:hover {
-    background: #666;
-    color: #fff;
-  }
+    .cancel-btn:hover {
+      background: #666;
+      color: #fff;
+    }
 
-  .position-container {
-    margin: 20px;
-    background: #4a1010;
-    border-radius: 10px;
-    color: #fafaf9;
-    overflow: hidden;
-  }
+    .position-container {
+      margin: 20px;
+      background: #4a1010;
+      border-radius: 10px;
+      color: #fafaf9;
+      overflow: hidden;
+    }
 
-  .position-header {
-    background: #FDDE54;
-    padding: 8px 20px;
-    display: flex;
-    align-items: center;
-    position: relative;
-    min-height: 40px;
-  }
+    .position-header {
+      background: #FDDE54;
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      min-height: 40px;
+    }
 
-  .position-header .icons {
-    position: absolute;
-    right: 20px;
-    display: flex;
-    gap: 10px;
-  }
+    .position-header .icons {
+      position: absolute;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+    }
 
-  .position-header .icons i {
-    color: #7a3535;
-    cursor: pointer;
-  }
+    .position-header .icons i {
+      color: #7a3535;
+      cursor: pointer;
+    }
 
-  .position-header .icons i:hover {
-    color: #4a1010;
-  }
+    .position-header .icons i:hover {
+      color: #4a1010;
+    }
 
-  .candidate-list {
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
+    .candidate-list {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
 
-  .candidate-list div {
-    
-    padding: 8px;
-    border-radius: 6px;
-  }
+    .candidate-list div {
 
-  .name-input {
-    width: 100%;
-    margin-bottom: 10px;
-    padding: 8px;
-    box-sizing: border-box;
-  }
+      padding: 8px;
+      border-radius: 6px;
+    }
 
-  .modal-content {
-    max-height: 80vh;
-    overflow-y: auto;
-  }
+    .name-input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      box-sizing: border-box;
+    }
 
-  .modal-content::-webkit-scrollbar {
-    width: 8px;
-  }
+    .modal-content {
+      max-height: 80vh;
+      overflow-y: auto;
+    }
 
-  .modal-content::-webkit-scrollbar-track {
-    background: #2d0808;
-  }
+    .modal-content::-webkit-scrollbar {
+      width: 8px;
+    }
 
-  .modal-content::-webkit-scrollbar-thumb {
-    background: #FDDE54;
-    border-radius: 4px;
-  }
+    .modal-content::-webkit-scrollbar-track {
+      background: #2d0808;
+    }
 
-  .positions-container {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    max-width: 1300px;
-    margin: 0 auto;
-  }
+    .modal-content::-webkit-scrollbar-thumb {
+      background: #FDDE54;
+      border-radius: 4px;
+    }
 
-  .position-block {
-    background: #4a1010;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
+    .positions-container {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
 
-  .position-id {
-    position: absolute;
-    left: 20px;
-    color: #7a3535;
-    font-weight: bold;
-    font-size: 1em;
-  }
+    .position-block {
+      background: #4a1010;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-  .position-title {
-    color: #7a3535;
-    font-size: 1.2em;
-    font-weight: bold;
-    width: 100%;
-    text-align: center;
-  }
+    .position-id {
+      position: absolute;
+      left: 20px;
+      color: #7a3535;
+      font-weight: bold;
+      font-size: 1em;
+    }
 
-  .candidates-section {
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
+    .position-title {
+      color: #7a3535;
+      font-size: 1.2em;
+      font-weight: bold;
+      width: 100%;
+      text-align: center;
+    }
 
-  .candidate-card {
-    background: #662d2d;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: transform 0.2s;
-    display: flex;
-    padding: 8px;
-    gap: 12px;
-    align-items: center;
-    position: relative;
-  }
+    .candidates-section {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
 
-  .candidate-card:hover {
-    transform: translateX(10px);
-    background: #7a3535;
-  }
+    .candidate-card {
+      background: #662d2d;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.2s;
+      display: flex;
+      padding: 8px;
+      gap: 12px;
+      align-items: center;
+      position: relative;
+    }
 
-  .candidate-image {
-    width: 70px;
-    height: 70px;
-    min-width: 60px;
-    overflow: hidden;
-    background: #4a1010;
-    border-radius: 6px;
-  }
+    .candidate-card:hover {
+      transform: translateX(10px);
+      background: #7a3535;
+    }
 
-  .candidate-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+    .candidate-image {
+      width: 70px;
+      height: 70px;
+      min-width: 60px;
+      overflow: hidden;
+      background: #4a1010;
+      border-radius: 6px;
+    }
 
-  .no-image {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #FDDE54;
-    font-style: italic;
-    font-size: 0.7em;
-  }
+    .candidate-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-  .candidate-info {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 2px;
-  }
+    .no-image {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FDDE54;
+      font-style: italic;
+      font-size: 0.7em;
+    }
 
-  .candidate-info h2 {
-    color: #FFF;
-    margin: 0;
-    margin-bottom: 6px;
-    font-size: 1.2em;
-    font-weight: bold;
-    line-height: 1;
-  }
+    .candidate-info {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 2px;
+    }
 
-  .candidate-info p {
-    margin: 0;
-    color: #fff;
-    font-size: 0.9em;
-    line-height: 1.2;
-  }
+    .candidate-info h2 {
+      color: #FFF;
+      margin: 0;
+      margin-bottom: 6px;
+      font-size: 1.2em;
+      font-weight: bold;
+      line-height: 1;
+    }
 
-  .candidate-info .program {
-    margin-bottom: 2px;
-  }
+    .candidate-info p {
+      margin: 0;
+      color: #fff;
+      font-size: 0.9em;
+      line-height: 1.2;
+    }
 
-  .no-positions {
-    text-align: center;
-    color: #FDDE54;
-    font-size: 1.2em;
-    padding: 40px;
-    background: #4a1010;
-    border-radius: 10px;
-  }
+    .candidate-info .program {
+      margin-bottom: 2px;
+    }
 
-  .year {
-    color: #FDDE54 !important;
-    
-  }
+    .no-positions {
+      text-align: center;
+      color: #FDDE54;
+      font-size: 1.2em;
+      padding: 40px;
+      background: #4a1010;
+      border-radius: 10px;
+    }
 
-  .program {
-    color: #FDDE54 !important;
-  }
+    .year {
+      color: #FDDE54 !important;
 
-  .candidate-card .delete-icon {
-    position: absolute;
-    right: 15px;
-    color: #FDDE54;
-    cursor: pointer;
-  }
+    }
 
-  .candidate-card .delete-icon:hover {
-    color: #ff4d4d;
-  }
+    .program {
+      color: #FDDE54 !important;
+    }
 
+    .candidate-card .delete-icon {
+      position: absolute;
+      right: 15px;
+      color: #FDDE54;
+      cursor: pointer;
+    }
+
+    .candidate-card .delete-icon:hover {
+      color: #ff4d4d;
+    }
   </style>
 </head>
+
 <body>
   <div class="sidebar" id="sidebar">
     <div>
       <div class="menu">
         <div class="menu-title">Admin Dashboard</div>
-        <div class="menu-item" onclick="window.location.href='admin_dashboard.php'"><i class="fas fa-chart-line"></i><span class="label1">Analytics</span></div>
+        <div class="menu-item" onclick="window.location.href='admin_dashboard.php'"><i
+            class="fas fa-chart-line"></i><span class="label1">Analytics</span></div>
         <div class="menu-item"><i class="fas fa-trophy"></i><span class="label1">Standings</span></div>
-        <div class="menu-item" onclick="window.location.href='student_list.php'"><i class="fas fa-address-card"></i><span class="label1">Student List</span></div>
+        <div class="menu-item" onclick="window.location.href='student_list.php'"><i
+            class="fas fa-address-card"></i><span class="label1">Student List</span></div>
         <div class="menu-item"><i class="fas fa-users"></i><span class="label">Add Candidates</span></div>
       </div>
     </div>
@@ -708,9 +738,9 @@
 
     <!-- Plus Icon Trigger -->
     <div class="add-icon-container">
-      <i class="fas fa-plus-circle"  onclick="openAddModal()"></i>
+      <i class="fas fa-plus-circle" onclick="openAddModal()"></i>
     </div>
-    
+
 
     <!-- Modal -->
     <div id="addCandidateModal" style="display: none;">
@@ -729,7 +759,12 @@
               <input type="text" name="year[]" placeholder="Year" required>
               <input type="text" name="program[]" placeholder="Program" required>
               <input type="file" name="image[]" accept="image/*" required>
+<<<<<<< HEAD
               <input type="hidden" name="is_new[]" value="1">
+=======
+              <button type="button" class="remove-field-btn" onclick="removeNameField(this)"
+                style="display:none;">×</button>
+>>>>>>> 9fe90c735baaf3aa98813ae382843af0df100498
             </div>
           </div>
           <button type="button" class="add-field" onclick="addNameField()">Add Candidate</button>
@@ -743,13 +778,13 @@
     <div class="positions-container">
       <?php
       include 'db.php';
-      
+
       // Get unique positions
       $query = "SELECT DISTINCT position_id, position FROM candidate_positions ORDER BY position_id";
       $result = $conn->query($query);
-      
+
       if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
+        while ($row = $result->fetch_assoc()) {
           $position_id = $row['position_id'];
           $position = $row['position'];
           ?>
@@ -758,8 +793,10 @@
               <span class="position-id"><?php echo htmlspecialchars($position_id); ?></span>
               <span class="position-title"><?php echo htmlspecialchars($position); ?></span>
               <div class="icons">
-                <i class="fas fa-edit" onclick="openEditModal('<?php echo htmlspecialchars($position_id); ?>', '<?php echo htmlspecialchars($position); ?>')"></i>
-                <i class="fas fa-minus-circle" onclick="deletePosition('<?php echo htmlspecialchars($position_id); ?>')"></i>
+                <i class="fas fa-edit"
+                  onclick="openEditModal('<?php echo htmlspecialchars($position_id); ?>', '<?php echo htmlspecialchars($position); ?>')"></i>
+                <i class="fas fa-minus-circle"
+                  onclick="deletePosition('<?php echo htmlspecialchars($position_id); ?>')"></i>
               </div>
             </div>
             <div class="candidates-section">
@@ -770,13 +807,14 @@
               $stmt->bind_param("s", $position_id);
               $stmt->execute();
               $candidates_result = $stmt->get_result();
-              
-              while($candidate = $candidates_result->fetch_assoc()) {
+
+              while ($candidate = $candidates_result->fetch_assoc()) {
                 ?>
                 <div class="candidate-card">
                   <div class="candidate-image">
-                    <?php if(!empty($candidate['image'])): ?>
-                      <img src="<?php echo htmlspecialchars($candidate['image']); ?>" alt="<?php echo htmlspecialchars($candidate['name']); ?>">
+                    <?php if (!empty($candidate['image'])): ?>
+                      <img src="<?php echo htmlspecialchars($candidate['image']); ?>"
+                        alt="<?php echo htmlspecialchars($candidate['name']); ?>">
                     <?php else: ?>
                       <div class="no-image">No Image</div>
                     <?php endif; ?>
@@ -786,7 +824,12 @@
                     <p class="program"><?php echo htmlspecialchars($candidate['program']); ?></p>
                     <p class="year"><?php echo htmlspecialchars($candidate['year']); ?> Year</p>
                   </div>
+<<<<<<< HEAD
                   <i class="fas fa-trash delete-icon" onclick="deleteCandidate('<?php echo htmlspecialchars($candidate['id']); ?>', '<?php echo htmlspecialchars($candidate['name']); ?>', '<?php echo htmlspecialchars($candidate['position_id']); ?>')"></i>
+=======
+                  <i class="fas fa-trash delete-icon"
+                    onclick="deleteCandidate('<?php echo htmlspecialchars($candidate['id']); ?>', '<?php echo htmlspecialchars($candidate['name']); ?>')"></i>
+>>>>>>> 9fe90c735baaf3aa98813ae382843af0df100498
                 </div>
                 <?php
               }
@@ -802,60 +845,57 @@
       ?>
     </div>
 
-    </div>
-    <div id="logoutModal" style="display: none;">
-      <div class="modal-overlay"></div>
-      <div class="modal-box">
-        <h2>Confirm Logout</h2>
-        <p>Are you sure you want to log out?</p>
-        <div class="modal-actions">
-          <button class="btn cancel-btn" onclick="closeLogoutModal()">Cancel</button>
-          <button class="btn confirm-btn" onclick="confirmLogout()">Logout</button>
-        </div>
+  </div>
+  <div id="logoutModal" style="display: none;">
+    <div class="modal-overlayy"></div>
+    <div class="modal-boxx">
+      <h2>Confirm Logout</h2>
+      <p>Are you sure you want to log out?</p>
+      <div class="modal-actions">
+        <button class="btn cancel-btnn" onclick="closeLogoutModal()">Cancel</button>
+        <button class="btn confirm-btn" onclick="confirmLogout()">Logout</button>
       </div>
     </div>
 
-<script>
+    <script>
 
       //Sidebar
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const main = document.getElementById('main');
-      const barChartCanvas = document.getElementById('barChart');
+      function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const main = document.getElementById('main');
+        const barChartCanvas = document.getElementById('barChart');
 
-      sidebar.classList.toggle('collapsed');
-      main.classList.toggle('collapsed');
+        sidebar.classList.toggle('collapsed');
+        main.classList.toggle('collapsed');
 
-    }
-
-
-    function scrollToSection(id) {
-      const element = document.getElementById(id);
-      if (element) {
-        window.scrollTo({ top: element.offsetTop, behavior: 'smooth' });
       }
-  
-    }
-    //logout modal
-    document.querySelector('.logout-btn').addEventListener('click', function () {
-    document.getElementById('logoutModal').style.display = 'block';
-  });
-
-  function closeLogoutModal() {
-    document.getElementById('logoutModal').style.display = 'none';
-  }
-
-  function confirmLogout() {
-    
-    window.location.href = 'logout.php';
-  }
 
 
-  //new
+      function scrollToSection(id) {
+        const element = document.getElementById(id);
+        if (element) {
+          window.scrollTo({ top: element.offsetTop, behavior: 'smooth' });
+        }
+
+      }
+      //logout modal
+      document.querySelector('.logout-btn').addEventListener('click', function () {
+        document.getElementById('logoutModal').style.display = 'block';
+      });
+
+      function closeLogoutModal() {
+        document.getElementById('logoutModal').style.display = 'none';
+      }
+
+      function confirmLogout() {
+
+        window.location.href = 'logout.php';
+      }
 
 
-let nameCount = 1;
+      //new
 
+<<<<<<< HEAD
 function openAddModal() {
   const modal = document.getElementById("addCandidateModal");
   modal.style.display = "flex";
@@ -867,12 +907,22 @@ function openAddModal() {
   modal.querySelector('h3').textContent = 'Add Candidates';
   
   document.getElementById("nameFieldsContainer").innerHTML = `
+=======
+
+      let nameCount = 1;
+
+      function openAddModal() {
+        const modal = document.getElementById("addCandidateModal");
+        modal.style.display = "flex";
+        document.getElementById("nameFieldsContainer").innerHTML = `
+>>>>>>> 9fe90c735baaf3aa98813ae382843af0df100498
     <div class="input-group">
       <label>1.</label>
       <input type="text" name="name[]" placeholder="Name" required>
       <input type="text" name="year[]" placeholder="Year" required>
       <input type="text" name="program[]" placeholder="Program" required>
       <input type="file" name="image[]" accept="image/*" required>
+<<<<<<< HEAD
       <input type="hidden" name="is_new[]" value="1">
     </div>
   `;
@@ -882,36 +932,48 @@ function openAddModal() {
   document.querySelector('input[name="position_id"]').value = '';
   document.querySelector('input[name="position"]').value = '';
 }
+=======
+      <button type="button" class="remove-field" onclick="removeNameField(this)" style="position:absolute;top:5px;right:5px;background:none;border:none;color:#FDDE54;font-size:18px;cursor:pointer;">&times;</button>
+    </div>
+  `;
+        nameCount = 1;
+      }
+>>>>>>> 9fe90c735baaf3aa98813ae382843af0df100498
 
-function closeModal() {
-  document.getElementById('addCandidateModal').style.display = 'none';
-  // Reset form
-  document.getElementById('candidateForm').reset();
-  document.getElementById("nameFieldsContainer").innerHTML = `
+      function closeModal() {
+        document.getElementById('addCandidateModal').style.display = 'none';
+        // Reset form
+        document.getElementById('candidateForm').reset();
+        document.getElementById("nameFieldsContainer").innerHTML = `
     <div class="input-group">
       <label>1.</label>
       <input type="text" name="name[]" placeholder="Name" required>
       <input type="text" name="year[]" placeholder="Year" required>
       <input type="text" name="program[]" placeholder="Program" required>
       <input type="file" name="image[]" accept="image/*" required>
+<<<<<<< HEAD
       <input type="hidden" name="is_new[]" value="1">
+=======
+      <button type="button" class="remove-field" onclick="removeNameField(this)" style="position:absolute;top:5px;right:5px;background:none;border:none;color:#FDDE54;font-size:18px;cursor:pointer;">&times;</button>
+
+>>>>>>> 9fe90c735baaf3aa98813ae382843af0df100498
     </div>
   `;
-  nameCount = 1;
-}
+        nameCount = 1;
+      }
 
-function addNameField() {
-  nameCount++;
-  const container = document.getElementById("nameFieldsContainer");
-  const group = document.createElement("div");
-  group.classList.add("input-group");
-  
-  group.innerHTML = `
+      function addNameField() {
+        nameCount++;
+        const container = document.getElementById("nameFieldsContainer");
+        const group = document.createElement("div");
+        group.classList.add("input-group");
+        group.innerHTML = `
     <label>${nameCount}.</label>
     <input type="text" name="name[]" placeholder="Name" required>
     <input type="text" name="year[]" placeholder="Year" required>
     <input type="text" name="program[]" placeholder="Program" required>
     <input type="file" name="image[]" accept="image/*" required>
+<<<<<<< HEAD
     <input type="hidden" name="is_new[]" value="1">
   `;
   
@@ -943,6 +1005,46 @@ function openEditModal(positionId, position) {
         const group = document.createElement("div");
         group.classList.add("input-group");
         group.innerHTML = `
+=======
+    <button type="button" class="remove-field" onclick="removeNameField(this)" style="position:absolute;top:5px;right:5px;background:none;border:none;color:#FDDE54;font-size:18px;cursor:pointer;">&times;</button>
+
+  `;
+        container.appendChild(group);
+        updateCandidateLabels();
+      }
+
+      function removeNameField(btn) {
+        const container = document.getElementById("nameFieldsContainer");
+        if (container.children.length > 1) {
+          btn.parentElement.remove();
+          nameCount = container.children.length;
+          updateCandidateLabels();
+        }
+      }
+
+      function updateCandidateLabels() {
+        const groups = document.querySelectorAll('#nameFieldsContainer .input-group label');
+        groups.forEach((label, idx) => {
+          label.textContent = (idx + 1) + '.';
+        });
+      }
+
+      function openEditModal(positionId, position) {
+        const modal = document.getElementById("addCandidateModal");
+        modal.style.display = "flex";
+        modal.querySelector('h3').textContent = 'Edit Position';
+        document.querySelector('input[name="position_id[]"]').value = positionId;
+        document.querySelector('input[name="position[]"]').value = position;
+        fetch(`get_candidates.php?position_id=${positionId}`)
+          .then(response => response.json())
+          .then(candidates => {
+            const container = document.getElementById("nameFieldsContainer");
+            container.innerHTML = '';
+            candidates.forEach((candidate, index) => {
+              const group = document.createElement("div");
+              group.classList.add("input-group");
+              group.innerHTML = `
+>>>>>>> 9fe90c735baaf3aa98813ae382843af0df100498
           <label>${index + 1}.</label>
           <input type="text" name="name[]" placeholder="Name" value="${candidate.name}" required>
           <input type="text" name="year[]" placeholder="Year" value="${candidate.year}" required>
@@ -950,15 +1052,22 @@ function openEditModal(positionId, position) {
           <input type="file" name="image[]" accept="image/*">
           ${candidate.image ? `<small>Current image: ${candidate.image}</small>` : ''}
           <input type="hidden" name="existing_image[]" value="${candidate.image || ''}">
+<<<<<<< HEAD
           <input type="hidden" name="candidate_id[]" value="${candidate.id}">
           <input type="hidden" name="is_new[]" value="0">
+=======
+          <button type="button" class="remove-field-btn" onclick="removeNameField(this)" ${candidates.length === 1 ? 'style=\"display:none;\"' : ''}>×</button>
+>>>>>>> 9fe90c735baaf3aa98813ae382843af0df100498
         `;
-        container.appendChild(group);
-      });
-      nameCount = candidates.length;
-    });
-}
+              container.appendChild(group);
+            });
+            nameCount = candidates.length;
+            updateRemoveButtons();
+            updateCandidateLabels();
+          });
+      }
 
+<<<<<<< HEAD
 function validateAndSubmit(event) {
   event.preventDefault();
   
@@ -985,31 +1094,23 @@ function validateAndSubmit(event) {
     alert('Error saving data. Please try again.');
   });
 }
+=======
+      function validateAndSubmit(event) {
+        event.preventDefault();
 
-// Update the form submission
-document.getElementById('candidateForm').addEventListener('submit', validateAndSubmit);
+        const form = document.getElementById('candidateForm');
+        const formData = new FormData();
+>>>>>>> 9fe90c735baaf3aa98813ae382843af0df100498
 
-function deletePosition(positionId) {
-  if (confirm('Are you sure you want to delete this position and all its candidates?')) {
-    fetch('delete_position.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: 'position_id=' + encodeURIComponent(positionId)
-    })
-    .then(response => response.text())
-    .then(data => {
-      console.log('Server response:', data);
-      window.location.reload();
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Error deleting position');
-    });
-  }
-}
+        // Add position data
+        const positionId = document.querySelector('input[name="position_id[]"]').value;
+        const position = document.querySelector('input[name="position[]"]').value;
 
+        // Append position data
+        formData.append('position_id', positionId);
+        formData.append('position', position);
+
+<<<<<<< HEAD
 function deleteCandidate(candidateId, candidateName, positionId) {
   if (confirm('Are you sure you want to delete ' + candidateName + '?')) {
     fetch('delete_candidate.php', {
@@ -1034,12 +1135,98 @@ function deleteCandidate(candidateId, candidateName, positionId) {
     });
   }
 }
+=======
+        // Get all input arrays
+        const names = Array.from(document.getElementsByName('name[]')).map(input => input.value);
+        const years = Array.from(document.getElementsByName('year[]')).map(input => input.value);
+        const programs = Array.from(document.getElementsByName('program[]')).map(input => input.value);
+        const images = Array.from(document.getElementsByName('image[]'));
+        const existingImages = Array.from(document.getElementsByName('existing_image[]')).map(input => input.value);
+>>>>>>> 9fe90c735baaf3aa98813ae382843af0df100498
 
-   
+        // Add all data to FormData
+        names.forEach((name, index) => {
+          formData.append('name[]', name);
+          formData.append('year[]', years[index]);
+          formData.append('program[]', programs[index]);
+          formData.append('existing_image[]', existingImages[index] || '');
+          if (images[index].files[0]) {
+            formData.append('image[]', images[index].files[0]);
+          } else {
+            formData.append('image[]', '');
+          }
+        });
+
+        // Send form data using fetch
+        fetch('save_position.php', {
+          method: 'POST',
+          body: formData
+        })
+          .then(response => response.text())
+          .then(data => {
+            console.log('Server response:', data);
+            closeModal();
+            window.location.reload();
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+      }
+
+      // Update the form submission
+      document.getElementById('candidateForm').addEventListener('submit', validateAndSubmit);
+
+      function deletePosition(positionId) {
+        if (confirm('Are you sure you want to delete this position and all its candidates?')) {
+          fetch('delete_position.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'position_id=' + encodeURIComponent(positionId)
+          })
+            .then(response => response.text())
+            .then(data => {
+              console.log('Server response:', data);
+              window.location.reload();
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('Error deleting position');
+            });
+        }
+      }
+
+      function deleteCandidate(candidateId, candidateName) {
+        if (confirm('Are you sure you want to delete ' + candidateName + '?')) {
+          fetch('delete_candidate.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'candidate_id=' + encodeURIComponent(candidateId)
+          })
+            .then(response => response.text())
+            .then(data => {
+              console.log('Server response:', data);
+              window.location.reload();
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('Error deleting candidate');
+            });
+        }
+      }
 
 
 
 
-  </script>
+
+
+    </script>
 </body>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9fe90c735baaf3aa98813ae382843af0df100498
 </html>
