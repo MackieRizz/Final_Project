@@ -301,17 +301,60 @@
       <h1 id="Welcome">Welcome to EVSU Voting Dashboard</h1>
       <br>
 
-      <div class="charts-container">
+       <div class="charts-container">
         <div class="chart-box">
           <h3>Total Number of Students</h3>
-          <p style="font-size: 60px; font-weight: bold; text-align: center; color: #fff; margin-top: 80px;" id="totalStudents">0</p>
-        </div>
+           <p style="font-size: 60px; font-weight: bold; text-align: center; color: #fff; margin-top: 80px;">
+           <?php
+              include 'db.php';
 
+              $sql = "SELECT COUNT(student_id) AS total FROM students_registration";
+              $result = $conn->query($sql);
+
+              if (!$result) {
+                  die("Query failed: " . $conn->error);
+              }
+
+              $row = $result->fetch_assoc();
+              echo $row['total'];
+
+              $conn->close();
+              ?>
+          </p>
+        </div>
+        
         <div class="chart-box">
           <h3>Number of Students per Department</h3>
-          <canvas id="barChart"></canvas>
+            <ul style="font-size: 20px; color: #fff;">
+            <?php
+              include 'db.php';
+
+              $departments = [
+                'Teacher Education Department',
+                'Engineering Department',
+                'Computer Studies Department',
+                'Industrial Technology Department',
+                'Business and Management Department'
+              ];
+
+              $counts = [];
+
+              foreach ($departments as $dept) {
+                  $stmt = $conn->prepare("SELECT COUNT(*) AS total FROM students_registration WHERE department = ?");
+                  $stmt->bind_param("s", $dept);
+                  $stmt->execute();
+                  $stmt->bind_result($count);
+                  $stmt->fetch();
+                  $counts[] = $count;
+                  $stmt->close();
+              }
+
+              $conn->close();
+              ?>
+          </ul>
+          <canvas id="barChart" style="max-height: 400px;"></canvas>
+          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         </div>
-      </div>
       <br>
 
       <div class="charts-container">
@@ -355,8 +398,6 @@
       });
     }
 
-
-
     function scrollToSection(id) {
       const element = document.getElementById(id);
       if (element) {
@@ -364,47 +405,59 @@
       }
     }
 
-    const studentCounts = [300, 250, 200, 150, 100];
-    const total = studentCounts.reduce((a, b) => a + b, 0);
-    document.getElementById('totalStudents').textContent = total;
+    const studentCounts = <?php echo json_encode($counts); ?>;
 
-    const barCtx = document.getElementById('barChart').getContext('2d');
-      new Chart(barCtx, {
-        type: 'bar',
-        data: {
-          labels: ['Engineering', 'IT', 'Education', 'Business', 'Agriculture'],
-          datasets: [{
-            label: 'Students',
-            data: studentCounts,
-            backgroundColor: '#FDDE54'
-          }]
-        },
-        options: {
-          responsive: true, 
-          plugins: {
-            legend: {
-              display: false,
-              labels: {
-                color: '#fff'
-              }
-            }
-          },
-          scales: {
-           x: {
-            ticks: {
-              color: '#fff',
-              maxRotation: 0,
-              minRotation: 0
-            }
-          },
-            y: {
-              ticks: {
-                color: '#fff'
-              }
-            }
+   const barCtx = document.getElementById('barChart').getContext('2d');
+new Chart(barCtx, {
+  type: 'bar',
+  data: {
+    labels: [
+      'Teacher Education',
+      'Engineering',
+      'Computer Studies',
+      'Industrial Tech',
+      'Business & Mgmt'
+    ],
+    datasets: [{
+      label: 'Students',
+      data: studentCounts,
+      backgroundColor: '#FDDE54'
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          label: function(context) {
+            // context.parsed.y contains the value (student count)
+            return context.parsed.y + ' students';
           }
         }
-      });
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: '#fff'
+        }
+      },
+      y: {
+        min: 0,
+        max: 200,
+        ticks: {
+          color: '#fff',
+          stepSize: 10
+        }
+      }
+    }
+  }
+});
 
 
     const pieCtx = document.getElementById('pieChart').getContext('2d');
