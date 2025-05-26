@@ -12,8 +12,11 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Karla', sans-serif;
+      font-family: 'Poppins', sans-serif;
     }
+
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
     body {
       background: linear-gradient(135deg, #1a0606, #f79f56);
       color: #FDDE54;
@@ -22,14 +25,18 @@
     }
     .sidebar {
       width: 250px;
-      background-color: #2d0808;
-      transition: width 0.3s ease;
+      background: linear-gradient(180deg, #2d0808 0%, #461212 100%);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       height: 100vh;
       overflow: hidden;
       position: fixed;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(253, 222, 84, 0.1);
+      z-index: 1000;
     }
     .sidebar.collapsed {
       width: 0px;
@@ -38,12 +45,18 @@
       padding: 20px;
     }
     .sidebar .menu-item {
-      padding: 15px 10px;
+      padding: 15px 20px;
       color: #FDDE54;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 15px;
       cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 0 30px 30px 0;
+      margin: 5px 0;
+      position: relative;
+      font-weight: 500;
+      letter-spacing: 0.5px;
     }
     .label {
       margin-left: 7px;
@@ -51,8 +64,20 @@
     .label1 {
       margin-left: 10px;
     }
+    .sidebar .menu-item i {
+      font-size: 20px;
+      transition: all 0.3s ease;
+      width: 30px;
+      text-align: center;
+    }
     .sidebar .menu-item:hover {
-      background: #4a1010;
+      background: linear-gradient(90deg, #4a1010 0%, rgba(74, 16, 16, 0.8) 100%);
+      transform: translateX(10px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .sidebar .menu-item:hover i {
+      transform: scale(1.2);
+      color: #fff;
     }
     .logout-btn {
       padding: 15px 10px;
@@ -64,9 +89,15 @@
       margin-bottom: 10px;
       margin-left: 20px;
       width: 87%;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
     }
     .logout-btn:hover {
       background: #4a1010;
+      transform: translateX(5px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
     .main-content {
       margin-left: 250px;
@@ -80,21 +111,29 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 25px 20px;
+      padding: 0 20px;
       background: rgba(0,0,0,0.6);
       position: sticky;
-      top: 0;
+      top: 10px;
       z-index: 10;
       width: 99.3%;
-      height: 40px;
-      transition: none;
-      margin: 7px 5px 5px 5px;
-      border-radius: 5px;
+      height: 55px;
+      transition: all 0.3s ease;
+      margin: 5px 5px 5px 5px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(253, 222, 84, 0.1);
     }
+
     .toggle-btn {
       font-size: 20px;
       cursor: pointer;
       color: #FDDE54;
+      transition: transform 0.3s ease;
+    }
+    .toggle-btn:hover {
+      transform: rotate(180deg);
     }
     .profile {
       position: relative;
@@ -109,17 +148,24 @@
       position: absolute;
       right: 0;
       top: 40px;
-      background: #4a1010;
-      border-radius: 10px;
+      background: rgba(74, 16, 16, 0.95);
+      border-radius: 20px;
       padding: 20px;
       width: 250px;
       height: 300px;
       text-align: center;
       color: #FDDE54;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(253, 222, 84, 0.1);
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .profile:hover .profile-modal {
       display: block;
+      transform: translateY(0);
+      opacity: 1;
     }
     .profile-modal .cover-photo {
       width: 100%;
@@ -158,39 +204,87 @@
     }
 
     .menu-title {
-      font-weight: bold;
-      font-size: 18px;
-      padding: 15px 10px;
-      color: #fff;
+      font-weight: 600;
+      font-size: 24px;
+      padding: 20px;
+      color: #FDDE54;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      border-bottom: 1px solid rgba(253, 222, 84, 0.1);
+      margin-bottom: 10px;
     }
     #Welcome {
-      margin-left: 20px;
+      margin: 5px 5px 10px 20px;
+      font-size: 35px;
+      position: fixed;
     }
     .analytics {
-      padding: 20px;
+      padding: 10px 20px;
+      height: calc(100vh - 60px);
+      overflow: hidden;
     }
     .charts-container {
       display: flex;
       gap: 20px;
-      flex-wrap: wrap;
-      
+      margin-bottom: 0;
+      margin-top: 55px;
     }
     .chart-box {
       background: rgba(255, 255, 255, 0.1);
-      padding: 20px;
-      border-radius: 10px;
+      padding: 15px;
+      border-radius: 20px;
       flex: 1;
-      flex: 1 1 500px;
-      min-width: 300px;
-      height: 300px;
-      transition: flex-basis 0.3s ease;
+      height: 35vh;
+      min-width: 290px;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(253, 222, 84, 0.1);
+      backdrop-filter: blur(10px);
+      transform-style: preserve-3d;
+      animation: float 6s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
     }
 
-    .chart-box canvas {
-      display: block;
-      margin: 0 auto;
-      height: 250px !important;
-      transition: max-width 0.3s ease;
+    .chart-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(253, 222, 84, 0.1) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .chart-box:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .chart-box h3 {
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #FDDE54;
+    }
+
+    #totalStudents {
+      font-size: 50px;
+      font-weight: bold;
+      text-align: center;
+      color: #fff;
+      margin-top: 50px;
+    }
+
+    .voting-participation-container {
+      height: 42vh;
+      margin-top: -40px;
+    }
+
+    #barChart, #pieChart {
+      width: 100% !important;
+      height: calc(100% - 30px) !important;
     }
 
     #logoutModal {
@@ -217,10 +311,12 @@
       background: #2d0808;
       color: #FDDE54;
       padding: 30px;
-      border-radius: 12px;
+      border-radius: 20px;
       text-align: center;
       width: 320px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(253, 222, 84, 0.1);
+      backdrop-filter: blur(10px);
     }
 
     .modal-box h2 {
@@ -238,12 +334,34 @@
     }
 
     .modal-actions .btn {
-      padding: 10px 20px;
+      padding: 12px 25px;
       font-weight: bold;
       border: none;
-      border-radius: 6px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.5s, height 0.5s;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
     }
 
     .confirm-btn {
@@ -266,6 +384,42 @@
       color: #fff;
     }
 
+    .pie-charts-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: calc(100% - 40px);
+      gap: 10px;
+      padding: 0 10px;
+    }
+
+    .pie-chart-container {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .pie-chart-container h4 {
+      color: #FDDE54;
+      font-size: 14px;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+
+    .pie-chart-container canvas {
+      width: 100% !important;
+      height: calc(100% - 25px) !important;
+    }
+
+    .pie-chart-container:nth-child(2) {
+      margin-bottom: -10px;
+    }
+
+    .pie-chart-container canvas {
+      margin-bottom: 5px;
+    }
 
   </style>
 </head>
@@ -313,12 +467,24 @@
           <canvas id="barChart"></canvas>
         </div>
       </div>
-      <br>
 
       <div class="charts-container">
-        <div class="chart-box">
+        <div class="chart-box voting-participation-container">
           <h3>Voting Participation</h3>
-          <canvas id="pieChart"></canvas>
+          <div class="pie-charts-wrapper">
+            <div class="pie-chart-container">
+              <h4>Overall Voting Rate</h4>
+              <canvas id="pieChart"></canvas>
+            </div>
+            <div class="pie-chart-container">
+              <h4>Votes per Department</h4>
+              <canvas id="departmentPieChart"></canvas>
+            </div>
+            <div class="pie-chart-container">
+              <h4>Gender-based Voting</h4>
+              <canvas id="genderPieChart"></canvas>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -377,11 +543,18 @@
           datasets: [{
             label: 'Students',
             data: studentCounts,
-            backgroundColor: '#FDDE54'
+            backgroundColor: '#FDDE54',
+            borderWidth: 2,
+            borderRadius: 10,
+            borderSkipped: false,
+            hoverBackgroundColor: '#fff',
+            hoverBorderColor: '#FDDE54',
+            hoverBorderWidth: 3
           }]
         },
         options: {
-          responsive: true, 
+          responsive: true,
+          maintainAspectRatio: false,
           plugins: {
             legend: {
               display: false,
@@ -391,18 +564,38 @@
             }
           },
           scales: {
-           x: {
-            ticks: {
-              color: '#fff',
-              maxRotation: 0,
-              minRotation: 0
-            }
-          },
-            y: {
+            x: {
+              grid: {
+                display: false,
+                drawBorder: false
+              },
               ticks: {
-                color: '#fff'
+                color: '#fff',
+                maxRotation: 0,
+                minRotation: 0,
+                padding: 10,
+                font: {
+                  size: 12
+                }
+              }
+            },
+            y: {
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)',
+                drawBorder: false
+              },
+              ticks: {
+                color: '#fff',
+                padding: 10,
+                font: {
+                  size: 12
+                }
               }
             }
+          },
+          animation: {
+            duration: 2000,
+            easing: 'easeInOutQuart'
           }
         }
       });
@@ -410,31 +603,58 @@
 
     const pieCtx = document.getElementById('pieChart').getContext('2d');
     new Chart(pieCtx, {
-      type: 'pie',
+      type: 'doughnut',
       data: {
         labels: ['Voted', 'Did Not Vote'],
         datasets: [{
           data: [800, 400],
-          backgroundColor: ['#FDDE54', '#4a1010']
+          backgroundColor: [
+            'rgba(253, 222, 84, 1)',
+            'rgba(74, 16, 16, 0.9)'
+          ],
+          borderWidth: 2,
+          borderColor: 'rgba(255, 255, 255, 0.1)',
+          hoverBackgroundColor: [
+            'rgba(255, 255, 255, 1)',
+            'rgba(106, 32, 32, 1)'
+          ],
+          hoverBorderColor: '#FDDE54',
+          hoverBorderWidth: 3,
+          hoverOffset: 15,
+          offset: 10
         }]
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
+        cutout: '60%',
         plugins: {
           legend: {
+            position: 'bottom',
             labels: {
-              color: '#fff'
+              color: '#fff',
+              padding: 5,
+              font: {
+                size: 11,
+                family: 'Poppins'
+              },
+              usePointStyle: true,
+              pointStyle: 'circle'
             }
           }
         }
       }
-
     });
     
     Chart.helpers.each(Chart.instances, function(instance) {
       instance.resize();
     });
 
+    // Add gradient effect to the charts container
+    const chartsContainers = document.querySelectorAll('.chart-box');
+    chartsContainers.forEach(container => {
+      container.style.background = 'linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)';
+    });
 
     //logout modal
     document.querySelector('.logout-btn').addEventListener('click', function () {
@@ -450,6 +670,101 @@
     window.location.href = 'logout.php'; // Replace with actual logout logic
   }
 
+  // Add Department Pie Chart
+  const deptCtx = document.getElementById('departmentPieChart').getContext('2d');
+  new Chart(deptCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Engineering', 'IT', 'Education', 'Business', 'Agriculture'],
+      datasets: [{
+        data: [250, 200, 150, 100, 50],
+        backgroundColor: [
+          'rgba(253, 222, 84, 1)',    // Yellow for Engineering
+          'rgba(255, 159, 64, 0.9)',  // Orange for IT
+          'rgba(255, 99, 132, 0.9)',  // Pink for Education
+          'rgba(75, 192, 192, 0.9)',  // Cyan for Business
+          'rgba(153, 102, 255, 0.9)'  // Purple for Agriculture
+        ],
+        borderWidth: 2,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        hoverOffset: 15
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          align: 'center',
+          labels: {
+            color: '#fff',
+            padding: 4,
+            boxWidth: 10,
+            boxHeight: 10,
+            font: {
+              size: 10,
+              family: 'Poppins'
+            },
+            usePointStyle: true,
+            pointStyle: 'circle'
+          },
+          maxWidth: 200,
+          maxHeight: 50
+        }
+      },
+      layout: {
+        padding: {
+          bottom: 10
+        }
+      }
+    }
+  });
+
+  // Add Gender Pie Chart
+  const genderCtx = document.getElementById('genderPieChart').getContext('2d');
+  new Chart(genderCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Male Voted', 'Female Voted'],
+      datasets: [{
+        data: [400, 400],
+        backgroundColor: [
+          'rgba(75, 99, 132, 0.9)',
+          'rgba(255, 192, 192, 0.9)'
+        ],
+        borderWidth: 2,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        hoverBackgroundColor: [
+          'rgba(75, 99, 132, 0.9)',
+          'rgba(255, 192, 192, 0.9)'
+        ],
+        hoverBorderWidth: 3,
+        hoverOffset: 15
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: '#fff',
+            padding: 5,
+            font: {
+              size: 11,
+              family: 'Poppins'
+            },
+            usePointStyle: true,
+            pointStyle: 'circle'
+          }
+        }
+      }
+    }
+  });
 
   </script>
 </body>

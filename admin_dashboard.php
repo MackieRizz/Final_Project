@@ -22,14 +22,18 @@
     }
     .sidebar {
       width: 250px;
-      background-color: #2d0808;
-      transition: width 0.3s ease;
+      background: linear-gradient(180deg, #2d0808 0%, #461212 100%);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       height: 100vh;
       overflow: hidden;
       position: fixed;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(253, 222, 84, 0.1);
+      z-index: 1000;
     }
     .sidebar.collapsed {
       width: 0px;
@@ -38,12 +42,18 @@
       padding: 20px;
     }
     .sidebar .menu-item {
-      padding: 15px 10px;
+      padding: 15px 20px;
       color: #FDDE54;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 15px;
       cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 0 30px 30px 0;
+      margin: 5px 0;
+      position: relative;
+      font-weight: 500;
+      letter-spacing: 0.5px;
     }
     .label {
       margin-left: 7px;
@@ -51,8 +61,20 @@
     .label1 {
       margin-left: 10px;
     }
+    .sidebar .menu-item i {
+      font-size: 20px;
+      transition: all 0.3s ease;
+      width: 30px;
+      text-align: center;
+    }
     .sidebar .menu-item:hover {
-      background: #4a1010;
+      background: linear-gradient(90deg, #4a1010 0%, rgba(74, 16, 16, 0.8) 100%);
+      transform: translateX(10px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .sidebar .menu-item:hover i {
+      transform: scale(1.2);
+      color: #fff;
     }
     .logout-btn {
       padding: 15px 10px;
@@ -64,9 +86,15 @@
       margin-bottom: 10px;
       margin-left: 20px;
       width: 87%;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
     }
     .logout-btn:hover {
       background: #4a1010;
+      transform: translateX(5px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
     .main-content {
       margin-left: 250px;
