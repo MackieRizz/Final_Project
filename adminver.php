@@ -4,7 +4,6 @@ ini_set('display_errors', 1);
 session_start();
 include 'db.php';
 
-$passcode    = '12345678'; // 8 digits now
 $secretKey   = '6LcWBTsrAAAAAHsAxa7FJ9S0Am3V95OnX54R9Cmg';
 $maxAttempts = 3;
 
@@ -16,16 +15,23 @@ $error = '';
 $lockout = false;
 $showAlert = false;
 
+// Get passcode from database
+$stmt = $conn->prepare("SELECT passcode FROM admin_passcode WHERE id = 1");
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$passcode = $row['passcode'] ?? '12345678'; // Fallback to default if not found
+$stmt->close();
 
 if ($_SESSION['admin_attempts'] >= $maxAttempts) {
     $lockout = true;
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $digits = '';
-    for ($i = 1; $i <= 8; $i++) { // Loop for 8 digits
+    for ($i = 1; $i <= 8; $i++) {
         $digits .= $_POST["digit{$i}"] ?? '';
     }
 
-    if (strlen($digits) < 8) { // Require 8 digits
+    if (strlen($digits) < 8) {
         $error = "Please enter all eight digits. Attempts left: " . ($maxAttempts - $_SESSION['admin_attempts']);
         $showAlert = true;
     } elseif (empty($_POST['g-recaptcha-response'])) {
