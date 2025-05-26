@@ -846,6 +846,7 @@
       <input type="text" name="year[]" placeholder="Year" required>
       <input type="text" name="program[]" placeholder="Program" required>
       <input type="file" name="image[]" accept="image/*" required>
+      <button type="button" class="remove-field" onclick="removeNameField(this)" style="position:absolute;top:5px;right:5px;background:none;border:none;color:#FDDE54;font-size:18px;cursor:pointer;">&times;</button>
     </div>
   `;
       nameCount = 1;
@@ -862,6 +863,7 @@
       <input type="text" name="year[]" placeholder="Year" required>
       <input type="text" name="program[]" placeholder="Program" required>
       <input type="file" name="image[]" accept="image/*" required>
+      <button type="button" class="remove-field" onclick="removeNameField(this)" style="position:absolute;top:5px;right:5px;background:none;border:none;color:#FDDE54;font-size:18px;cursor:pointer;">&times;</button>
     </div>
   `;
       nameCount = 1;
@@ -872,16 +874,32 @@
       const container = document.getElementById("nameFieldsContainer");
       const group = document.createElement("div");
       group.classList.add("input-group");
-
       group.innerHTML = `
     <label>${nameCount}.</label>
     <input type="text" name="name[]" placeholder="Name" required>
     <input type="text" name="year[]" placeholder="Year" required>
     <input type="text" name="program[]" placeholder="Program" required>
     <input type="file" name="image[]" accept="image/*" required>
+    <button type="button" class="remove-field" onclick="removeNameField(this)" style="position:absolute;top:5px;right:5px;background:none;border:none;color:#FDDE54;font-size:18px;cursor:pointer;">&times;</button>
   `;
-
       container.appendChild(group);
+      updateCandidateLabels();
+    }
+
+    function removeNameField(btn) {
+      const container = document.getElementById("nameFieldsContainer");
+      if (container.children.length > 1) {
+        btn.parentElement.remove();
+        nameCount = container.children.length;
+        updateCandidateLabels();
+      }
+    }
+
+    function updateCandidateLabels() {
+      const groups = document.querySelectorAll('#nameFieldsContainer .input-group label');
+      groups.forEach((label, idx) => {
+        label.textContent = (idx + 1) + '.';
+      });
     }
 
     function openEditModal(positionId, position) {
