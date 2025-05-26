@@ -191,22 +191,27 @@
       margin-left: 20px;
     }
 
-
     #logoutModal {
       position: fixed;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       width: 100vw;
       height: 100vh;
       z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    }
+
+    .modal-overlayy {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0, 0, 0, 0.7);
     }
 
-    .modal-box {
-      position: relative;
+    .modal-boxx {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       background: #2d0808;
       color: #FDDE54;
       padding: 30px;
@@ -214,26 +219,13 @@
       text-align: center;
       width: 320px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
-      z-index: 10000;
     }
 
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 9998;
-    }
-
-
-
-    .modal-box h2 {
+    .modal-boxx h2 {
       margin-bottom: 10px;
     }
 
-    .modal-box p {
+    .modal-boxx p {
       margin-bottom: 20px;
     }
 
@@ -262,33 +254,15 @@
       color: #fff;
     }
 
-    .cancel-btn {
+    .cancel-btnn {
       background-color: #aaa;
       color: #2d0808;
     }
 
-    .cancel-btn:hover {
+    .cancel-btnn:hover {
       background-color: #666;
       color: #fff;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     .add-icon-container {
@@ -810,12 +784,12 @@
 
   </div>
   <div id="logoutModal" style="display: none;">
-    <div class="modal-overlay"></div>
-    <div class="modal-box">
+    <div class="modal-overlayy"></div>
+    <div class="modal-boxx">
       <h2>Confirm Logout</h2>
       <p>Are you sure you want to log out?</p>
       <div class="modal-actions">
-        <button class="btn cancel-btn" onclick="closeLogoutModal()">Cancel</button>
+        <button class="btn cancel-btnn" onclick="closeLogoutModal()">Cancel</button>
         <button class="btn confirm-btn" onclick="confirmLogout()">Logout</button>
       </div>
     </div>
