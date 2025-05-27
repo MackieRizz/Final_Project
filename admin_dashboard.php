@@ -201,7 +201,7 @@
     }
     .charts-container {
       display: flex;
-      gap: 20px;
+      gap: 10px;
       flex-wrap: wrap;
       
     }
@@ -246,6 +246,7 @@
       text-shadow: 0 0 10px rgba(253, 222, 84, 0.3);
       position: relative;
       display: inline-block;
+
     }
 
     .chart-box h4 {
@@ -253,12 +254,14 @@
       font-size: 1.1rem;
       text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
       position: relative;
+      margin-top: -15px;
+      margin-left: 75px;
     }
 
     .chart-box canvas {
       display: block;
       margin: 0 auto;
-      height: 250px !important;
+      height: 200px;
       transition: max-width 0.3s ease;
     }
 
@@ -635,24 +638,33 @@
 
       <div class="charts-container" style="width: 100%;">
         <div class="chart-box">
-          <h3>Voting Statistics</h3>
-          <div style="display: flex; justify-content: space-between; gap: 20px;">
-            <div style="flex: 1; max-width: 25%;">
-              <h4 style="text-align: center; color: #fff; margin-bottom: -15px; ">Overall Participation</h4>
-              <div style="position: relative; width: 80%; margin: auto; padding-bottom: 10px;">
-                <canvas id="pieChart"></canvas>
+          <h3 style="margin-bottom: 30px;">Voting Statistics</h3>
+          <div style="display: flex; justify-content: space-between; gap: 100px; padding: 0px 50px;">
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+              <h4 style="color: #fff; margin-bottom: 15px; font-size: 14px; align-self: flex-start;">Overall Participation</h4>
+              <div style="display: flex; align-items: flex-start; gap: 10px; width: 100%;">
+                <div style="width: 150px; height: 130px; position: relative;">
+                  <canvas id="pieChart" style="position: absolute; top: 20px; left: 0;"></canvas>
+                </div>
+                <div id="pieChartLegend" style="font-size: 12px; padding-top: 25px;"></div>
               </div>
             </div>
-            <div style="flex: 1; max-width: 25%;">
-              <h4 style="text-align: center; color: #fff; margin-bottom: -15px; ">Votes per Department</h4>
-              <div style="position: relative; width: 80%; margin: auto; padding-bottom: 10px;">
-                <canvas id="departmentPieChart"></canvas>
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+              <h4 style="color: #fff; margin-bottom: 15px; font-size: 14px; align-self: flex-start;">Votes per Department</h4>
+              <div style="display: flex; align-items: flex-start; gap: 10px; width: 100%;">
+                <div style="width: 150px; height: 130px; position: relative; " >
+                  <canvas id="departmentPieChart" style="position: absolute; top: 20px; left: 0;"></canvas>
+                </div>
+                <div id="departmentPieChartLegend" style="font-size: 12px; padding-top: 15px;"></div>
               </div>
             </div>
-            <div style="flex: 1; max-width: 25%;">
-              <h4 style="text-align: center; color: #fff; margin-bottom: -15px; ">Gender-based Voting</h4>
-              <div style="position: relative; width: 80%; margin: auto; padding-bottom: 10px;">
-                <canvas id="genderPieChart"></canvas>
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+              <h4 style="color: #fff; margin-bottom: 15px; font-size: 14px; align-self: flex-start;">Gender-based Voting</h4>
+              <div style="display: flex; align-items: flex-start; gap: 10px; width: 100%;">
+                <div style="width: 150px; height: 130px; position: relative;">
+                  <canvas id="genderPieChart" style="position: absolute; top: 20px; left: 0;"></canvas>
+                </div>
+                <div id="genderPieChartLegend" style="font-size: 12px; padding-top: 25px;"></div>
               </div>
             </div>
           </div>
@@ -787,28 +799,31 @@
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        aspectRatio: 1,
         plugins: {
           legend: {
-            position: 'bottom',
-            labels: {
-              color: '#fff',
-              font: {
-                size: 11
-              },
-              padding: 10,
-              boxWidth: 15
-            }
+            display: false
           }
         },
         layout: {
-          padding: {
-            bottom: 35,
-            top: 25
-          }
+          padding: 0
         },
-        radius: '80%'
+        radius: '100%'
       }
     });
+
+    // Create custom legend for pie chart
+    const pieChartLegend = document.getElementById('pieChartLegend');
+    pieChartLegend.innerHTML = `
+      <div style="color: #fff; margin-bottom: 6px; display: flex; align-items: center;">
+        <span style="display: inline-block; width: 10px; height: 10px; background: #FDDE54; margin-right: 6px; border-radius: 2px;"></span>
+        <span>Voted</span>
+      </div>
+      <div style="color: #fff; display: flex; align-items: center;">
+        <span style="display: inline-block; width: 10px; height: 10px; background: #4a1010; margin-right: 6px; border-radius: 2px;"></span>
+        <span>Did Not Vote</span>
+      </div>
+    `;
     
     Chart.helpers.each(Chart.instances, function(instance) {
       instance.resize();
@@ -844,77 +859,91 @@
 
     // Department Pie Chart
     const deptPieCtx = document.getElementById('departmentPieChart').getContext('2d');
+    const deptLabels = <?php echo json_encode($deptLabels); ?>;
+    const deptData = <?php echo json_encode($deptData); ?>;
+    const deptColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD'];
+    
     new Chart(deptPieCtx, {
       type: 'pie',
       data: {
-        labels: <?php echo json_encode($deptLabels); ?>,
+        labels: deptLabels,
         datasets: [{
-          data: <?php echo json_encode($deptData); ?>,
-          backgroundColor: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD']
+          data: deptData,
+          backgroundColor: deptColors
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        aspectRatio: 1,
         plugins: {
           legend: {
-            position: 'bottom',
-            labels: {
-              color: '#fff',
-              font: {
-                size: 11
-              },
-              padding: 10,
-              boxWidth: 15
-            }
+            display: false
           }
         },
         layout: {
-          padding: {
-            bottom: 35,
-            top: 25
-          }
+          padding: 0
         },
-        radius: '80%'
+        radius: '100%'
       }
     });
 
+    // Create custom legend for department pie chart
+    const deptChartLegend = document.getElementById('departmentPieChartLegend');
+    let deptLegendHtml = '';
+    deptLabels.forEach((label, index) => {
+      deptLegendHtml += `
+        <div style="color: #fff; margin-bottom: 6px; display: flex; align-items: center;">
+          <span style="display: inline-block; width: 10px; height: 10px; background: ${deptColors[index]}; margin-right: 6px; border-radius: 2px;"></span>
+          <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${label}</span>
+        </div>
+      `;
+    });
+    deptChartLegend.innerHTML = deptLegendHtml;
+
     // Gender Pie Chart
     const genderPieCtx = document.getElementById('genderPieChart').getContext('2d');
+    const genderLabels = <?php echo json_encode($genderLabels); ?>;
+    const genderData = <?php echo json_encode($genderData); ?>;
+    const genderColors = ['#007BFF', '#FF69B4'];
+    
     new Chart(genderPieCtx, {
       type: 'pie',
       data: {
-        labels: <?php echo json_encode($genderLabels); ?>,
+        labels: genderLabels,
         datasets: [{
-          data: <?php echo json_encode($genderData); ?>,
-          backgroundColor: ['#007BFF', '#FF69B4']
+          data: genderData,
+          backgroundColor: genderColors
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        aspectRatio: 1,
         plugins: {
           legend: {
-            position: 'bottom',
-            labels: {
-              color: '#fff',
-              font: {
-                size: 11
-              },
-              padding: 10,
-              boxWidth: 15
-            }
+            display: false
           }
         },
         layout: {
-          padding: {
-            bottom: 35,
-            top: 25
-          }
+          padding: 0
         },
-        radius: '80%'
+        radius: '100%'
       }
     });
+
+    // Create custom legend for gender pie chart
+    const genderChartLegend = document.getElementById('genderPieChartLegend');
+    let genderLegendHtml = '';
+    genderLabels.forEach((label, index) => {
+      genderLegendHtml += `
+        <div style="color: #fff; margin-bottom: 6px; display: flex; align-items: center;">
+          <span style="display: inline-block; width: 10px; height: 10px; background: ${genderColors[index]}; margin-right: 6px; border-radius: 2px;"></span>
+          <span>${label}</span>
+        </div>
+      `;
+    });
+    genderChartLegend.innerHTML = genderLegendHtml;
 
     //logout modal
     document.querySelector('.logout-btn').addEventListener('click', function() {
