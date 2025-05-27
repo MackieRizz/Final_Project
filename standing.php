@@ -197,28 +197,38 @@
       width: 100vw;
       height: 100vh;
       z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
     }
-
+    #logoutModal.show {
+      opacity: 1;
+      visibility: visible;
+    }
     .modal-overlay {
-      position: absolute;
+      position: fixed;
       top: 0; left: 0;
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(2px);
     }
-
     .modal-box {
-      position: absolute;
+      position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(0.8);
       background: #2d0808;
       color: #FDDE54;
       padding: 30px;
       border-radius: 12px;
       text-align: center;
       width: 320px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+      transition: transform 0.3s ease;
+    }
+    #logoutModal.show .modal-box {
+      transform: translate(-50%, -50%) scale(1);
     }
 
     .modal-box h2 {
@@ -402,6 +412,19 @@
 
     <!-- Your content for the standing page goes here -->
 
+    <!-- Logout Modal -->
+    <div id="logoutModal">
+      <div class="modal-overlay"></div>
+      <div class="modal-box">
+        <h2>Confirm Logout</h2>
+        <p>Are you sure you want to log out?</p>
+        <div class="modal-actions">
+          <button class="btn cancel-btn" onclick="closeLogoutModal()">Cancel</button>
+          <button class="btn confirm-btn" onclick="confirmLogout()">Logout</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Passcode Update Modal -->
     <div id="passcodeModal" class="passcode-modal-overlay">
       <div class="passcode-modal-container">
@@ -430,11 +453,23 @@
 
     //logout modal
     document.querySelector('.logout-btn').addEventListener('click', function () {
-      document.getElementById('logoutModal').style.display = 'block';
+      const modal = document.getElementById('logoutModal');
+      modal.classList.add('show');
+    });
+
+    // Close modal when clicking overlay
+    document.querySelector('.modal-overlay').addEventListener('click', closeLogoutModal);
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeLogoutModal();
+      }
     });
 
     function closeLogoutModal() {
-      document.getElementById('logoutModal').style.display = 'none';
+      const modal = document.getElementById('logoutModal');
+      modal.classList.remove('show');
     }
 
     function confirmLogout() {

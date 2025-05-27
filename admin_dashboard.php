@@ -672,7 +672,7 @@
       </div>
 
     </div>
-    <div id="logoutModal" style="display: none;">
+    <div id="logoutModal">
       <div class="modal-overlay"></div>
       <div class="modal-box">
         <h2>Confirm Logout</h2>
