@@ -56,7 +56,7 @@ if ($_SESSION['admin_attempts'] >= $maxAttempts) {
         if ($digits === $passcode) {
             unset($_SESSION['admin_attempts']);
             $_SESSION['admin_verified'] = true;
-            header('Location: admin_dashboard.php');
+            header('Location: admin_auth.php');
             exit;
         } else {
             $_SESSION['admin_attempts']++;

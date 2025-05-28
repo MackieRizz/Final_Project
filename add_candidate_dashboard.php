@@ -1,3 +1,17 @@
+<?php
+session_start();
+include 'db.php';
+
+// Check if admin is logged in and has a valid session
+// Check if admin is logged in
+if (!isset($_SESSION['admin_username'])) {
+    header("Location: admin_auth.php");
+    exit();
+}
+
+$admin_username = $_SESSION['admin_username'];
+$profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/ba/ab/b4baab4d57a5d0d4bbb3455ad57bda80.jpg';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -896,9 +910,9 @@
         <i class="fas fa-user-circle"></i>
         <div class="profile-modal">
           <div class="cover-photo"></div>
-          <img src="https://i.pinimg.com/564x/b4/ba/ab/b4baab4d57a5d0d4bbb3455ad57bda80.jpg" alt="Profile">
+          <img src="<?php echo htmlspecialchars($profile_pic); ?>" alt="Profile">
           <br><br>
-          <p id="name">SARJAGA</p>
+          <p id="name"><?php echo htmlspecialchars($admin_username); ?></p>
           <p id="role">Administrator</p>
           <button class="edit-passcode-btn" title="Edit Passcode">
             <i class="fas fa-key"></i>

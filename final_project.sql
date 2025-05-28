@@ -186,6 +186,15 @@ INSERT INTO `votes` (`id`, `student_id`, `candidate_id`, `position_id`, `vote_ti
 (8, '2022-35473', 2, 2, '2025-05-28 05:58:40'),
 (9, '2022-35473', 2, 3, '2025-05-28 05:58:40');
 
+
+
+CREATE TABLE `admin` (
+  `id` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `profile_pic` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 --
 -- Indexes for dumped tables
 --
