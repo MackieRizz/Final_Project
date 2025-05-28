@@ -319,7 +319,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
     </style>
 </head>
 <body>
-    <a href="Homepage.html" class="back-icon entrance-animate" title="Back to Homepage">
+    <a href="adminver.php" class="back-icon entrance-animate" title="Back to Homepage">
         <i class="fas fa-arrow-left"></i>
     </a>
 
