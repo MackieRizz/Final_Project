@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 28, 2025 at 06:03 AM
+-- Generation Time: May 28, 2025 at 07:42 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,20 @@ SET time_zone = "+00:00";
 --
 -- Database: `final_project`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin`
+--
+
+CREATE TABLE `admin` (
+  `id` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `profile_pic` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -80,60 +94,23 @@ CREATE TABLE `students_registration` (
   `id` int(11) NOT NULL,
   `fullname` varchar(255) NOT NULL,
   `student_id` varchar(15) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
   `department` varchar(255) DEFAULT NULL,
   `program` varchar(255) DEFAULT NULL,
   `qr_code_path` varchar(255) NOT NULL,
   `gender` enum('Male','Female') NOT NULL,
   `section` varchar(50) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `otp` varchar(10) DEFAULT NULL,
+  `status` enum('pending','verified') DEFAULT 'pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `students_registration`
 --
 
-INSERT INTO `students_registration` (`id`, `fullname`, `student_id`, `department`, `program`, `qr_code_path`, `gender`, `section`, `created_at`) VALUES
-(3, 'Michael Johnson', '2022-10003', 'Computer Studies Department', 'BSCS', 'qr_codes/2022-10003.png', 'Male', 'A', '2025-05-26 16:05:07'),
-(4, 'Emily Davis', '2022-10004', 'Computer Studies Department', 'BSIT', 'qr_codes/2022-10004.png', 'Female', 'C', '2025-05-26 16:05:07'),
-(5, 'Daniel Brown', '2022-10005', 'Computer Studies Department', 'BSCS', 'qr_codes/2022-10005.png', 'Male', 'B', '2025-05-26 16:05:07'),
-(9, 'James Martinez', '2022-10009', 'Computer Studies Department', 'BSCS', 'qr_codes/2022-10009.png', 'Male', 'B', '2025-05-26 16:05:07'),
-(11, 'Benjamin Lopez', '2022-10011', 'Computer Studies Department', 'BSCS', 'qr_codes/2022-10011.png', 'Male', 'A', '2025-05-26 16:05:07'),
-(14, 'Charlotte Perez', '2022-10014', 'Computer Studies Department', 'BSIT', 'qr_codes/2022-10014.png', 'Female', 'A', '2025-05-26 16:05:07'),
-(15, 'Henry Anderson', '2022-10015', 'Computer Studies Department', 'BSCS', 'qr_codes/2022-10015.png', 'Male', 'B', '2025-05-26 16:05:07'),
-(17, 'Alexander Taylor', '2022-10017', 'Engineering Department', 'BSECE', 'qr_codes/2022-10017.png', 'Male', 'A', '2025-05-26 16:05:07'),
-(18, 'Evelyn Moore', '2022-10018', 'Engineering Department', 'BSEE', 'qr_codes/2022-10018.png', 'Female', 'B', '2025-05-26 16:05:07'),
-(19, 'Sebastian Jackson', '2022-10019', 'Engineering Department', 'BSCE', 'qr_codes/2022-10019.png', 'Male', 'C', '2025-05-26 16:05:07'),
-(20, 'Harper White', '2022-10020', 'Engineering Department', 'BSME', 'qr_codes/2022-10020.png', 'Female', 'A', '2025-05-26 16:05:07'),
-(21, 'Elijah Harris', '2022-10021', 'Business and Management Department', 'BSBA', 'qr_codes/2022-10021.png', 'Male', 'B', '2025-05-26 16:05:07'),
-(22, 'Avery Martin', '2022-10022', 'Business and Management Department', 'BSBA', 'qr_codes/2022-10022.png', 'Female', 'C', '2025-05-26 16:05:07'),
-(23, 'Logan Thompson', '2022-10023', 'Business and Management Department', 'BSBA', 'qr_codes/2022-10023.png', 'Male', 'A', '2025-05-26 16:05:07'),
-(24, 'Ella Martinez', '2022-10024', 'Business and Management Department', 'BSBA', 'qr_codes/2022-10024.png', 'Female', 'B', '2025-05-26 16:05:07'),
-(25, 'Jackson Lee', '2022-10025', 'Teacher Education Department', 'BSED English', 'qr_codes/2022-10025.png', 'Male', 'C', '2025-05-26 16:05:07'),
-(26, 'Lily Clark', '2022-10026', 'Teacher Education Department', 'BSED Math', 'qr_codes/2022-10026.png', 'Female', 'A', '2025-05-26 16:05:07'),
-(27, 'Mateo Lewis', '2022-10027', 'Teacher Education Department', 'BSED Science', 'qr_codes/2022-10027.png', 'Male', 'B', '2025-05-26 16:05:07'),
-(28, 'Aria Walker', '2022-10028', 'Teacher Education Department', 'BEED', 'qr_codes/2022-10028.png', 'Female', 'C', '2025-05-26 16:05:07'),
-(29, 'Jack Hall', '2022-10029', 'Teacher Education Department', 'BEED', 'qr_codes/2022-10029.png', 'Male', 'A', '2025-05-26 16:05:07'),
-(30, 'Sofia Allen', '2022-10030', 'Teacher Education Department', 'BSED Filipino', 'qr_codes/2022-10030.png', 'Female', 'B', '2025-05-26 16:05:07'),
-(31, 'Leo Young', '2022-10031', 'Industrial Technology Department', 'BSIT', 'qr_codes/2022-10031.png', 'Male', 'C', '2025-05-26 16:05:07'),
-(32, 'Scarlett King', '2022-10032', 'Industrial Technology Department', 'BSIT', 'qr_codes/2022-10032.png', 'Female', 'A', '2025-05-26 16:05:07'),
-(33, 'Grayson Wright', '2022-10033', 'Industrial Technology Department', 'BSIT', 'qr_codes/2022-10033.png', 'Male', 'B', '2025-05-26 16:05:07'),
-(34, 'Chloe Scott', '2022-10034', 'Industrial Technology Department', 'BSIT', 'qr_codes/2022-10034.png', 'Female', 'C', '2025-05-26 16:05:07'),
-(37, 'Owen Baker', '2022-10037', 'Computer Studies Department', 'BSCS', 'qr_codes/2022-10037.png', 'Male', 'C', '2025-05-26 16:05:07'),
-(38, 'Victoria Nelson', '2022-10038', 'Computer Studies Department', 'BSIT', 'qr_codes/2022-10038.png', 'Female', 'A', '2025-05-26 16:05:07'),
-(39, 'Wyatt Carter', '2022-10039', 'Computer Studies Department', 'BSCS', 'qr_codes/2022-10039.png', 'Male', 'B', '2025-05-26 16:05:07'),
-(40, 'Hannah Mitchell', '2022-10040', 'Computer Studies Department', 'BSIT', 'qr_codes/2022-10040.png', 'Female', 'C', '2025-05-26 16:05:07'),
-(41, 'Dylan Roberts', '2022-10041', 'Engineering Department', 'BSECE', 'qr_codes/2022-10041.png', 'Male', 'A', '2025-05-26 16:05:07'),
-(42, 'Zoey Turner', '2022-10042', 'Engineering Department', 'BSCE', 'qr_codes/2022-10042.png', 'Female', 'B', '2025-05-26 16:05:07'),
-(43, 'Nathan Phillips', '2022-10043', 'Business and Management Department', 'BSBA', 'qr_codes/2022-10043.png', 'Male', 'C', '2025-05-26 16:05:07'),
-(44, 'Penelope Campbell', '2022-10044', 'Business and Management Department', 'BSBA', 'qr_codes/2022-10044.png', 'Female', 'A', '2025-05-26 16:05:07'),
-(45, 'Caleb Parker', '2022-10045', 'Business and Management Department', 'BSBA', 'qr_codes/2022-10045.png', 'Male', 'B', '2025-05-26 16:05:07'),
-(46, 'Riley Evans', '2022-10046', 'Business and Management Department', 'BSBA', 'qr_codes/2022-10046.png', 'Female', 'C', '2025-05-26 16:05:07'),
-(47, 'Nathaniel Edwards', '2022-10047', 'Teacher Education Department', 'BSED Math', 'qr_codes/2022-10047.png', 'Male', 'A', '2025-05-26 16:05:07'),
-(50, 'Stella Sanchez', '2022-10050', 'Industrial Technology Department', 'BSIT', 'qr_codes/2022-10050.png', 'Female', 'A', '2025-05-26 16:05:07'),
-(52, 'Ma. Althea Bhea Daza', '2022-30383', 'Computer Studies Department', 'Bachelor of Science in Information Technology (BSIT)', '../qr_codes/QRCode_2022-30383.png', 'Female', '3C', '2025-05-28 01:25:55'),
-(53, 'Almackie Bangalao', '2022-12345', 'Computer Studies Department', 'Bachelor of Science in Information Technology (BSIT)', '../qr_codes/QRCode_2022-12345.png', 'Male', '3C', '2025-05-28 01:52:01'),
-(56, 'Kata Kata', '2022-98754', 'Computer Studies Department', 'Bachelor of Science in Information Technology (BSIT)', '../qr_codes/QRCode_2022-98754.png', 'Female', '3A', '2025-05-28 02:02:36'),
-(58, 'Kapoy Na', '2022-35473', 'Engineering Department', 'Bachelor of Science in Electrical Engineering (BSEE)', '../qr_codes/QRCode_2022-35473.png', 'Female', '3A', '2025-05-28 03:57:28');
+INSERT INTO `students_registration` (`id`, `fullname`, `student_id`, `email`, `department`, `program`, `qr_code_path`, `gender`, `section`, `created_at`, `otp`, `status`) VALUES
+(59, 'Stephanie Angel  A. Nudalo', '2022-31997', 'stephanieangel.nudalo@evsu.edu.ph', 'Engineering Department', 'Bachelor of Science in Civil Engineering (BSCE)', '../qr_codes/QRCode_2022-31997.png', 'Female', '3B', '2025-05-28 17:39:37', NULL, 'pending');
 
 -- --------------------------------------------------------
 
@@ -154,8 +131,7 @@ CREATE TABLE `student_votes` (
 --
 
 INSERT INTO `student_votes` (`id`, `student_id`, `scan_time`, `vote_time`, `status`) VALUES
-(1, '2022-30383', '2025-05-28 11:46:54', '2025-05-28 05:47:18', 'Voted'),
-(3, '2022-35473', '2025-05-28 11:58:17', '2025-05-28 05:58:40', 'Voted');
+(4, '2022-31997', '2025-05-29 01:40:16', '2025-05-28 19:40:28', 'Voted');
 
 -- --------------------------------------------------------
 
@@ -184,7 +160,10 @@ INSERT INTO `votes` (`id`, `student_id`, `candidate_id`, `position_id`, `vote_ti
 (6, '2022-37643', 1, 3, '2025-05-28 05:55:27'),
 (7, '2022-35473', 1, 1, '2025-05-28 05:58:40'),
 (8, '2022-35473', 2, 2, '2025-05-28 05:58:40'),
-(9, '2022-35473', 2, 3, '2025-05-28 05:58:40');
+(9, '2022-35473', 2, 3, '2025-05-28 05:58:40'),
+(10, '2022-31997', 2, 1, '2025-05-28 19:40:28'),
+(11, '2022-31997', 2, 2, '2025-05-28 19:40:28'),
+(12, '2022-31997', 1, 3, '2025-05-28 19:40:28');
 
 --
 -- Indexes for dumped tables
@@ -195,7 +174,8 @@ INSERT INTO `votes` (`id`, `student_id`, `candidate_id`, `position_id`, `vote_ti
 --
 ALTER TABLE `students_registration`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `student_id` (`student_id`);
+  ADD UNIQUE KEY `student_id` (`student_id`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- Indexes for table `student_votes`
@@ -219,19 +199,19 @@ ALTER TABLE `votes`
 -- AUTO_INCREMENT for table `students_registration`
 --
 ALTER TABLE `students_registration`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT for table `student_votes`
 --
 ALTER TABLE `student_votes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `votes`
 --
 ALTER TABLE `votes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables

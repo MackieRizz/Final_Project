@@ -1,3 +1,16 @@
+<?php
+session_start();
+include 'db.php';
+
+// Check if admin is logged in
+if (!isset($_SESSION['admin_username'])) {
+    header("Location: adminver.php");
+    exit();
+}
+
+$admin_username = $_SESSION['admin_username'];
+$profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/ba/ab/b4baab4d57a5d0d4bbb3455ad57bda80.jpg';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -470,9 +483,9 @@
         <i class="fas fa-user-circle"></i>
         <div class="profile-modal">
           <div class="cover-photo"></div>
-          <img src="https://i.pinimg.com/564x/b4/ba/ab/b4baab4d57a5d0d4bbb3455ad57bda80.jpg" alt="Profile">
+          <img src="<?php echo htmlspecialchars($profile_pic); ?>" alt="Profile">
           <br><br>
-          <p id="name">SARJAGA</p>
+          <p id="name"><?php echo htmlspecialchars($admin_username); ?></p>
           <p id="role">Administrator</p>
           <button class="edit-passcode-btn" title="Edit Passcode">
             <i class="fas fa-key"></i>
@@ -498,7 +511,6 @@
           <select id="programSort">
             <option value="">Sort by Program</option>
             <?php
-              include 'db.php';
               $sql = "SELECT DISTINCT program FROM students_registration ORDER BY program";
               $result = $conn->query($sql);
               while($row = $result->fetch_assoc()) {
@@ -514,7 +526,6 @@
               while($row = $result->fetch_assoc()) {
                 echo "<option value='" . htmlspecialchars($row['section']) . "'>" . htmlspecialchars($row['section']) . "</option>";
               }
-              $conn->close();
             ?>
           </select>
         </div>
@@ -539,8 +550,8 @@
           <tbody>
             <?php
               include 'db.php';
-              $sql = "SELECT student_id, fullname, department, program, section, email, gender
-                     FROM students_registration 
+              $sql = "SELECT student_id, fullname, department, program, section, email, gender               
+              FROM students_registration 
                      ORDER BY student_id DESC";
               $result = $conn->query($sql);
 
