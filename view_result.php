@@ -61,7 +61,19 @@ if (!$conn) {
         background: transparent;
         z-index: 100;
         transition: all 0.3s ease;
+        border-bottom: 4px solid #FDDE54;
     }
+
+    header.scrolled {
+      width: calc(100% - 40px);    /* leave padding space */
+        margin: 10px 10px;           /* float away from edges */
+        padding: 0px 95px;
+        background: rgba(0,0,0,0.8);
+        border-radius: 12px;
+        border-bottom: none;         /* hide the yellow line */
+        box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
     nav {
       padding: 5px 0;
       display: flex;
@@ -152,14 +164,14 @@ if (!$conn) {
     #back-icon-container {
         position: fixed;
         margin-top: 20px;
-        left: 10px;
+        left: 5px;
         z-index: 200;
     }
 
     #back-icon-container .back-icon {
         position: fixed;
         
-        left: 38px;
+        left: 15px;
         z-index: 200;
         background: rgba(253, 222, 84, 0.85);
         border: 2.5px solid #C46B02;
@@ -270,7 +282,8 @@ if (!$conn) {
       max-width: 1200px;
       margin: 0 auto;
       width: 95%;
-      margin-top: 5%;
+      margin-top: 100px;
+      transition: all 0.3s ease;
     }
 
     .position-standings {
@@ -278,6 +291,12 @@ if (!$conn) {
       border-radius: 15px;
       padding: 20px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .position-standings:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     }
 
     .position-title {
@@ -392,14 +411,15 @@ if (!$conn) {
     </style>
 </head>
 <body>
-<!-- Back Icon Button -->
+
+
+<header class="entrance-animate">
+  <!-- Back Icon Button -->
  <div id="back-icon-container" class="entrance-animate">
 <a href="Homepage.html" class="back-icon entrance-animate" id="back" title="Back to Homepage">
     <i class="fas fa-arrow-left"></i>
 </a>
 </div>
-
-<header class="entrance-animate">
   <nav>
     <div class="menu-toggle">&#9776;</div>
     <div class="logo">
@@ -509,5 +529,25 @@ if (!$conn) {
         <a href="#">Privacy Policy</a> | <a href="#">Terms of Use</a> | <a href="#">Help</a>
     </nav>
 </footer>
+<script>
+window.addEventListener('scroll', function() {
+    const header = document.querySelector('header');
+    const containers = document.querySelectorAll('.position-standings');
+    
+    if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+        containers.forEach(container => {
+            container.style.transform = 'translateY(-5px)';
+            container.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.3)';
+        });
+    } else {
+        header.classList.remove('scrolled');
+        containers.forEach(container => {
+            container.style.transform = 'translateY(0)';
+            container.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
+        });
+    }
+});
+</script>
 </body>
 </html>
