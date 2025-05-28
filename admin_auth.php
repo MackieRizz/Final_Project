@@ -1,22 +1,57 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
+include 'db.php';
 
-// Database connection
-$conn = new mysqli('localhost', 'root', '', 'Final_Project');
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+// PHPMailer setup
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+require 'vendor/autoload.php';
 
 $error = '';
 $success = '';
+$otp_verified = false;
+
+// Handle OTP Verification
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['verify_otp'])) {
+    $entered_otp = $_POST['otp'] ?? '';
+    $email = $_SESSION['admin_email'] ?? '';
+
+    $sql = "SELECT id, otp FROM admin WHERE email = ? AND status = 'unverified'";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $admin = $result->fetch_assoc();
+        if ($entered_otp === $admin['otp']) {
+            // Update admin status to verified
+            $update_sql = "UPDATE admin SET status = 'verified', otp = NULL WHERE id = ?";
+            $update_stmt = $conn->prepare($update_sql);
+            $update_stmt->bind_param("i", $admin['id']);
+            
+            if ($update_stmt->execute()) {
+                $success = "Email verified successfully! Please login.";
+                unset($_SESSION['admin_email']);
+            } else {
+                $error = "Error updating verification status.";
+            }
+        } else {
+            $error = "Invalid OTP. Please try again.";
+        }
+    } else {
+        $error = "Invalid verification attempt.";
+    }
+}
 
 // Handle Login
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     $username = $conn->real_escape_string($_POST['username']);
     $password = $_POST['password'];
 
-    $sql = "SELECT username, password, profile_pic FROM admin WHERE username = ?";
+    $sql = "SELECT username, password, profile_pic, status FROM admin WHERE username = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $username);
     $stmt->execute();
@@ -24,7 +59,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
 
     if ($result->num_rows > 0) {
         $admin = $result->fetch_assoc();
-        if (password_verify($password, $admin['password'])) {
+        if ($admin['status'] !== 'verified') {
+            $error = "Please verify your email first.";
+        } elseif (password_verify($password, $admin['password'])) {
             $_SESSION['admin_username'] = $admin['username'];
             $_SESSION['admin_profile_pic'] = $admin['profile_pic'];
             header("Location: admin_dashboard.php");
@@ -44,16 +81,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
     $password = $_POST['reg_password'];
     $confirm_password = $_POST['confirm_password'];
 
-    if ($password !== $confirm_password) {
+    // Validate EVSU email
+    if (!preg_match('/^[a-zA-Z0-9._%+-]+@evsu\.edu\.ph$/', $email)) {
+        $error = "Only @evsu.edu.ph email addresses are allowed.";
+    } elseif ($password !== $confirm_password) {
         $error = "Passwords do not match";
     } else {
         // Handle profile picture upload
         $profile_pic_path = null;
         if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
             $upload_dir = 'uploads/profile_pics/';
+            
+            // Create directory if it doesn't exist
             if (!file_exists($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
+            
+            // Debug information
+            error_log("Upload directory: " . realpath($upload_dir));
+            error_log("File info: " . print_r($_FILES['profile_pic'], true));
             
             $file_extension = strtolower(pathinfo($_FILES['profile_pic']['name'], PATHINFO_EXTENSION));
             $allowed_types = array('jpg', 'jpeg', 'png', 'gif');
@@ -62,10 +108,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
                 $new_filename = uniqid('profile_') . '.' . $file_extension;
                 $target_path = $upload_dir . $new_filename;
                 
-                if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $target_path)) {
-                    $profile_pic_path = $target_path;
+                // Ensure the file is an actual image
+                if (getimagesize($_FILES['profile_pic']['tmp_name']) !== false) {
+                    if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $target_path)) {
+                        $profile_pic_path = $target_path;
+                        chmod($target_path, 0644); // Set proper file permissions
+                    } else {
+                        $upload_error = error_get_last();
+                        $error = "Error uploading profile picture. Details: " . ($upload_error ? $upload_error['message'] : 'Unknown error');
+                        error_log("Upload error: " . $error);
+                    }
                 } else {
-                    $error = "Error uploading profile picture";
+                    $error = "The file is not a valid image.";
                 }
             } else {
                 $error = "Invalid file type. Only JPG, JPEG, PNG, and GIF are allowed.";
@@ -84,12 +138,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
                 $error = "Username or email already exists";
             } else {
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                $sql = "INSERT INTO admin (email, username, password, profile_pic) VALUES (?, ?, ?, ?)";
+                $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+                
+                $sql = "INSERT INTO admin (email, username, password, profile_pic, otp, status) VALUES (?, ?, ?, ?, ?, 'unverified')";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssss", $email, $username, $hashed_password, $profile_pic_path);
+                $stmt->bind_param("sssss", $email, $username, $hashed_password, $profile_pic_path, $otp);
 
                 if ($stmt->execute()) {
-                    $success = "Registration successful! Please login.";
+                    // Send OTP via email
+                    $mail = new PHPMailer(true);
+                    try {
+                        $mail->isSMTP();
+                        $mail->Host = 'smtp.gmail.com';
+                        $mail->SMTPAuth = true;
+                        $mail->Username = 'memorawebnote@gmail.com';
+                        $mail->Password = 'dypl dsxz kweq ejew';
+                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                        $mail->Port = 587;
+
+                        $mail->setFrom('memorawebnote@gmail.com', 'EVSU Voting System');
+                        $mail->addAddress($email, $username);
+
+                        $mail->isHTML(true);
+                        $mail->Subject = 'Admin Account Verification';
+                        $mail->Body = "Dear $username,<br><br>Your OTP code is: <b>$otp</b><br><br>Please use this code to verify your admin account.<br><br>Thank you!";
+
+                        $mail->send();
+                        $_SESSION['admin_email'] = $email;
+                        $success = "Registration initiated! Please check your email for OTP.";
+                    } catch (Exception $e) {
+                        $error = "Error sending OTP: " . $mail->ErrorInfo;
+                    }
                 } else {
                     $error = "Error registering admin: " . $conn->error;
                 }
@@ -97,6 +176,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
         }
     }
 }
+
+// Check if OTP verification is needed
+$show_otp_form = isset($_SESSION['admin_email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -369,10 +451,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
             <!-- Registration Form -->
             <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
                 <div class="form-section">
-                    <form method="POST" enctype="multipart/form-data">
+                    <form method="POST" enctype="multipart/form-data" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="email" class="form-control" id="email" name="email" required pattern="[a-zA-Z0-9._%+-]+@evsu\.edu\.ph$" title="Please use your @evsu.edu.ph email address">
                         </div>
                         <div class="mb-3">
                             <label for="reg_username" class="form-label">Username</label>
@@ -388,7 +470,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
                         </div>
                         <div class="mb-3">
                             <label for="profile_pic" class="form-label">Profile Picture</label>
-                            <input type="file" class="form-control mt-2" id="profile_pic" name="profile_pic" accept="image/*">
+                            <input type="file" class="form-control" id="profile_pic" name="profile_pic" accept="image/*">
+                            <small class="text-muted">Supported formats: JPG, JPEG, PNG, GIF</small>
                         </div>
                         <button type="submit" name="register" class="btn btn-primary">
                             <i class="fas fa-user-plus me-2"></i> Register
@@ -398,6 +481,79 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
             </div>
         </div>
     </div>
+
+    <?php if ($show_otp_form): ?>
+        <style>
+            .otp-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.8);
+                backdrop-filter: blur(8px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            }
+
+            .otp-container {
+                background: rgba(77, 20, 20, 0.95);
+                border-radius: 18px;
+                padding: 30px;
+                width: 90%;
+                max-width: 400px;
+                text-align: center;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            }
+
+            .otp-container h2 {
+                color: #FDDE54;
+                margin-bottom: 20px;
+                font-family: 'Montserrat', sans-serif;
+            }
+
+            .otp-input {
+                width: 100%;
+                padding: 12px;
+                margin-bottom: 20px;
+                border: 2px solid #C46B02;
+                border-radius: 8px;
+                background: #fff;
+                color: #7F0404;
+                font-size: 1.2rem;
+                text-align: center;
+                letter-spacing: 4px;
+            }
+
+            .otp-btn {
+                background: linear-gradient(90deg, #C46B02 60%, #7F0404 100%);
+                color: #fffbe6;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 8px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .otp-btn:hover {
+                background: linear-gradient(90deg, #7F0404 60%, #C46B02 100%);
+                transform: translateY(-2px);
+            }
+        </style>
+
+        <div class="otp-overlay">
+            <div class="otp-container">
+                <h2>Enter OTP</h2>
+                <form method="POST">
+                    <input type="text" name="otp" class="otp-input" maxlength="6" pattern="[0-9]{6}" required placeholder="000000">
+                    <button type="submit" name="verify_otp" class="otp-btn">Verify OTP</button>
+                </form>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>

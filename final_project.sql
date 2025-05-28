@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: May 28, 2025 at 07:42 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost
+-- Generation Time: May 28, 2025 at 09:34 PM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `final_project`
+-- Database: `Final_Project`
 --
 
 -- --------------------------------------------------------
@@ -32,8 +32,17 @@ CREATE TABLE `admin` (
   `email` varchar(255) NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `profile_pic` varchar(255) DEFAULT NULL
+  `profile_pic` varchar(255) DEFAULT NULL,
+  `otp` varchar(6) DEFAULT NULL,
+  `status` enum('unverified','verified') DEFAULT 'unverified'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin`
+--
+
+INSERT INTO `admin` (`id`, `email`, `username`, `password`, `profile_pic`, `otp`, `status`) VALUES
+(1, 'almackieandrew.bangalao@evsu.edu.ph', 'SARJAGA', '$2y$10$5Rq2ddj3IdR5y5sBXGjntusyez6rPrLb1fou3NO/6O6L5Rep0POwO', 'uploads/profile_pics/profile_6837646f755bf.jpg', NULL, 'verified');
 
 -- --------------------------------------------------------
 
@@ -110,7 +119,8 @@ CREATE TABLE `students_registration` (
 --
 
 INSERT INTO `students_registration` (`id`, `fullname`, `student_id`, `email`, `department`, `program`, `qr_code_path`, `gender`, `section`, `created_at`, `otp`, `status`) VALUES
-(59, 'Stephanie Angel  A. Nudalo', '2022-31997', 'stephanieangel.nudalo@evsu.edu.ph', 'Engineering Department', 'Bachelor of Science in Civil Engineering (BSCE)', '../qr_codes/QRCode_2022-31997.png', 'Female', '3B', '2025-05-28 17:39:37', NULL, 'pending');
+(59, 'Stephanie Angel  A. Nudalo', '2022-31997', 'stephanieangel.nudalo@evsu.edu.ph', 'Engineering Department', 'Bachelor of Science in Civil Engineering (BSCE)', '../qr_codes/QRCode_2022-31997.png', 'Female', '3B', '2025-05-28 17:39:37', NULL, 'pending'),
+(61, 'Almackie Andrew Bangalao', '2022-30424', 'almackieandrew.bangalao@evsu.edu.ph', 'Computer Studies Department', 'Bachelor of Science in Information Technology (BSIT)', '../qr_codes/QRCode_2022-30424.png', 'Male', '3C', '2025-05-28 19:00:48', '856147', 'verified');
 
 -- --------------------------------------------------------
 
@@ -170,6 +180,12 @@ INSERT INTO `votes` (`id`, `student_id`, `candidate_id`, `position_id`, `vote_ti
 --
 
 --
+-- Indexes for table `admin`
+--
+ALTER TABLE `admin`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `students_registration`
 --
 ALTER TABLE `students_registration`
@@ -196,10 +212,16 @@ ALTER TABLE `votes`
 --
 
 --
+-- AUTO_INCREMENT for table `admin`
+--
+ALTER TABLE `admin`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `students_registration`
 --
 ALTER TABLE `students_registration`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `student_votes`
