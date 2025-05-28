@@ -884,6 +884,189 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       background: #fff;
       transform: translateY(-2px);
     }
+
+    /* Scanner Settings Modal */
+    .scanner-settings-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .scanner-settings-container {
+      background: #2d0808;
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      color: #FDDE54;
+      border: 1px solid rgba(253, 222, 84, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .scanner-settings-container h3 {
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 1.5em;
+    }
+
+    .datetime-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .datetime-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .datetime-group label {
+      font-weight: bold;
+      color: #FDDE54;
+    }
+
+    .datetime-group input {
+      padding: 10px;
+      border: 2px solid #FDDE54;
+      background: rgba(253, 222, 84, 0.1);
+      border-radius: 8px;
+      color: #FDDE54;
+      font-size: 1em;
+    }
+
+    .scanner-settings-container button {
+      width: 100%;
+      padding: 12px;
+      background: #FDDE54;
+      border: none;
+      border-radius: 8px;
+      color: #2d0808;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .scanner-settings-container button:hover {
+      background: #fff;
+      transform: translateY(-2px);
+    }
+
+    .scanner-icon-btn {
+      position: absolute;
+      bottom: 60px;
+      right: 15px;
+      background: transparent;
+      border: 1px solid #FDDE54;
+      color: #FDDE54;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .scanner-icon-btn:hover {
+      background: rgba(253, 222, 84, 0.1);
+      box-shadow: 0 0 10px rgba(253, 222, 84, 0.2);
+      transform: scale(1.1);
+    }
+
+    .scanner-icon-btn i {
+      font-size: 14px;
+      color: #FDDE54;
+    }
+
+    /* View Scanner Settings Modal */
+    .view-scanner-settings-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .view-settings-container {
+      background: #2d0808;
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      color: #FDDE54;
+      border: 1px solid rgba(253, 222, 84, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .view-settings-container h3 {
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 1.5em;
+    }
+
+    .settings-info {
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(253, 222, 84, 0.1);
+      border-radius: 8px;
+    }
+
+    .settings-info p {
+      margin: 10px 0;
+      font-size: 1.1em;
+    }
+
+    .edit-settings-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      color: #FDDE54;
+      cursor: pointer;
+      font-size: 1.2em;
+    }
+
+    .edit-settings-btn:hover {
+      color: #fff;
+    }
+
+    .close-view-settings-btn {
+      width: 100%;
+      padding: 12px;
+      background: #FDDE54;
+      border: none;
+      border-radius: 8px;
+      color: #2d0808;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 20px;
+    }
+
+    .close-view-settings-btn:hover {
+      background: #fff;
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 
@@ -914,6 +1097,9 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
           <br><br>
           <p id="name"><?php echo htmlspecialchars($admin_username); ?></p>
           <p id="role">Administrator</p>
+          <button class="scanner-icon-btn" title="View Scanner Settings">
+            <i class="fas fa-qrcode"></i>
+          </button>
           <button class="edit-passcode-btn" title="Edit Passcode">
             <i class="fas fa-key"></i>
           </button>
@@ -1054,6 +1240,40 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
         <input type="text" maxlength="1" class="passcode-input" />
       </div>
       <button class="update-passcode-btn" onclick="updatePasscode()">Update Passcode</button>
+    </div>
+  </div>
+
+  <!-- Scanner Settings Modal -->
+  <div id="scannerSettingsModal" class="scanner-settings-modal">
+    <div class="scanner-settings-container">
+      <h3>Set Scanner Availability</h3>
+      <div class="datetime-inputs">
+        <div class="datetime-group">
+          <label>Start Date & Time:</label>
+          <input type="datetime-local" id="startDateTime" required>
+        </div>
+        <div class="datetime-group">
+          <label>End Date & Time:</label>
+          <input type="datetime-local" id="endDateTime" required>
+        </div>
+      </div>
+      <button onclick="saveSettingsAndForm()">Set Scan & Save Voting Form</button>
+      <button onclick="closeScannerSettings()" style="background: #666;">Cancel</button>
+    </div>
+  </div>
+
+  <!-- View Scanner Settings Modal -->
+  <div id="viewScannerSettingsModal" class="view-scanner-settings-modal">
+    <div class="view-settings-container">
+      <h3>Scanner Settings</h3>
+      <button class="edit-settings-btn" onclick="editScannerSettings()">
+        <i class="fas fa-edit"></i>
+      </button>
+      <div class="settings-info">
+        <p><strong>Start:</strong> <span id="viewStartDateTime">Not set</span></p>
+        <p><strong>End:</strong> <span id="viewEndDateTime">Not set</span></p>
+      </div>
+      <button class="close-view-settings-btn" onclick="closeViewSettings()">Close</button>
     </div>
   </div>
 
@@ -1422,55 +1642,165 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
     }
 
     function saveVotingForm() {
+      document.getElementById('scannerSettingsModal').style.display = 'flex';
+    }
+
+    function closeScannerSettings() {
+      document.getElementById('scannerSettingsModal').style.display = 'none';
+    }
+
+    function saveSettingsAndForm() {
+      const startDateTime = document.getElementById('startDateTime').value;
+      const endDateTime = document.getElementById('endDateTime').value;
+
+      if (!startDateTime || !endDateTime) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Please set both start and end date/time.'
+        });
+        return;
+      }
+
+      // Show confirmation dialog
       Swal.fire({
-        title: 'Save Voting Form',
-        text: 'Are you sure you want to update the voting form with the current candidates?',
+        title: 'Save Settings & Voting Form',
+        text: 'Are you sure you want to save these settings and update the voting form?',
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#FDDE54',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, update it!'
+        confirmButtonText: 'Yes, save all!'
       }).then((result) => {
         if (result.isConfirmed) {
           // Show loading state
           Swal.fire({
-            title: 'Updating Voting Form...',
-            text: 'Please wait while we update the voting form.',
+            title: 'Saving...',
+            text: 'Please wait while we save your settings.',
             allowOutsideClick: false,
             didOpen: () => {
               Swal.showLoading();
             }
           });
 
-          // Send request to update voting form
-          fetch('update_voting_form.php', {
-            method: 'POST'
+          // Send settings to server
+          fetch('save_scanner_settings.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              start_datetime: startDateTime,
+              end_datetime: endDateTime
+            })
           })
-          .then(response => response.json())
+          .then(response => response.json().catch(() => {
+            throw new Error('Invalid response from server');
+          }))
+          .then(data => {
+            if (data.success) {
+              // If settings are saved, proceed to save voting form
+              return fetch('update_voting_form.php', {
+                method: 'POST'
+              })
+              .then(response => response.json().catch(() => {
+                throw new Error('Invalid response from voting form update');
+              }));
+            }
+            throw new Error(data.message || 'Failed to save scanner settings');
+          })
           .then(data => {
             if (data.success) {
               Swal.fire({
                 icon: 'success',
                 title: 'Success!',
-                text: 'Voting form has been updated successfully.'
+                html: `Scanner settings and voting form have been saved successfully.<br><br>
+                      <strong>Voting Period:</strong><br>
+                      Start: ${new Date(startDateTime).toLocaleString()}<br>
+                      End: ${new Date(endDateTime).toLocaleString()}`
               });
+              closeScannerSettings();
+              
+              // Update the view settings if modal is open
+              document.getElementById('viewStartDateTime').textContent = 
+                new Date(startDateTime).toLocaleString();
+              document.getElementById('viewEndDateTime').textContent = 
+                new Date(endDateTime).toLocaleString();
             } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: data.message || 'Failed to update voting form. Please try again.'
-              });
+              throw new Error(data.message || 'Failed to save voting form');
             }
           })
           .catch(error => {
+            console.error('Error:', error);
             Swal.fire({
               icon: 'error',
               title: 'Error',
-              text: 'An error occurred while updating the voting form.'
+              text: error.message || 'An error occurred while saving.'
             });
           });
         }
       });
+    }
+
+    // View Scanner Settings
+    document.querySelector('.scanner-icon-btn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      fetch('get_scanner_settings.php')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('viewStartDateTime').textContent = 
+              new Date(data.settings.start_datetime).toLocaleString();
+            document.getElementById('viewEndDateTime').textContent = 
+              new Date(data.settings.end_datetime).toLocaleString();
+          } else {
+            document.getElementById('viewStartDateTime').textContent = 'Not set';
+            document.getElementById('viewEndDateTime').textContent = 'Not set';
+          }
+          document.getElementById('viewScannerSettingsModal').style.display = 'flex';
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load scanner settings.'
+          });
+        });
+    });
+
+    function closeViewSettings() {
+      document.getElementById('viewScannerSettingsModal').style.display = 'none';
+    }
+
+    function editScannerSettings() {
+      closeViewSettings();
+      document.getElementById('scannerSettingsModal').style.display = 'flex';
+      
+      // Load current settings into the form
+      fetch('get_scanner_settings.php')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('startDateTime').value = 
+              data.settings.start_datetime.slice(0, 16);
+            document.getElementById('endDateTime').value = 
+              data.settings.end_datetime.slice(0, 16);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+      if (event.target.classList.contains('scanner-settings-modal')) {
+        closeScannerSettings();
+      }
+      if (event.target.classList.contains('view-scanner-settings-modal')) {
+        closeViewSettings();
+      }
     }
 
   </script>

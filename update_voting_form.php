@@ -1,11 +1,17 @@
 <?php
-include 'db.php';
-
-// Enable error reporting for debugging
+// Prevent any output before headers
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 
 header('Content-Type: application/json');
+session_start();
+require_once 'db.php';
+
+// Check if admin is logged in
+if (!isset($_SESSION['admin_username'])) {
+    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+    exit();
+}
 
 try {
     // Get all positions and their candidates
@@ -26,8 +32,15 @@ try {
         $candidates_query = "SELECT id, candidate_id, name, year, program, image FROM candidate_positions 
                            WHERE position_id = ? ORDER BY id";
         $stmt = $conn->prepare($candidates_query);
+        if (!$stmt) {
+            throw new Exception("Error preparing candidate query: " . $conn->error);
+        }
+        
         $stmt->bind_param("s", $position_id);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            throw new Exception("Error executing candidate query: " . $stmt->error);
+        }
+        
         $candidates_result = $stmt->get_result();
         
         $candidates = array();
@@ -57,21 +70,43 @@ try {
     $voting_form_content .= "\$positions = " . var_export($positions, true) . ";\n";
     $voting_form_content .= "?>\n";
     
-    // Write to voting_form_data.php
-    if (file_put_contents('voting_form_data.php', $voting_form_content) === false) {
-        throw new Exception("Failed to write voting form data file");
+    // Define the file path
+    $file_path = __DIR__ . '/voting_form_data.php';
+    
+    // Check if directory is writable
+    if (!is_writable(__DIR__)) {
+        throw new Exception("Directory is not writable. Please check permissions.");
     }
     
-    echo json_encode(array(
+    // If file exists, check if it's writable
+    if (file_exists($file_path) && !is_writable($file_path)) {
+        throw new Exception("Existing file is not writable. Please check file permissions.");
+    }
+    
+    // Try to write the file
+    $write_result = file_put_contents($file_path, $voting_form_content);
+    if ($write_result === false) {
+        throw new Exception("Failed to write file. Path: " . $file_path);
+    }
+    
+    // Verify the file was written correctly
+    if (!file_exists($file_path)) {
+        throw new Exception("File was not created successfully.");
+    }
+    
+    // Set proper permissions (readable by web server, writable by owner)
+    chmod($file_path, 0644);
+    
+    echo json_encode([
         'success' => true,
         'message' => 'Voting form updated successfully'
-    ));
+    ]);
 
 } catch (Exception $e) {
-    echo json_encode(array(
+    echo json_encode([
         'success' => false,
-        'message' => $e->getMessage()
-    ));
+        'message' => 'Error updating voting form: ' . $e->getMessage()
+    ]);
 }
 
 $conn->close();

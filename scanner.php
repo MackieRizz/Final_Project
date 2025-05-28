@@ -5,6 +5,36 @@ session_start();
 // Ensure proper timezone is set
 date_default_timezone_set('Asia/Manila');
 
+// Check scanner availability
+$stmt = $conn->prepare("SELECT start_datetime, end_datetime FROM scanner_settings ORDER BY id DESC LIMIT 1");
+$stmt->execute();
+$result = $stmt->get_result();
+$voting_status = '';
+$start_time = '';
+$end_time = '';
+
+if ($result->num_rows > 0) {
+    $settings = $result->fetch_assoc();
+    $now = new DateTime();
+    $start = new DateTime($settings['start_datetime']);
+    $end = new DateTime($settings['end_datetime']);
+
+    if ($now < $start) {
+        // Voting hasn't started yet
+        $voting_status = 'not_started';
+        $start_time = $start->format('F j, Y g:i A');
+        $end_time = $end->format('F j, Y g:i A');
+    } elseif ($now > $end) {
+        // Voting has ended
+        $voting_status = 'ended';
+        $start_time = $start->format('F j, Y g:i A');
+        $end_time = $end->format('F j, Y g:i A');
+    }
+} else {
+    // No settings found
+    $voting_status = 'not_set';
+}
+
 // Get subject_id from URL parameter
 $subject_id = isset($_GET['subject_id']) ? (int)$_GET['subject_id'] : null;
 
@@ -481,6 +511,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         transform: translateY(0) scale(1);
     }
 }
+
+/* Add new styles for unavailable message */
+.unavailable-container {
+    min-height: unset;
+    max-height: calc(100vh - 120px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    background: rgba(77, 20, 20, 0.92);
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    margin: 0 auto;
+    margin-top: 100px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.unavailable-message {
+    background: linear-gradient(135deg, #fffbe6 60%, #FDDE54 100%);
+    border-radius: 14px;
+    padding: 30px;
+    text-align: center;
+    color: #7F0404;
+    border: 2px solid #C46B02;
+    width: 100%;
+}
+
+.unavailable-message h2 {
+    color: #7F0404;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.unavailable-message p {
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    color: #4D1414;
+}
+
+.time-info {
+    background: rgba(196, 107, 2, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border: 1px solid #C46B02;
+}
+
+.back-btn {
+    background: #C46B02;
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.back-btn:hover {
+    background: #7F0404;
+    color: #FDDE54;
+    transform: translateY(-2px);
+}
     </style>
 </head>
 <body>
@@ -503,17 +600,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </ul>
   </nav>
 </header>
-    <div class="main-container entrance-animate">
-        <div class="scanner-section">
-            <h2>QR code Scanner to VOTE </h2>
-             <div class="current-time-info">
-                Date: <span id="current-date"></span><br>
-                Time: <span id="current-time"></span>
+    <?php if ($voting_status === ''): ?>
+        <div class="main-container entrance-animate">
+            <div class="scanner-section">
+                <h2>QR code Scanner to VOTE</h2>
+                <div class="current-time-info">
+                    Date: <span id="current-date"></span><br>
+                    Time: <span id="current-time"></span>
+                </div>
+                <div id="reader"></div>
             </div>
-            <div id="reader"></div>
-
         </div>
-    </div>
+    <?php else: ?>
+        <div class="unavailable-container entrance-animate">
+            <div class="unavailable-message">
+                <h2>
+                    <?php 
+                    if ($voting_status === 'not_started') echo 'Voting Not Started';
+                    elseif ($voting_status === 'ended') echo 'Voting Has Ended';
+                    else echo 'Voting Not Available';
+                    ?>
+                </h2>
+                
+                <?php if ($voting_status === 'not_started'): ?>
+                    <p>The voting period has not started yet.</p>
+                    <div class="time-info">
+                        <p><strong>Voting Period:</strong></p>
+                        <p>Starts: <?php echo $start_time; ?></p>
+                        <p>Ends: <?php echo $end_time; ?></p>
+                    </div>
+                    <p>Please come back during the scheduled voting period.</p>
+                
+                <?php elseif ($voting_status === 'ended'): ?>
+                    <p>The voting period has ended.</p>
+                    <div class="time-info">
+                        <p><strong>Voting Period Was:</strong></p>
+                        <p>From: <?php echo $start_time; ?></p>
+                        <p>Until: <?php echo $end_time; ?></p>
+                    </div>
+                    <p>Thank you for your participation.</p>
+                
+                <?php else: ?>
+                    <p>The voting period has not been set up yet.</p>
+                    <p>Please contact the administrator for more information.</p>
+                <?php endif; ?>
+
+                <a href="Homepage.html" class="back-btn">Back to Homepage</a>
+            </div>
+        </div>
+    <?php endif; ?>
 
   <footer class="entrance-animate entrance-animate">
     <p>&copy; 2025 EVSU Voting System. All rights reserved.</p>

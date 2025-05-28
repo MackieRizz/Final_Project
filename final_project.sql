@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: May 28, 2025 at 09:34 PM
+-- Generation Time: May 28, 2025 at 10:44 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -92,6 +92,27 @@ INSERT INTO `candidate_positions` (`id`, `candidate_id`, `position_id`, `positio
 (6, 1, 3, 'Secretary', 'Kapoy', '2nd', 'Bachelor of Solo Leveling', 'uploads/candidate_683686a3d8504_6147625809230282886.jpg'),
 (7, 3, 1, 'President', 'COJ', '4th', 'Bachelor of Solo Leveling', 'uploads/candidate_6836871849454_7bd74bfe-e57f-43d6-b9d7-28c1d156fb04_removalai_preview.png'),
 (8, 2, 3, 'Secretary', 'Hambot', '1st', 'Bachelor of Meowing', 'uploads/candidate_683689721f49d_DIGITAL LITERACY POSTER.jpg');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `scanner_settings`
+--
+
+CREATE TABLE `scanner_settings` (
+  `id` int(11) NOT NULL,
+  `start_datetime` datetime NOT NULL,
+  `end_datetime` datetime NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `scanner_settings`
+--
+
+INSERT INTO `scanner_settings` (`id`, `start_datetime`, `end_datetime`, `created_at`, `updated_at`) VALUES
+(8, '2025-05-30 04:33:00', '2025-05-30 23:59:00', '2025-05-28 20:35:20', '2025-05-28 20:35:20');
 
 -- --------------------------------------------------------
 
@@ -186,6 +207,12 @@ ALTER TABLE `admin`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `scanner_settings`
+--
+ALTER TABLE `scanner_settings`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `students_registration`
 --
 ALTER TABLE `students_registration`
@@ -216,6 +243,12 @@ ALTER TABLE `votes`
 --
 ALTER TABLE `admin`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `scanner_settings`
+--
+ALTER TABLE `scanner_settings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `students_registration`
