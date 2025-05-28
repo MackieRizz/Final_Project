@@ -801,6 +801,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endif; ?>
                 </div>
             </div>
+            <?php if ($successMessage && !$update_mode): ?>
+            <div class="mt-4">
+                <a href="scanner.php" class="btn btn-primary w-100">Vote Now</a>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
