@@ -1,12 +1,16 @@
 <?php
+session_start();
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && isset($_SESSION['otp'])) {
+    unset($_SESSION['otp'], $_SESSION['form_data']);
+}
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 include 'db.php';
 
-// Ensure database connection is successful
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
+// PHPMailer setup
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+require '../vendor/autoload.php'; // Adjust path if needed
 
 $qrCodeUrl = '';
 $successMessage = '';
@@ -17,6 +21,8 @@ $update_mode = false;
 $qrCodePath = "";
 $gender = "";
 $section = "";
+$email = "";
+$otp_verified = false;
 
 // Path to save QR code images
 $qrCodeSavePath = "../qr_codes/";
@@ -28,20 +34,41 @@ if (!file_exists($qrCodeSavePath)) {
 
 // Check if an ID is passed for updating an existing record
 if (isset($_GET['id'])) {
-    $id = $_GET['id'];
+    $id = intval($_GET['id']);
     $update_mode = true;
 
     // Fetch existing data
-    $sql = "SELECT fullname, student_id, qr_code_path FROM students_registration WHERE id = $id";
+    $sql = "SELECT fullname, student_id, qr_code_path, email FROM students_registration WHERE id = $id";
     $result = $conn->query($sql);
-    $row = $result->fetch_assoc();
-
-    $fullname = $row['fullname'];
-    $student_id = $row['student_id'];
-    $qrCodePath = $row['qr_code_path'];
+    if ($result && $row = $result->fetch_assoc()) {
+        $fullname = $row['fullname'];
+        $student_id = $row['student_id'];
+        $qrCodePath = $row['qr_code_path'];
+        $email = $row['email'];
+    }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// OTP verification logic
+if (isset($_POST['verify_otp'])) {
+    $entered_otp = $_POST['otp'] ?? '';
+    if (isset($_SESSION['otp']) && $entered_otp == $_SESSION['otp']) {
+        $otp_verified = true;
+        // Restore form data from session
+        $fullname = $_SESSION['form_data']['fullname'] ?? '';
+        $student_id = $_SESSION['form_data']['student_id'] ?? '';
+        $department = $_SESSION['form_data']['department'] ?? '';
+        $program = $_SESSION['form_data']['program'] ?? '';
+        $gender = $_SESSION['form_data']['gender'] ?? '';
+        $section = $_SESSION['form_data']['section'] ?? '';
+        $email = $_SESSION['form_data']['email'] ?? '';
+        unset($_SESSION['otp'], $_SESSION['form_data']);
+    } else {
+        $errorMessage = "Invalid OTP. Please try again.";
+    }
+}
+
+// Registration logic
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['verify_otp'])) {
     // Get all form data
     $fullname = isset($_POST['fullname']) ? $conn->real_escape_string($_POST['fullname']) : '';
     $student_id = isset($_POST['student_id']) ? $conn->real_escape_string($_POST['student_id']) : '';
@@ -49,7 +76,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $program = isset($_POST['program']) ? $conn->real_escape_string($_POST['program']) : '';
     $gender = isset($_POST['gender']) ? $conn->real_escape_string($_POST['gender']) : '';
     $section = isset($_POST['section']) ? $conn->real_escape_string($_POST['section']) : '';
+    $email = isset($_POST['email']) ? $conn->real_escape_string($_POST['email']) : '';
 
+    if (!preg_match('/^[a-zA-Z0-9._%+-]+@evsu\.edu\.ph$/', $email)) {
+        $errorMessage = "Only @evsu.edu.ph email addresses are allowed.";
+    } else {
+        // Check if email or student_id already exists
+        $checkEmailSql = "SELECT id FROM students_registration WHERE email = '$email'";
+        $checkEmailResult = $conn->query($checkEmailSql);
+        $checkIdSql = "SELECT id FROM students_registration WHERE student_id = '$student_id'";
+        $checkIdResult = $conn->query($checkIdSql);
+        
+        if ($checkEmailResult && $checkEmailResult->num_rows > 0) {
+            $errorMessage = "Email already exists. Please use a different one.";
+            } elseif ($checkIdResult && $checkIdResult->num_rows > 0) {
+                $errorMessage = "Student ID already exists. Please use a different one.";
+            }else {
+            $otp = rand(100000, 999999);
+            $_SESSION['otp'] = $otp;
+            $_SESSION['form_data'] = [
+                'fullname' => $fullname,
+                'student_id' => $student_id,
+                'department' => $department,
+                'program' => $program,
+                'gender' => $gender,
+                'section' => $section,
+                'email' => $email
+            ];
+
+            // Send OTP via PHPMailer
+            $mail = new PHPMailer(true);
+            try {
+                // SMTP config (edit as needed)
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'memorawebnote@gmail.com';
+                $mail->Password = 'dypl dsxz kweq ejew';
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+
+                $mail->setFrom('memorawebnote@gmail.com', 'EVSU Voting System');
+                $mail->addAddress($email, $fullname);
+
+                $mail->isHTML(true);
+                $mail->Subject = 'Your OTP Code';
+                $mail->Body = "Dear $fullname,<br><br>Your OTP code is: <b>$otp</b><br><br>Thank you!";
+
+                $mail->send();
+                $successMessage = "OTP sent to your email. Please check your inbox.";
+            } catch (Exception $e) {
+                $errorMessage = "Failed to send OTP: " . $mail->ErrorInfo;
+            }
+        }   
+    }
+}
+
+if ($otp_verified) {
     // Generate QR code URL
     $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" . urlencode("Name:" . $fullname . ",ID:" . $student_id);
     $qrCodeFileName = "QRCode_" . $student_id . ".png";
@@ -58,37 +141,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Create QR code directory if it doesn't exist
     if (!file_exists($qrCodeSavePath)) {
         mkdir($qrCodeSavePath, 0777, true);
-        chmod($qrCodeSavePath, 0777); // Ensure directory is writable
+        chmod($qrCodeSavePath, 0777);
     }
 
     // Generate QR code
     try {
-        // Initialize cURL
         $ch = curl_init($qrCodeUrl);
-        
-        // Set cURL options
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        
-        // Execute cURL and get response
         $response = curl_exec($ch);
-        
+
         if (curl_errno($ch)) {
             throw new Exception("cURL error: " . curl_error($ch));
         }
-        
-        // Close cURL
         curl_close($ch);
-        
-        // Save the image
+
         if (file_put_contents($fullQrCodePath, $response) === false) {
             throw new Exception("Failed to save QR code image");
         }
-        
-        // Set proper permissions
         chmod($fullQrCodePath, 0666);
-        
+
     } catch (Exception $e) {
         $errorMessage = "Error generating QR code: " . $e->getMessage();
         $qrCodeUrl = "";
@@ -96,51 +169,383 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fullQrCodePath = "";
     }
 
-    if ($update_mode) {
-        $sql = "UPDATE students_registration SET fullname='$fullname', student_id='$student_id', qr_code_path='$fullQrCodePath' WHERE id=$id";
-        if ($conn->query($sql) === TRUE) {
-            echo "<script>
-                setTimeout(function() {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Update Successful!',
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => {
-                        window.location.href='view_page.php';
-                    });
-                }, 100);
-            </script>";
-        } else {
-            $errorMessage = "Error updating record: " . $conn->error;
-        }
-    } else {
-        // Check if student_id already exists
-        $checkSql = "SELECT id FROM students_registration WHERE student_id = '$student_id'";
-        $checkResult = $conn->query($checkSql);
+    // Check if student_id already exists
+    $checkSql = "SELECT id FROM students_registration WHERE student_id = '$student_id'";
+    $checkResult = $conn->query($checkSql);
 
-        if ($checkResult && $checkResult->num_rows > 0) {
-            // Student ID already exists
-            $successMessage = "Registration Failed! Student ID $student_id is already registered.";
-            $student_id = ""; // Clear the student ID field
-            $qrCodeUrl = "";  // Do not generate QR code
-            $qrCodeFileName = "";
-            $fullQrCodePath = "";
+    if ($checkResult && $checkResult->num_rows > 0) {
+        $successMessage = "Registration Failed! Student ID $student_id is already registered.";
+        $student_id = "";
+        $qrCodeUrl = "";
+        $qrCodeFileName = "";
+        $fullQrCodePath = "";
+    } else {
+        $sql = "INSERT INTO students_registration (fullname, student_id, qr_code_path, department, program, gender, section, email)
+                VALUES ('$fullname', '$student_id', '$fullQrCodePath', '$department', '$program', '$gender', '$section', '$email')";
+        if ($conn->query($sql) === TRUE) {
+            $successMessage = "Registration Successful!";
+            $new_id = $conn->insert_id;
         } else {
-            $sql = "INSERT INTO students_registration (fullname, student_id, qr_code_path, department, program, gender, section)
-                    VALUES ('$fullname', '$student_id', '$fullQrCodePath', '$department', '$program', '$gender', '$section')";
-            
-            if ($conn->query($sql) === TRUE) {
-                $successMessage = "Registration Successful!";
-                $new_id = $conn->insert_id;
-            } else {
-                $errorMessage = "Error: " . $conn->error;
-            }
+            $errorMessage = "Error: " . $conn->error;
         }
     }
 }
 ?>
 
+
+<?php
+// Place OTP check here, before any HTML output
+if (isset($_SESSION['otp']) && !$otp_verified): ?>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body.otp-bg {
+            background: linear-gradient(135deg, #C46B02 0%, #800000 40%, #7F0404 70%, #4D1414 90%, #000000 100%) !important;
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            position: relative;
+        }
+        
+        body.otp-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(196, 107, 2, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(127, 4, 4, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(253, 222, 84, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .otp-main-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .otp-form-section {
+            width: 100%;
+            max-width: 440px;
+            background: rgba(255, 251, 230, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 48px 40px 40px 40px;
+            box-shadow: 
+                0 32px 64px rgba(124, 4, 4, 0.15),
+                0 16px 32px rgba(196, 107, 2, 0.1),
+                0 8px 16px rgba(253, 222, 84, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            color: #4D1414;
+            border: 1px solid rgba(196, 107, 2, 0.3);
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .otp-form-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #C46B02 0%, #7F0404 50%, #C46B02 100%);
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { background-position: -200% 0; }
+            50% { background-position: 200% 0; }
+        }
+        
+        .otp-form-section h2 {
+            font-size: 2.25rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-align: center;
+            color: #7F0404;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+        
+        .otp-form-section h2 i {
+            color: #C46B02;
+            margin-right: 12px;
+            font-size: 2rem;
+            vertical-align: middle;
+            filter: drop-shadow(0 2px 4px rgba(196, 107, 2, 0.3));
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #C46B02;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 32px;
+            opacity: 0.9;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+        
+        .otp-form-section label {
+            font-weight: 600;
+            color: #7F0404;
+            font-size: 0.9rem;
+            letter-spacing: 0.01em;
+            margin-bottom: 8px;
+            display: block;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        
+        .otp-form-section .form-control {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(196, 107, 2, 0.3);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #7F0404;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.1em;
+            text-align: center;
+            font-family: 'Inter', monospace;
+            outline: none;
+        }
+        
+        .otp-form-section .form-control:focus {
+            border: 2px solid #7F0404;
+            box-shadow: 
+                0 0 0 4px rgba(127, 4, 4, 0.1),
+                0 8px 24px rgba(196, 107, 2, 0.15);
+            background: rgba(255, 251, 230, 0.95);
+            color: #C46B02;
+            transform: translateY(-2px);
+        }
+        
+        .otp-form-section .form-control::placeholder {
+            color: rgba(196, 107, 2, 0.5);
+            font-weight: 500;
+        }
+        
+        .btn-container {
+            margin-top: 32px;
+        }
+        
+        .otp-form-section .btn-primary {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #C46B02 0%, #7F0404 100%);
+            color: #fffbe6;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            letter-spacing: 0.02em;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            box-shadow: 
+                0 8px 16px rgba(196, 107, 2, 0.25),
+                0 4px 8px rgba(127, 4, 4, 0.15);
+        }
+        
+        .otp-form-section .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .otp-form-section .btn-primary:hover {
+            background: linear-gradient(135deg, #7F0404 0%, #C46B02 100%);
+            box-shadow: 
+                0 12px 24px rgba(127, 4, 4, 0.3),
+                0 6px 12px rgba(196, 107, 2, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .otp-form-section .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .otp-form-section .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 8px rgba(127, 4, 4, 0.2),
+                0 2px 4px rgba(196, 107, 2, 0.15);
+        }
+        
+        .back-link-container {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(196, 107, 2, 0.2);
+        }
+        
+        .otp-form-section .btn-link {
+            color: #C46B02;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        .otp-form-section .btn-link:hover {
+            color: #7F0404;
+            background: rgba(196, 107, 2, 0.1);
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+        
+        .otp-form-section .alert-danger {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(127, 4, 4, 0.1));
+            border: 1px solid rgba(127, 4, 4, 0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 0.95rem;
+            margin-top: 20px;
+            font-weight: 500;
+            color: #7F0404;
+            backdrop-filter: blur(10px);
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        @media (max-width: 600px) {
+            .otp-form-section {
+                margin: 10px;
+                padding: 32px 24px 24px 24px;
+                max-width: calc(100vw - 20px);
+                border-radius: 20px;
+            }
+            
+            .otp-form-section h2 {
+                font-size: 1.9rem;
+            }
+            
+            .otp-form-section h2 i {
+                font-size: 1.7rem;
+                margin-right: 8px;
+            }
+            
+            .otp-form-section .form-control {
+                padding: 14px 16px;
+                font-size: 1rem;
+            }
+            
+            .otp-form-section .btn-primary {
+                padding: 14px 20px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .otp-main-container {
+                padding: 10px;
+            }
+            
+            .otp-form-section {
+                padding: 24px 20px 20px 20px;
+            }
+        }
+    </style>
+    <body class="otp-bg">
+        <div class="otp-main-container">
+            <div class="otp-form-section">
+                <h2>
+                    <i class="fas fa-key"></i>
+                    OTP Verification
+                </h2>
+                <p class="subtitle">Secure access verification required</p>
+                
+                <form method="POST" action="">
+                    <div class="form-group">
+                        <label for="otp">Enter OTP sent to your email</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="otp" 
+                            name="otp" 
+                            maxlength="6" 
+                            required 
+                            autocomplete="one-time-code" 
+                            inputmode="numeric" 
+                            pattern="[0-9]{6}"
+                            placeholder="000000"
+                        >
+                    </div>
+                    
+                    <div class="btn-container">
+                        <button type="submit" name="verify_otp" class="btn btn-primary">
+                            Verify OTP
+                        </button>
+                    </div>
+                </form>
+                
+                <?php if ($errorMessage): ?>
+                    <div class="alert alert-danger text-center">
+                        <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>
+                        <?= $errorMessage ?>
+                    </div>
+                <?php endif; ?>
+                
+                <div class="back-link-container">
+                    <a href="register.php" class="btn btn-link">
+                        <i class="fas fa-arrow-left" style="margin-right: 6px; font-size: 0.8rem;"></i>
+                        Back to Registration
+                    </a>
+                </div>
+            </div>
+        </div>
+    </body>
+    <?php exit; ?>
+<?php endif; ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -314,6 +719,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     h2, h4 {
         font-weight: 600;
     }
+    
 .flex-container {
     display: flex;
     justify-content: center;
@@ -324,7 +730,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     margin: 0 auto;
     min-height: 100vh;
     padding: 120px 20px 100px 20px;
-    margin-top: -32px;
+    margin-top: -30px;
 }
 
 .main-container {
@@ -645,6 +1051,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         margin-left: -118px;
         color: #FDDE54;
     }
+
+    
+    #gender-container {
+        margin-left: 25%;
+    }
     @media (max-width: 768px) {
         footer {
             flex-direction: column;
@@ -656,6 +1067,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             gap: 10px;
             position: static;
         }
+        #gender-container {
+                margin-left: 1%;
+            }
     }
     .back-icon {
     position: fixed;
@@ -743,6 +1157,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="student_id" class="form-label">Student ID</label>
             <input type="text" class="form-control" id="student_id" name="student_id" value="<?php echo htmlspecialchars($student_id); ?>" required>
             </div>
+             <div class="col-md-6">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="email" name="email"
+                        value="<?= htmlspecialchars($email ?? '') ?>" required
+                        pattern="^[a-zA-Z0-9._%+-]+@evsu\.edu\.ph$"
+                        title="Please use your @evsu.edu.ph email address.">
+                </div>
             <div class="col-md-6">
             <label for="department" class="form-label">Department</label>
             <select class="form-select" id="department" name="department" required onchange="updateProgramOptions()">
@@ -764,7 +1185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="section" class="form-label">Year & Section</label>
             <input type="text" name="section" value="<?= htmlspecialchars($section ?? '') ?>" required class="form-control">
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6"  id="gender-container">
             <label for="gender" class="form-label">Gender</label>
             <select name="gender" required class="form-select">
                 <option value="">-- Select Gender --</option>

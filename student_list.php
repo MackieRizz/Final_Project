@@ -532,13 +532,14 @@
               <th>Department</th>
               <th>Program</th>
               <th>Year & Section</th>
+              <th>Email</th>
               <th>Gender</th>
             </tr>
           </thead>
           <tbody>
             <?php
               include 'db.php';
-              $sql = "SELECT student_id, fullname, department, program, section, gender 
+              $sql = "SELECT student_id, fullname, department, program, section, email, gender
                      FROM students_registration 
                      ORDER BY student_id DESC";
               $result = $conn->query($sql);
@@ -552,6 +553,7 @@
                   echo "<td>" . htmlspecialchars($row['department']) . "</td>";
                   echo "<td>" . htmlspecialchars($row['program']) . "</td>";
                   echo "<td>" . htmlspecialchars($row['section']) . "</td>";
+                  echo "<td>" . htmlspecialchars($row['email']) . "</td>";
                   echo "<td>" . htmlspecialchars($row['gender']) . "</td>";
                   echo "</tr>";
                 }

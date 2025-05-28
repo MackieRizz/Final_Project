@@ -19,244 +19,522 @@ if (!isset($_SESSION['student_id']) || !isset($_SESSION['has_scanned'])) {
     <link rel="icon" type="image/png" href="Images/EvsuLogo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Karla', sans-serif;
-        }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+}
 
-        body {
-            background: linear-gradient(135deg, #1a0606, #f79f56);
-            color: #FDDE54;
-            min-height: 100vh;
-            padding: 20px;
-        }
 
-        .voting-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+body {
+    background: linear-gradient(135deg, #C46B02 0%, #800000 25%, #7F0404 50%, #4D1414 75%, #000000 100%);
+    min-height: 100vh;
+    padding: 40px 20px;
+    position: relative;
+}
 
-        .page-title {
-            text-align: center;
-            color: #FDDE54;
-            font-size: 2.5em;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="0.5" fill="%23ffffff" opacity="0.05"/><circle cx="75" cy="75" r="0.3" fill="%23ffffff" opacity="0.03"/><circle cx="50" cy="10" r="0.4" fill="%23ffffff" opacity="0.04"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    pointer-events: none;
+    z-index: -1;
+}
 
-        .positions-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+.voting-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid rgba(224, 224, 224, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    position: relative;
+}
 
-        .position-section {
-            background: #4a1010;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+.voting-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #C46B02, #800000, #7F0404, #4D1414);
+    z-index: 1;
+}
 
-        .position-title {
-            color: #FDDE54;
-            font-size: 1.5em;
-            margin-bottom: 15px;
-            text-align: center;
-            font-weight: bold;
-        }
+.page-title {
+    background: linear-gradient(135deg, #C46B02 0%, #800000 25%, #7F0404 50%, #4D1414 75%, #000000 100%);
+    color: #FDDE54;
+    font-size: 2.25rem;
+    font-weight: 300;
+    padding: 48px 40px 32px;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    border-bottom: 3px solid #FDDE54;
+    position: relative;
+    overflow: hidden;
+}
 
-        .candidates-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 10px;
-        }
+.page-title::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(253, 222, 84, 0.1) 50%, transparent 70%);
+    animation: shimmer 3s ease-in-out infinite;
+}
 
-        .candidate-card {
-            background: #662d2d;
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-            transition: transform 0.2s;
-            cursor: pointer;
-            position: relative;
-        }
+.positions-container {
+    display: block;
+    padding: 0;
+}
 
-        .candidate-card:hover {
-            transform: translateY(-5px);
-            background: #7a3535;
-        }
+.position-section {
+    background: #ffffff;
+    border-radius: 0;
+    padding: 32px;
+    box-shadow: none;
+    border-bottom: 1px solid #e0e0e0;
+    margin: 0;
+}
 
-        .candidate-card.selected {
-            border: 2px solid #FDDE54;
-            background: #7a3535;
-        }
+.position-section:last-child {
+    border-bottom: none;
+}
 
-        .candidate-image {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 10px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 3px solid #FDDE54;
-        }
+.position-title {
+    color: #1a1a1a;
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 24px;
+    text-align: left;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #800000;
+    display: inline-block;
+    position: relative;
+}
 
-        .candidate-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+.position-title::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 40%;
+    height: 2px;
+    background: #C46B02;
+}
 
-        .candidate-name {
-            color: #fff;
-            font-size: 1.2em;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
+.candidates-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0;
+    margin-top: 24px;
+}
 
-        .candidate-info {
-            color: #FDDE54;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-        }
+.candidate-card {
+    background: #ffffff;
+    border: 2px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    text-align: left;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
 
-        .submit-btn {
-            background: #FDDE54;
-            color: #2d0808;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 5px;
-            font-size: 1.2em;
-            font-weight: bold;
-            cursor: pointer;
-            display: block;
-            margin: 20px auto;
-            transition: all 0.3s ease;
-        }
+.candidate-card:hover {
+    background: #fafafa;
+    border-color: #800000;
+    box-shadow: 0 4px 16px rgba(128, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
 
-        .submit-btn:hover {
-            background: #ffd700;
-            transform: translateY(-2px);
-        }
+.candidate-card.selected {
+    border: 2px solid #800000;
+    background: linear-gradient(135deg, #fff8f0 0%, #fff4e6 100%);
+    box-shadow: 0 4px 20px rgba(128, 0, 0, 0.15);
+}
 
-        .submit-btn:disabled {
-            background: #666;
-            cursor: not-allowed;
-            transform: none;
-        }
+.candidate-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #e8e8e8;
+    flex-shrink: 0;
+    margin: 0;
+    transition: all 0.3s ease;
+    position: relative;
+}
 
-        .radio-input {
-            position: absolute;
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+.candidate-image:hover {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px; /* Makes it square with rounded corners */
+    transform: scale(1.1);
+    z-index: 10;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
 
-        .selected-indicator {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #FDDE54;
-            font-size: 1.2em;
-            display: none;
-        }
+.candidate-card.selected .candidate-image {
+    border-color: #C46B02;
+    box-shadow: 0 0 0 2px rgba(196, 107, 2, 0.2);
+}
 
-        .candidate-card.selected .selected-indicator {
-            display: block;
-        }
+.candidate-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
 
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-        }
+.candidate-card:hover .candidate-image img {
+    transform: scale(1.05);
+}
 
-        .modal-content {
-            background: #4a1010;
-            margin: 10% auto;
-            padding: 20px;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 600px;
-            position: relative;
-            color: #fff;
-        }
+.candidate-info-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #FDDE54;
-        }
+.candidate-name {
+    color: #1a1a1a;
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.3;
+}
 
-        .modal-title {
-            color: #FDDE54;
-            font-size: 1.5em;
-            margin: 0;
-        }
+.candidate-info {
+    color: #666666;
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-        .close-modal {
-            color: #FDDE54;
-            font-size: 1.5em;
-            cursor: pointer;
-            background: none;
-            border: none;
-        }
+.radio-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
 
-        .vote-summary {
-            margin-bottom: 20px;
-        }
+.selected-indicator {
+    position: absolute;
+    top: 49px;
+    right: 16px;
+    color: #800000;
+    font-size: 1.5rem;
+    display: none;
+    animation: checkmark 0.3s ease;
+}
 
-        .vote-summary-item {
-            margin-bottom: 15px;
-            padding: 10px;
-            background: #662d2d;
-            border-radius: 5px;
-        }
+.candidate-card.selected .selected-indicator {
+    display: block;
+}
 
-        .position-name {
-            color: #FDDE54;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+.candidate-card::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid #dadce0;
+    border-radius: 50%;
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
 
-        .candidate-selected {
-            color: #fff;
-        }
+.submit-btn {
+    background: linear-gradient(135deg, #FDDE54 0%, #ffd700 100%);
+    color: #2d0808;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 40px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 16px rgba(253, 222, 84, 0.3);
+    position: relative;
+    overflow: hidden;
+}
 
-        .modal-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
+.submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
 
-        .modal-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+.submit-btn:hover::before {
+    left: 100%;
+}
 
-        .confirm-btn {
-            background: #FDDE54;
-            color: #2d0808;
-        }
+.submit-btn:hover {
+    background: linear-gradient(135deg, #ffd700 0%, #FDDE54 100%);
+    box-shadow: 0 6px 20px rgba(253, 222, 84, 0.4);
+    transform: translateY(-2px);
+}
 
-        .cancel-btn {
-            background: #662d2d;
-            color: #FDDE54;
-        }
+.submit-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(253, 222, 84, 0.3);
+}
+
+.submit-btn:disabled {
+    background: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Enhanced Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: #ffffff;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 650px;
+    position: relative;
+    color: #1a1a1a;
+    box-shadow: 0 16px 64px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease;
+    overflow: hidden;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #C46B02, #800000, #7F0404);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32px 32px 20px;
+    margin: 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-title {
+    color: #1a1a1a;
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin: 0;
+}
+
+.close-modal {
+    color: #666;
+    font-size: 1.5rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.close-modal:hover {
+    background: #f5f5f5;
+    color: #800000;
+}
+
+.vote-summary {
+    padding: 32px;
+    margin: 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.vote-summary-item {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border-radius: 12px;
+    border-left: 4px solid #800000;
+    transition: all 0.2s ease;
+}
+
+.vote-summary-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.vote-summary-item:last-child {
+    margin-bottom: 0;
+}
+
+.position-name {
+    color: #800000;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.candidate-selected {
+    color: #1a1a1a;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 32px 32px;
+    border-top: 1px solid #f0f0f0;
+    background: #fafafa;
+}
+
+.modal-btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.confirm-btn {
+    background: linear-gradient(135deg, #800000 0%, #C46B02 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(128, 0, 0, 0.3);
+}
+
+.confirm-btn:hover {
+    background: linear-gradient(135deg, #a00000 0%, #d47b02 100%);
+    box-shadow: 0 6px 16px rgba(128, 0, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+.cancel-btn {
+    background: transparent;
+    color: #800000;
+    border: 2px solid #e0e0e0;
+}
+
+.cancel-btn:hover {
+    background: #f8f8f8;
+    border-color: #800000;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .voting-container {
+        margin: 0;
+        border-radius: 0;
+    }
+    
+    .position-section {
+        padding: 24px 16px;
+    }
+    
+    .page-title {
+        padding: 32px 16px 20px;
+        font-size: 1.75rem;
+    }
+    
+    .candidate-card {
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .candidate-image {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .submit-btn {
+        margin: 24px 16px;
+    }
+    
+    .modal-content {
+        margin: 20px;
+        width: calc(100% - 40px);
+        margin-left: 50px;
+    }
+    
+    .modal-header,
+    .vote-summary,
+    .modal-buttons {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    
+    .selected-indicator {
+        top: 22px;
+     }
+}
     </style>
 </head>
 <body>
