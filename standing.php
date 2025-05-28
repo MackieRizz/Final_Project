@@ -557,6 +557,8 @@
       </div>
     </div>
 
+
+    <div class="main-container">
     <!-- Standings Display -->
     <div class="standings-container">
       <?php
@@ -644,6 +646,7 @@
       }
       $conn->close();
       ?>
+    </div>
     </div>
 
     <!-- Logout Modal -->

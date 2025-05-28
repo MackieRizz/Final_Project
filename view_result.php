@@ -146,17 +146,19 @@ if (!$conn) {
         nav ul li {
             margin: 10px 0;
         }
-        .menu-toggle {
-            display: block;
-            cursor: pointer;
-            font-size: 26px;
-            color: #FDDE54;
-        }
     }
 
-    .back-icon {
+
+    #back-icon-container {
         position: fixed;
-        top: 20px;
+        margin-top: 20px;
+        left: 10px;
+        z-index: 200;
+    }
+
+    #back-icon-container .back-icon {
+        position: fixed;
+        
         left: 38px;
         z-index: 200;
         background: rgba(253, 222, 84, 0.85);
@@ -178,7 +180,7 @@ if (!$conn) {
         cursor: pointer;
         text-decoration: none;
     }
-    .back-icon:hover {
+    #back-icon-container .back-icon:hover {
         background: #C46B02;
         border: 2.5px solid #FDDE54;
         color: #fffbe6;
@@ -209,7 +211,6 @@ if (!$conn) {
         font-family: 'Karla', sans-serif;
         background: transparent;
         width: 84%;
-        position: fixed;
         bottom: 0;
         left: 8%;
         right: 0;
@@ -256,13 +257,147 @@ if (!$conn) {
             position: static;
         }
     }
+
+
+
+
+     /* Standings Styles */
+    .standings-container {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 95%;
+      margin-top: 5%;
+    }
+
+    .position-standings {
+      background: rgba(45, 8, 8, 0.8);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .position-title {
+      color: #FDDE54;
+      text-align: center;
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(253, 222, 84, 0.3);
+    }
+
+    .candidates-standings {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .candidate-standing {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(74, 16, 16, 0.6);
+      padding: 15px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .candidate-standing:hover {
+      transform: translateX(10px);
+      background: rgba(74, 16, 16, 0.8);
+    }
+
+    .candidate-standing.leading {
+      background: linear-gradient(90deg, rgba(74, 16, 16, 0.8) 0%, rgba(253, 222, 84, 0.2) 100%);
+      border: 1px solid rgba(253, 222, 84, 0.3);
+    }
+
+    .candidate-info {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex: 1;
+    }
+
+    .candidate-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #2d0808;
+    }
+
+    .candidate-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .candidate-details {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .candidate-details h3 {
+      color: #fff;
+      margin: 0;
+      font-size: 1.2em;
+    }
+
+    .candidate-details p {
+      margin: 0;
+      color: #FDDE54;
+      font-size: 0.9em;
+    }
+
+    .vote-count {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      min-width: 100px;
+    }
+
+    .vote-count .count {
+      font-size: 2em;
+      font-weight: bold;
+      color: #FDDE54;
+    }
+
+    .vote-count .label {
+      color: #fff;
+      font-size: 0.9em;
+    }
+
+    .leading-icon {
+      color: #FDDE54;
+      font-size: 1.5em;
+      margin-top: 5px;
+    }
+
+    .no-image {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FDDE54;
+      font-style: italic;
+      font-size: 0.8em;
+    }
     </style>
 </head>
 <body>
 <!-- Back Icon Button -->
-<a href="Homepage.html" class="back-icon entrance-animate" title="Back to Homepage">
+ <div id="back-icon-container" class="entrance-animate">
+<a href="Homepage.html" class="back-icon entrance-animate" id="back" title="Back to Homepage">
     <i class="fas fa-arrow-left"></i>
 </a>
+</div>
 
 <header class="entrance-animate">
   <nav>
@@ -279,10 +414,94 @@ if (!$conn) {
     </ul>
   </nav>
 </header>
+ <!-- Standings Display -->
+    <div class="standings-container entrance-animate">
+      <?php
+      include 'db.php';
 
-<div class="main-content">
-    <!-- Your content for the result page goes here -->
-</div>
+      // Get all positions
+      $positions_query = "SELECT DISTINCT position_id, position FROM candidate_positions ORDER BY position_id";
+      $positions_result = $conn->query($positions_query);
+
+      while ($position = $positions_result->fetch_assoc()) {
+        $position_id = $position['position_id'];
+        $position_name = $position['position'];
+        ?>
+        <div class="position-standings">
+          <h2 class="position-title"><?php echo htmlspecialchars($position_name); ?></h2>
+          <div class="candidates-standings">
+            <?php
+            // Get candidates and their vote counts for this position
+            $candidates_query = "
+              SELECT 
+                cp.id,
+                cp.candidate_id,
+                cp.name,
+                cp.year,
+                cp.program,
+                cp.image,
+                COUNT(v.id) as vote_count
+              FROM candidate_positions cp
+              LEFT JOIN votes v ON cp.candidate_id = v.candidate_id AND cp.position_id = v.position_id
+              WHERE cp.position_id = ?
+              GROUP BY cp.id, cp.candidate_id, cp.name, cp.year, cp.program, cp.image
+              ORDER BY vote_count DESC
+            ";
+            
+            $stmt = $conn->prepare($candidates_query);
+            $stmt->bind_param("i", $position_id);
+            $stmt->execute();
+            $candidates_result = $stmt->get_result();
+
+            $max_votes = 0;
+            $candidates_data = array();
+
+            while ($candidate = $candidates_result->fetch_assoc()) {
+              $candidates_data[] = $candidate;
+              if ($candidate['vote_count'] > $max_votes) {
+                $max_votes = $candidate['vote_count'];
+              }
+            }
+
+            foreach ($candidates_data as $candidate) {
+              $is_leading = $candidate['vote_count'] == $max_votes && $max_votes > 0;
+              ?>
+              <div class="candidate-standing <?php echo $is_leading ? 'leading' : ''; ?>">
+                <div class="candidate-info">
+                  <div class="candidate-image">
+                    <?php if (!empty($candidate['image'])): ?>
+                      <img src="<?php echo htmlspecialchars($candidate['image']); ?>" 
+                           alt="<?php echo htmlspecialchars($candidate['name']); ?>">
+                    <?php else: ?>
+                      <div class="no-image">No Image</div>
+                    <?php endif; ?>
+                  </div>
+                  <div class="candidate-details">
+                    <h3><?php echo htmlspecialchars($candidate['name']); ?></h3>
+                    <p class="program"><?php echo htmlspecialchars($candidate['program']); ?></p>
+                    <p class="year"><?php echo htmlspecialchars($candidate['year']); ?> Year</p>
+                    <p class="candidate-number">Candidate #<?php echo htmlspecialchars($candidate['candidate_id']); ?></p>
+                  </div>
+                </div>
+                <div class="vote-count">
+                  <span class="count"><?php echo $candidate['vote_count']; ?></span>
+                  <span class="label">votes</span>
+                  <?php if ($is_leading): ?>
+                    <i class="fas fa-trophy leading-icon"></i>
+                  <?php endif; ?>
+                </div>
+              </div>
+              <?php
+            }
+            $stmt->close();
+            ?>
+          </div>
+        </div>
+        <?php
+      }
+      $conn->close();
+      ?>
+    </div>
 
 <footer class="entrance-animate">
     <p>&copy; 2025 EVSU Voting System. All rights reserved.</p>
@@ -290,13 +509,5 @@ if (!$conn) {
         <a href="#">Privacy Policy</a> | <a href="#">Terms of Use</a> | <a href="#">Help</a>
     </nav>
 </footer>
-
-<script>
-    // Menu toggle functionality
-    document.querySelector('.menu-toggle').addEventListener('click', function() {
-        document.querySelector('nav ul').classList.toggle('active');
-    });
-</script>
-
 </body>
 </html>
