@@ -5,7 +5,7 @@ include 'db.php';
 // Check if admin is logged in and has a valid session
 // Check if admin is logged in
 if (!isset($_SESSION['admin_username'])) {
-    header("Location: admin_auth.php");
+    header("Location: adminver.php");
     exit();
 }
 
