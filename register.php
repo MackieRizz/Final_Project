@@ -10,7 +10,7 @@ include 'db.php';
 // PHPMailer setup
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-require '../vendor/autoload.php'; // Adjust path if needed
+require 'vendor/autoload.php'; // Changed from '../vendor/autoload.php' to 'vendor/autoload.php'
 
 $qrCodeUrl = '';
 $successMessage = '';
@@ -61,13 +61,72 @@ if (isset($_POST['verify_otp'])) {
         $gender = $_SESSION['form_data']['gender'] ?? '';
         $section = $_SESSION['form_data']['section'] ?? '';
         $email = $_SESSION['form_data']['email'] ?? '';
-        unset($_SESSION['otp'], $_SESSION['form_data']);
+        $otp = $_SESSION['otp']; // Store the OTP value
+        
+        // Generate QR code URL
+        $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" . urlencode("Name:" . $fullname . ",ID:" . $student_id);
+        $qrCodeFileName = "QRCode_" . $student_id . ".png";
+        $fullQrCodePath = $qrCodeSavePath . $qrCodeFileName;
+
+        // Create QR code directory if it doesn't exist
+        if (!file_exists($qrCodeSavePath)) {
+            mkdir($qrCodeSavePath, 0777, true);
+            chmod($qrCodeSavePath, 0777);
+        }
+
+        // Generate QR code
+        try {
+            $ch = curl_init($qrCodeUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            $response = curl_exec($ch);
+
+            if (curl_errno($ch)) {
+                throw new Exception("cURL error: " . curl_error($ch));
+            }
+            curl_close($ch);
+
+            if (file_put_contents($fullQrCodePath, $response) === false) {
+                throw new Exception("Failed to save QR code image");
+            }
+            chmod($fullQrCodePath, 0666);
+
+            // Check if student_id already exists
+            $checkSql = "SELECT id FROM students_registration WHERE student_id = '$student_id'";
+            $checkResult = $conn->query($checkSql);
+
+            if ($checkResult && $checkResult->num_rows > 0) {
+                $successMessage = "Registration Failed! Student ID $student_id is already registered.";
+                $student_id = "";
+                $qrCodeUrl = "";
+                $qrCodeFileName = "";
+                $fullQrCodePath = "";
+            } else {
+                // Insert into database with OTP and verified status
+                $sql = "INSERT INTO students_registration (fullname, student_id, qr_code_path, department, program, gender, section, email, otp, status)
+                        VALUES ('$fullname', '$student_id', '$fullQrCodePath', '$department', '$program', '$gender', '$section', '$email', '$otp', 'verified')";
+                if ($conn->query($sql) === TRUE) {
+                    $successMessage = "Registration Successful!";
+                    $new_id = $conn->insert_id;
+                    unset($_SESSION['otp'], $_SESSION['form_data']); // Clear session after successful registration
+                } else {
+                    $errorMessage = "Error: " . $conn->error;
+                }
+            }
+
+        } catch (Exception $e) {
+            $errorMessage = "Error generating QR code: " . $e->getMessage();
+            $qrCodeUrl = "";
+            $qrCodeFileName = "";
+            $fullQrCodePath = "";
+        }
     } else {
         $errorMessage = "Invalid OTP. Please try again.";
     }
 }
 
-// Registration logic
+// Move the registration form handling here
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['verify_otp'])) {
     // Get all form data
     $fullname = isset($_POST['fullname']) ? $conn->real_escape_string($_POST['fullname']) : '';
@@ -89,9 +148,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['verify_otp'])) {
         
         if ($checkEmailResult && $checkEmailResult->num_rows > 0) {
             $errorMessage = "Email already exists. Please use a different one.";
-            } elseif ($checkIdResult && $checkIdResult->num_rows > 0) {
-                $errorMessage = "Student ID already exists. Please use a different one.";
-            }else {
+        } elseif ($checkIdResult && $checkIdResult->num_rows > 0) {
+            $errorMessage = "Student ID already exists. Please use a different one.";
+        } else {
             $otp = rand(100000, 999999);
             $_SESSION['otp'] = $otp;
             $_SESSION['form_data'] = [
@@ -107,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['verify_otp'])) {
             // Send OTP via PHPMailer
             $mail = new PHPMailer(true);
             try {
-                // SMTP config (edit as needed)
+                // SMTP config
                 $mail->isSMTP();
                 $mail->Host = 'smtp.gmail.com';
                 $mail->SMTPAuth = true;
@@ -129,65 +188,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['verify_otp'])) {
                 $errorMessage = "Failed to send OTP: " . $mail->ErrorInfo;
             }
         }   
-    }
-}
-
-if ($otp_verified) {
-    // Generate QR code URL
-    $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" . urlencode("Name:" . $fullname . ",ID:" . $student_id);
-    $qrCodeFileName = "QRCode_" . $student_id . ".png";
-    $fullQrCodePath = $qrCodeSavePath . $qrCodeFileName;
-
-    // Create QR code directory if it doesn't exist
-    if (!file_exists($qrCodeSavePath)) {
-        mkdir($qrCodeSavePath, 0777, true);
-        chmod($qrCodeSavePath, 0777);
-    }
-
-    // Generate QR code
-    try {
-        $ch = curl_init($qrCodeUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        $response = curl_exec($ch);
-
-        if (curl_errno($ch)) {
-            throw new Exception("cURL error: " . curl_error($ch));
-        }
-        curl_close($ch);
-
-        if (file_put_contents($fullQrCodePath, $response) === false) {
-            throw new Exception("Failed to save QR code image");
-        }
-        chmod($fullQrCodePath, 0666);
-
-    } catch (Exception $e) {
-        $errorMessage = "Error generating QR code: " . $e->getMessage();
-        $qrCodeUrl = "";
-        $qrCodeFileName = "";
-        $fullQrCodePath = "";
-    }
-
-    // Check if student_id already exists
-    $checkSql = "SELECT id FROM students_registration WHERE student_id = '$student_id'";
-    $checkResult = $conn->query($checkSql);
-
-    if ($checkResult && $checkResult->num_rows > 0) {
-        $successMessage = "Registration Failed! Student ID $student_id is already registered.";
-        $student_id = "";
-        $qrCodeUrl = "";
-        $qrCodeFileName = "";
-        $fullQrCodePath = "";
-    } else {
-        $sql = "INSERT INTO students_registration (fullname, student_id, qr_code_path, department, program, gender, section, email)
-                VALUES ('$fullname', '$student_id', '$fullQrCodePath', '$department', '$program', '$gender', '$section', '$email')";
-        if ($conn->query($sql) === TRUE) {
-            $successMessage = "Registration Successful!";
-            $new_id = $conn->insert_id;
-        } else {
-            $errorMessage = "Error: " . $conn->error;
-        }
     }
 }
 ?>
@@ -724,12 +724,12 @@ if (isset($_SESSION['otp']) && !$otp_verified): ?>
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    gap: 32px;
+    gap: 25px;
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
     min-height: 100vh;
-    padding: 120px 20px 100px 20px;
+    padding: 100px 20px 100px 20px;
     margin-top: -30px;
 }
 
@@ -739,7 +739,7 @@ if (isset($_SESSION['otp']) && !$otp_verified): ?>
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding: 24px;
+    padding: 14px;
     background: rgba(77, 20, 20, 0.92);
     border-radius: 18px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.18);
@@ -1012,7 +1012,7 @@ if (isset($_SESSION['otp']) && !$otp_verified): ?>
     }
     footer {
         border-top: 1px solid #FDDE54;
-        padding: 18px 8% 10px 8%;
+        padding: 3px 8% 2px 8%;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -1031,8 +1031,9 @@ if (isset($_SESSION['otp']) && !$otp_verified): ?>
         display: flex;
         align-items: center;
         position: fixed;
-        right: 110px;
-        bottom: 20px;
+        right: 0px;
+        bottom: 5px;
+        font-size: 14px;
     }
     footer nav a {
         color: #FDDE54;
