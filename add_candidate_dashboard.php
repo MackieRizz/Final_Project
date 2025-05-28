@@ -350,6 +350,32 @@
       text-align: right;
       margin: 10px 25px;
       font-size: 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+    }
+
+    .save-voting-form-btn {
+      background: #FDDE54;
+      color: #2d0808;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .save-voting-form-btn:hover {
+      background: #ffd700;
+      transform: translateY(-2px);
+    }
+
+    .save-voting-form-btn i {
+      font-size: 16px;
     }
 
     .add-icon-btn {
@@ -854,7 +880,7 @@
         <div class="menu-title">Admin Dashboard</div>
         <div class="menu-item" onclick="window.location.href='admin_dashboard.php'"><i
             class="fas fa-chart-line"></i><span class="label1">Analytics</span></div>
-        <div class="menu-item"><i class="fas fa-trophy"></i><span class="label1">Standings</span></div>
+        <div class="menu-item" onclick="window.location.href='standing.php'"><i class="fas fa-trophy"></i><span class="label1">Standings</span></div>
         <div class="menu-item" onclick="window.location.href='student_list.php'"><i
             class="fas fa-address-card"></i><span class="label1">Student List</span></div>
         <div class="menu-item"><i class="fas fa-users"></i><span class="label">Add Candidates</span></div>
@@ -883,6 +909,10 @@
 
     <!-- Plus Icon Trigger -->
     <div class="add-icon-container">
+      <button class="save-voting-form-btn" onclick="saveVotingForm()">
+        <i class="fas fa-save"></i>
+        Save Voting Form
+      </button>
       <i class="fas fa-plus-circle" onclick="openAddModal()"></i>
     </div>
 
@@ -1374,6 +1404,58 @@
           title: 'Error',
           text: 'An error occurred. Please try again.'
         });
+      });
+    }
+
+    function saveVotingForm() {
+      Swal.fire({
+        title: 'Save Voting Form',
+        text: 'Are you sure you want to update the voting form with the current candidates?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#FDDE54',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, update it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Show loading state
+          Swal.fire({
+            title: 'Updating Voting Form...',
+            text: 'Please wait while we update the voting form.',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+
+          // Send request to update voting form
+          fetch('update_voting_form.php', {
+            method: 'POST'
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Voting form has been updated successfully.'
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message || 'Failed to update voting form. Please try again.'
+              });
+            }
+          })
+          .catch(error => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'An error occurred while updating the voting form.'
+            });
+          });
+        }
       });
     }
 

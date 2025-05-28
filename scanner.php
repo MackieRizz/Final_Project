@@ -21,6 +21,13 @@ if ($subject_id) {
     }
 }
 
+// Add this at the beginning of the file, after session_start();
+if (isset($_GET['clear'])) {
+    unset($_SESSION['show_voted_modal']);
+    header('Location: scanner.php?subject_id=' . $subject_id);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $qrData = $_POST['qr_data'] ?? '';
 
@@ -28,66 +35,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fullname = trim($matches[1]);
         $studentId = trim($matches[2]);
 
-        $today = date('Y-m-d');
-        $current_datetime = new DateTime();
-        $current_time = $current_datetime->format('H:i:s');
-        
-        // Check if already logged today for this subject
-        $stmt = $conn->prepare("SELECT 1 FROM record_attendance WHERE student_id = ? AND DATE(date) = ? AND subject_id = ?");
-        $stmt->bind_param("ssi", $studentId, $today, $subject_id);
-        $stmt->execute();
-        $stmt->store_result();
+        // Check if student exists in registration
+        $checkStudent = $conn->prepare("SELECT id FROM students_registration WHERE student_id = ?");
+        $checkStudent->bind_param("s", $studentId);
+        $checkStudent->execute();
+        $studentResult = $checkStudent->get_result();
 
-        if ($stmt->num_rows > 0) {
-            $message = "<div class='alert alert-warning fw-bold text-center'>Attendance already logged for this subject today!</div>";
+        if ($studentResult->num_rows === 0) {
+            $message = "<div class='alert alert-danger fw-bold text-center'>Student not registered!</div>";
         } else {
-            // Convert class times to DateTime objects for today
-            $start_datetime = new DateTime($today . ' ' . date('H:i:s', strtotime($subject['start_datetime'])));
-            $end_datetime = new DateTime($today . ' ' . date('H:i:s', strtotime($subject['end_datetime'])));
+            // Check if student has already voted
+            $checkVote = $conn->prepare("SELECT status FROM student_votes WHERE student_id = ? ORDER BY scan_time DESC LIMIT 1");
+            $checkVote->bind_param("s", $studentId);
+            $checkVote->execute();
+            $voteResult = $checkVote->get_result();
             
-            // Add grace period (15 minutes) and early window (30 minutes)
-            $grace_period = new DateInterval('PT15M');
-            $early_window = new DateInterval('PT30M');
-            
-            $late_cutoff = clone $start_datetime;
-            $late_cutoff->add($grace_period);
-            
-            $early_allowed = clone $start_datetime;
-            $early_allowed->sub($early_window);
-
-            // Determine attendance status based on current time
-            if ($current_datetime < $early_allowed) {
-                $message = "<div class='alert alert-danger fw-bold text-center'>
-                    Too early to scan! Scanning will be available from " . $early_allowed->format('h:i A') . "<br>
-                    <small>Current Time: " . $current_datetime->format('h:i A') . "</small>
-                </div>";
-                $can_record = false;
-            } else {
-                $can_record = true;
-                if ($current_datetime <= $late_cutoff) {
-                    $attendance_status = 'present';
-                } elseif ($current_datetime <= $end_datetime) {
-                    $attendance_status = 'late';
+            if ($voteResult->num_rows > 0) {
+                $voteData = $voteResult->fetch_assoc();
+                if ($voteData['status'] === 'Voted') {
+                    if (!isset($_SESSION['show_voted_modal'])) {
+                        $_SESSION['show_voted_modal'] = true;
+                        $message = "<script>
+                            Swal.fire({
+                                title: 'Already Voted!',
+                                text: 'Student ID: " . $studentId . " has already voted',
+                                icon: 'warning',
+                                confirmButtonColor: '#C46B02',
+                                confirmButtonText: 'OK'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = 'scanner.php?subject_id=" . $subject_id . "&clear=1';
+                                }
+                            });
+                        </script>";
+                    }
                 } else {
-                    $attendance_status = 'absent';
+                    // Student has scanned but hasn't voted yet
+                    $_SESSION['student_id'] = $studentId;
+                    $_SESSION['has_scanned'] = true;
+                    header('Location: voting_form.php');
+                    exit;
                 }
-            }
-
-            if ($can_record) {
-                $insert = $conn->prepare("INSERT INTO record_attendance (fullname, student_id, subject_id, attendance_status, date) VALUES (?, ?, ?, ?, ?)");
-                $current_timestamp = $current_datetime->format('Y-m-d H:i:s');
-                $insert->bind_param("ssiss", $fullname, $studentId, $subject_id, $attendance_status, $current_timestamp);
+            } else {
+                // Create new voting record
+                $current_time = date('Y-m-d H:i:s');
+                $insertVote = $conn->prepare("INSERT INTO student_votes (student_id, scan_time, status) VALUES (?, ?, 'Didn\'t vote yet')");
+                $insertVote->bind_param("ss", $studentId, $current_time);
                 
-                if ($insert->execute()) {
-                    $status_text = ucfirst($attendance_status);
-                    $alert_class = ($attendance_status == 'present') ? 'success' : 
-                                ($attendance_status == 'late' ? 'warning' : 'danger');
-                    $message = "<div class='alert alert-{$alert_class} fw-bold text-center'>
-                        Attendance logged as {$status_text}!<br>
-                        <small>Time: " . $current_datetime->format('h:i A') . "</small>
-                    </div>";
+                if ($insertVote->execute()) {
+                    $_SESSION['student_id'] = $studentId;
+                    $_SESSION['has_scanned'] = true;
+                    header('Location: voting_form.php');
+                    exit;
                 } else {
-                    $message = "<div class='alert alert-danger text-center'>Error: " . $insert->error . "</div>";
+                    $message = "<div class='alert alert-danger text-center'>Error creating voting record: " . $insertVote->error . "</div>";
                 }
             }
         }
@@ -544,8 +545,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         cameraId,
                         { fps: 10, qrbox: 310 },
                         (decodedText) => {
-                            // No backend logic, just log to console
-                            console.log("Decoded QR:", decodedText);
+                            // Stop scanning after successful scan
+                            qrScanner.stop().then(() => {
+                                // Create and submit form with QR data
+                                const form = document.createElement('form');
+                                form.method = 'POST';
+                                form.action = window.location.href;
+
+                                const input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = 'qr_data';
+                                input.value = decodedText;
+
+                                form.appendChild(input);
+                                document.body.appendChild(form);
+                                form.submit();
+                            });
                         },
                         (err) => console.warn("Scan error:", err)
                     );
@@ -556,5 +571,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         window.addEventListener('load', startScanner);
     </script>
+    <?php if (isset($message)) echo $message; ?>
 </body>
 </html>

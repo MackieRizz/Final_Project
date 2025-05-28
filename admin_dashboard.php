@@ -787,12 +787,30 @@
 
 
     const pieCtx = document.getElementById('pieChart').getContext('2d');
+    <?php
+      include 'db.php';
+      
+      // Get total number of students
+      $totalStudentsQuery = "SELECT COUNT(*) as total FROM students_registration";
+      $totalStudentsResult = $conn->query($totalStudentsQuery);
+      $totalStudents = $totalStudentsResult->fetch_assoc()['total'];
+      
+      // Get number of students who voted
+      $votedStudentsQuery = "SELECT COUNT(DISTINCT student_id) as voted FROM student_votes";
+      $votedStudentsResult = $conn->query($votedStudentsQuery);
+      $votedStudents = $votedStudentsResult->fetch_assoc()['voted'];
+      
+      // Calculate students who didn't vote
+      $notVotedStudents = $totalStudents - $votedStudents;
+      
+      $conn->close();
+    ?>
     new Chart(pieCtx, {
       type: 'pie',
       data: {
         labels: ['Voted', 'Did Not Vote'],
         datasets: [{
-          data: [800, 400],
+          data: [<?php echo $votedStudents; ?>, <?php echo $notVotedStudents; ?>],
           backgroundColor: ['#FDDE54', '#4a1010']
         }]
       },

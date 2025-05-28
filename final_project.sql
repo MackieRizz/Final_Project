@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 28, 2025 at 04:06 AM
+-- Generation Time: May 28, 2025 at 06:03 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -64,8 +64,11 @@ CREATE TABLE `candidate_positions` (
 INSERT INTO `candidate_positions` (`id`, `candidate_id`, `position_id`, `position`, `name`, `year`, `program`, `image`) VALUES
 (1, 1, 1, 'President', 'Sung Jin Woo', '4th', 'Bachelor of Solo Leveling', 'uploads/candidate_683497ec77aaa_sung-jinwoo-8k-7680x4320-14673.jpg'),
 (2, 2, 1, 'President', 'Tirzo Woo', '4th', 'Bachelor of Solo Leveling', 'uploads/candidate_683497ec7ac3d_6328115552077334118.jpg'),
-(3, 1, 2, 'Vice-President', 'Hambot', '3rd', 'Bachelor of Meowing', 'uploads/candidate_6834a3c23b56c_6327664803849552034.jpg'),
-(4, 2, 2, 'Vice-President', 'Meow', '3rd', 'Bachelor of Meowing', 'uploads/candidate_6834a3c23f45d_enhance-the-beauty-of-this-cat-s-eye-showing-the-amazing-colors-and-textures-in-great-detail-make-it-look-as-realistic-as-possible-almost-like-agraph-free-photo.jpg');
+(4, 2, 2, 'Vice-President', 'Meow', '3rd', 'Bachelor of Meowing', 'uploads/candidate_6834a3c23f45d_enhance-the-beauty-of-this-cat-s-eye-showing-the-amazing-colors-and-textures-in-great-detail-make-it-look-as-realistic-as-possible-almost-like-agraph-free-photo.jpg'),
+(5, 3, 2, 'Vice-President', 'Please', '2nd', 'Bachelor of Meowing', 'uploads/candidate_683683333500b_6328115552077334118.jpg'),
+(6, 1, 3, 'Secretary', 'Kapoy', '2nd', 'Bachelor of Solo Leveling', 'uploads/candidate_683686a3d8504_6147625809230282886.jpg'),
+(7, 3, 1, 'President', 'COJ', '4th', 'Bachelor of Solo Leveling', 'uploads/candidate_6836871849454_7bd74bfe-e57f-43d6-b9d7-28c1d156fb04_removalai_preview.png'),
+(8, 2, 3, 'Secretary', 'Hambot', '1st', 'Bachelor of Meowing', 'uploads/candidate_683689721f49d_DIGITAL LITERACY POSTER.jpg');
 
 -- --------------------------------------------------------
 
@@ -129,9 +132,59 @@ INSERT INTO `students_registration` (`id`, `fullname`, `student_id`, `department
 (50, 'Stella Sanchez', '2022-10050', 'Industrial Technology Department', 'BSIT', 'qr_codes/2022-10050.png', 'Female', 'A', '2025-05-26 16:05:07'),
 (52, 'Ma. Althea Bhea Daza', '2022-30383', 'Computer Studies Department', 'Bachelor of Science in Information Technology (BSIT)', '../qr_codes/QRCode_2022-30383.png', 'Female', '3C', '2025-05-28 01:25:55'),
 (53, 'Almackie Bangalao', '2022-12345', 'Computer Studies Department', 'Bachelor of Science in Information Technology (BSIT)', '../qr_codes/QRCode_2022-12345.png', 'Male', '3C', '2025-05-28 01:52:01'),
-(54, 'Kata Kata', '2022-17564', 'Computer Studies Department', 'Bachelor of Science in Information Technology (BSIT)', '../qr_codes/QRCode_2022-17564.png', 'Female', '3A', '2025-05-28 01:54:18'),
-(55, 'Kata Kata', '2022-18453', 'Engineering Department', 'Bachelor of Science in Civil Engineering (BSCE)', '../qr_codes/QRCode_2022-18453.png', 'Female', '3A', '2025-05-28 02:00:34'),
-(56, 'Kata Kata', '2022-98754', 'Computer Studies Department', 'Bachelor of Science in Information Technology (BSIT)', '../qr_codes/QRCode_2022-98754.png', 'Female', '3A', '2025-05-28 02:02:36');
+(56, 'Kata Kata', '2022-98754', 'Computer Studies Department', 'Bachelor of Science in Information Technology (BSIT)', '../qr_codes/QRCode_2022-98754.png', 'Female', '3A', '2025-05-28 02:02:36'),
+(58, 'Kapoy Na', '2022-35473', 'Engineering Department', 'Bachelor of Science in Electrical Engineering (BSEE)', '../qr_codes/QRCode_2022-35473.png', 'Female', '3A', '2025-05-28 03:57:28');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `student_votes`
+--
+
+CREATE TABLE `student_votes` (
+  `id` int(11) NOT NULL,
+  `student_id` varchar(50) NOT NULL,
+  `scan_time` datetime NOT NULL,
+  `vote_time` datetime DEFAULT NULL,
+  `status` enum('Didn''t vote yet','Voted') NOT NULL DEFAULT 'Didn''t vote yet'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `student_votes`
+--
+
+INSERT INTO `student_votes` (`id`, `student_id`, `scan_time`, `vote_time`, `status`) VALUES
+(1, '2022-30383', '2025-05-28 11:46:54', '2025-05-28 05:47:18', 'Voted'),
+(3, '2022-35473', '2025-05-28 11:58:17', '2025-05-28 05:58:40', 'Voted');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `votes`
+--
+
+CREATE TABLE `votes` (
+  `id` int(11) NOT NULL,
+  `student_id` varchar(15) NOT NULL,
+  `candidate_id` int(11) NOT NULL,
+  `position_id` int(11) NOT NULL,
+  `vote_time` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `votes`
+--
+
+INSERT INTO `votes` (`id`, `student_id`, `candidate_id`, `position_id`, `vote_time`) VALUES
+(1, '2022-30383', 3, 1, '2025-05-28 05:47:18'),
+(2, '2022-30383', 3, 2, '2025-05-28 05:47:18'),
+(3, '2022-30383', 1, 3, '2025-05-28 05:47:18'),
+(4, '2022-37643', 3, 1, '2025-05-28 05:55:27'),
+(5, '2022-37643', 2, 2, '2025-05-28 05:55:27'),
+(6, '2022-37643', 1, 3, '2025-05-28 05:55:27'),
+(7, '2022-35473', 1, 1, '2025-05-28 05:58:40'),
+(8, '2022-35473', 2, 2, '2025-05-28 05:58:40'),
+(9, '2022-35473', 2, 3, '2025-05-28 05:58:40');
 
 --
 -- Indexes for dumped tables
@@ -145,6 +198,20 @@ ALTER TABLE `students_registration`
   ADD UNIQUE KEY `student_id` (`student_id`);
 
 --
+-- Indexes for table `student_votes`
+--
+ALTER TABLE `student_votes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `student_id` (`student_id`);
+
+--
+-- Indexes for table `votes`
+--
+ALTER TABLE `votes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `student_id` (`student_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -152,7 +219,29 @@ ALTER TABLE `students_registration`
 -- AUTO_INCREMENT for table `students_registration`
 --
 ALTER TABLE `students_registration`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+
+--
+-- AUTO_INCREMENT for table `student_votes`
+--
+ALTER TABLE `student_votes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `votes`
+--
+ALTER TABLE `votes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `student_votes`
+--
+ALTER TABLE `student_votes`
+  ADD CONSTRAINT `student_votes_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students_registration` (`student_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
