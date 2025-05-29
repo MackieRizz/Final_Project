@@ -1067,6 +1067,21 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       background: #fff;
       transform: translateY(-2px);
     }
+
+    .scanner-settings-btn:hover {
+      background: rgba(253, 222, 84, 0.1);
+      box-shadow: 0 0 10px rgba(253, 222, 84, 0.2);
+      transform: scale(1.1);
+    }
+
+    .fa-plus-circle {
+      color: #FDDE54;
+      transition: transform 0.3s ease;
+    }
+
+    .fa-plus-circle:hover {
+      transform: scale(1.1);
+    }
   </style>
 </head>
 
@@ -1098,9 +1113,6 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
           <br><br>
           <p id="name"><?php echo htmlspecialchars($admin_username); ?></p>
           <p id="role">Administrator</p>
-          <button class="scanner-icon-btn" title="View Scanner Settings">
-            <i class="fas fa-qrcode"></i>
-          </button>
           <button class="edit-passcode-btn" title="Edit Passcode">
             <i class="fas fa-key"></i>
           </button>
@@ -1118,7 +1130,10 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
         <i class="fas fa-trash"></i>
         Delete All
       </button>
-      <i class="fas fa-plus-circle" onclick="openAddModal()"></i>
+      <button class="scanner-settings-btn" onclick="openScannerSettings()" style="background: transparent; border: 1px solid #FDDE54; color: #FDDE54; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+        <i class="fas fa-qrcode"></i>
+      </button>
+      <i class="fas fa-plus-circle" onclick="openAddModal()" style="font-size: 40px; cursor: pointer;"></i>
     </div>
 
 
@@ -1655,6 +1670,31 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
 
     function saveVotingForm() {
       document.getElementById('scannerSettingsModal').style.display = 'flex';
+    }
+
+    function openScannerSettings() {
+      fetch('get_scanner_settings.php')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('viewStartDateTime').textContent = 
+              new Date(data.settings.start_datetime).toLocaleString();
+            document.getElementById('viewEndDateTime').textContent = 
+              new Date(data.settings.end_datetime).toLocaleString();
+          } else {
+            document.getElementById('viewStartDateTime').textContent = 'Not set';
+            document.getElementById('viewEndDateTime').textContent = 'Not set';
+          }
+          document.getElementById('viewScannerSettingsModal').style.display = 'flex';
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load scanner settings.'
+          });
+        });
     }
 
     function closeScannerSettings() {
