@@ -1081,6 +1081,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
         <div class="menu-item" onclick="window.location.href='student_list.php'"><i
             class="fas fa-address-card"></i><span class="label1">Student List</span></div>
         <div class="menu-item"><i class="fas fa-users"></i><span class="label">Add Candidates</span></div>
+        <div class="menu-item" onclick="openVotingFormPreview()"><i class="fas fa-eye"></i><span class="label1">View Voting Form</span></div>
       </div>
     </div>
     <div class="logout-btn"><i class="fas fa-sign-out-alt"></i><span class="label">Logout</span></div>
@@ -1112,6 +1113,10 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       <button class="save-voting-form-btn" onclick="saveVotingForm()">
         <i class="fas fa-save"></i>
         Save Voting Form
+      </button>
+      <button class="delete-all-btn" onclick="confirmDeleteAll()" style="background: #ff4d4d; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease;">
+        <i class="fas fa-trash"></i>
+        Delete All
       </button>
       <i class="fas fa-plus-circle" onclick="openAddModal()"></i>
     </div>
@@ -1277,6 +1282,17 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
     </div>
   </div>
 
+  <!-- Voting Form Preview Modal -->
+  <div id="votingFormPreviewModal" class="scanner-settings-modal">
+    <div class="scanner-settings-container" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+      <h3>Voting Form Preview</h3>
+      <div id="votingFormPreview" style="background: #fff; padding: 20px; border-radius: 10px; margin-top: 20px;">
+        <!-- Content will be loaded dynamically -->
+      </div>
+      <button onclick="closeVotingFormPreview()" style="background: #666; margin-top: 20px;">Close</button>
+    </div>
+  </div>
+
   <script>
 
     //Sidebar
@@ -1336,8 +1352,6 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       <input type="text" name="program[]" placeholder="Program" required>
       <input type="file" name="image[]" accept="image/*" required>
       <input type="hidden" name="is_new[]" value="1">
-      <button type="button" class="remove-field" onclick="removeNameField(this)" style="position:absolute;top:5px;right:5px;background:none;border:none;color:#FDDE54;font-size:18px;cursor:pointer;">&times;</button>
-
     </div>
   `;
       nameCount = 1;
@@ -1359,8 +1373,6 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       <input type="text" name="program[]" placeholder="Program" required>
       <input type="file" name="image[]" accept="image/*" required>
       <input type="hidden" name="is_new[]" value="1">
-      <button type="button" class="remove-field" onclick="removeNameField(this)" style="position:absolute;top:5px;right:5px;background:none;border:none;color:#FDDE54;font-size:18px;cursor:pointer;">&times;</button>
-
     </div>
   `;
       nameCount = 1;
@@ -1801,6 +1813,85 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       if (event.target.classList.contains('view-scanner-settings-modal')) {
         closeViewSettings();
       }
+    }
+
+    function confirmDeleteAll() {
+      Swal.fire({
+        title: 'Delete All Candidates',
+        text: 'Are you sure you want to delete all candidates? This action cannot be undone!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ff4d4d',
+        cancelButtonColor: '#666',
+        confirmButtonText: 'Yes, delete all!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Show loading state
+          Swal.fire({
+            title: 'Deleting...',
+            text: 'Please wait while we delete all candidates.',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+
+          // Send delete request to server
+          fetch('delete_all_candidates.php', {
+            method: 'POST'
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'All candidates have been deleted successfully.'
+              }).then(() => {
+                window.location.reload();
+              });
+            } else {
+              throw new Error(data.message || 'Failed to delete candidates');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: error.message || 'An error occurred while deleting candidates.'
+            });
+          });
+        }
+      });
+    }
+
+    function openVotingFormPreview() {
+      const modal = document.getElementById('votingFormPreviewModal');
+      modal.style.display = 'flex';
+      
+      // Show loading state
+      const previewDiv = document.getElementById('votingFormPreview');
+      previewDiv.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin" style="font-size: 24px; color: #FDDE54;"></i><p style="margin-top: 10px; color: #FDDE54;">Loading voting form...</p></div>';
+      
+      // Fetch the voting form preview
+      fetch('get_voting_form_preview.php')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            previewDiv.innerHTML = data.html;
+          } else {
+            previewDiv.innerHTML = '<div style="text-align: center; padding: 20px; color: #FDDE54;">No voting form available yet.</div>';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          previewDiv.innerHTML = '<div style="text-align: center; padding: 20px; color: #FDDE54;">Error loading voting form.</div>';
+        });
+    }
+
+    function closeVotingFormPreview() {
+      document.getElementById('votingFormPreviewModal').style.display = 'none';
     }
 
   </script>
