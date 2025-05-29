@@ -570,7 +570,7 @@ if (!$conn) {
     </div>
     <h1>EVSU Student Government Election</h1>
     <div class="disclaimer">
-        Real-time results - Final certification pending
+        Real-time results
     </div>
 </div>
 
