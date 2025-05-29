@@ -68,6 +68,15 @@ $positions = array (
         'program' => 'Bachelor of Winning',
         'image' => 'uploads/candidate_6837c3915d9d0_6100661114942636645.jpg',
       ),
+      1 => 
+      array (
+        'id' => 6,
+        'candidate_id' => 2,
+        'name' => 'Sung Jin Woo',
+        'year' => '4th',
+        'program' => 'Bachelor of Solo Leveling',
+        'image' => 'uploads/candidate_6837c98a23aed_sung-jinwoo-8k-7680x4320-14673.jpg',
+      ),
     ),
   ),
 );

@@ -21,6 +21,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -533,6 +534,57 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       font-style: italic;
       font-size: 0.8em;
     }
+
+    .download-btn {
+      margin-left: 20px;
+      cursor: pointer;
+      color: #FDDE54;
+      font-size: 20px;
+      background: none;
+      border: none;
+      outline: none;
+      transition: transform 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .download-btn:hover {
+      transform: scale(1.1);
+      color: #fff;
+    }
+    .download-overlay {
+      position: absolute;
+      bottom: 10px;
+      left: 20px;
+      background: rgba(45,8,8,0.85);
+      color: #FDDE54;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: bold;
+      z-index: 9999;
+      pointer-events: none;
+      max-width: 90%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .election-header {
+      text-align: center;
+      color: #fff;
+      font-size: 2em;
+      font-weight: bold;
+      margin-bottom: 0.2em;
+      margin-top: 0.5em;
+      letter-spacing: 1px;
+    }
+    .election-subheader {
+      text-align: center;
+      color: #FDDE54;
+      font-size: 1.2em;
+      font-weight: 500;
+      margin-bottom: 0.5em;
+      margin-top: 0.5em;
+      letter-spacing: 0.5px;
+    }
   </style>
 </head>
 <body>
@@ -555,6 +607,9 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       <div class="refresh-btn" onclick="refreshStandings()" title="Refresh Results">
         <i class="fas fa-sync-alt"></i>
       </div>
+      <button class="download-btn" id="downloadImageBtn" title="Download Standings as Image">
+        <i class="fas fa-download"></i> Download as Image
+      </button>
       <div class="profile">
         <i class="fas fa-user-circle"></i>
         <div class="profile-modal">
@@ -574,6 +629,8 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
     <div class="main-container">
     <!-- Standings Display -->
     <div class="standings-container">
+      <div class="election-header">EVSU Student Council Elections</div>
+      <div class="election-subheader">Official Standings and Results</div>
       <?php
       // Get all positions
       $positions_query = "SELECT DISTINCT position_id, position FROM candidate_positions ORDER BY position_id";
@@ -842,6 +899,35 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
         });
       });
     }
+
+    // Download Standings as Image Feature
+    document.getElementById('downloadImageBtn').addEventListener('click', function() {
+      const standingsContainer = document.querySelector('.standings-container');
+      // Create overlay for username and time (bottom left)
+      const overlay = document.createElement('div');
+      overlay.className = 'download-overlay';
+      const now = new Date();
+      const formattedTime = now.toLocaleString();
+      overlay.innerText = 'Downloaded by: <?php echo addslashes($admin_username); ?> | ' + formattedTime;
+      overlay.style.position = 'absolute';
+      overlay.style.bottom = '10px';
+      overlay.style.left = '20px';
+      overlay.style.top = '';
+      standingsContainer.style.position = 'relative'; // Ensure parent is positioned
+      standingsContainer.appendChild(overlay);
+      // Use html2canvas to capture
+      html2canvas(standingsContainer, {backgroundColor: null, useCORS: true}).then(function(canvas) {
+        // Remove overlay after capture
+        standingsContainer.removeChild(overlay);
+        // Remove relative position if not needed
+        standingsContainer.style.position = '';
+        // Trigger download
+        const link = document.createElement('a');
+        link.download = 'standings_<?php echo addslashes($admin_username); ?>_' + now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate() + '_' + now.getHours() + now.getMinutes() + now.getSeconds() + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    });
 
     function refreshStandings() {
       const refreshBtn = document.querySelector('.refresh-btn i');

@@ -15,7 +15,7 @@ try {
     
     if ($result->num_rows > 0) {
         $html = '<div style="font-family: Arial, sans-serif;">';
-        $html .= '<h2 style="text-align: center; color: #2d0808; margin-bottom: 30px;">EVSU Voting Form</h2>';
+        $html .= '<h2 style="text-align: center; color: #2d0808; margin-bottom: 30px;">EVSU Student Council Elections</h2>';
         
         while ($row = $result->fetch_assoc()) {
             $position_id = $row['position_id'];
