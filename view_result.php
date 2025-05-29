@@ -400,6 +400,12 @@ if (!$conn) {
     background: rgba(45, 8, 8, 0.8);
     border: 2px solid rgba(253, 222, 84, 0.3);
     flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.candidate-photo:hover {
+    transform: scale(1.05);
 }
 
 .candidate-photo img {
@@ -538,6 +544,61 @@ if (!$conn) {
         top: 20px;
     }
 }
+
+/* Image Modal Styles */
+.image-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90vh;
+    margin: auto;
+    display: block;
+    top: 50%;
+    transform: translateY(-50%);
+    object-fit: contain;
+    width: auto;
+    height: auto;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #FDDE54;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.modal-close:hover {
+    color: #C46B02;
+}
+
+.modal-caption {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #FDDE54;
+    font-size: 1.2em;
+    text-align: center;
+    width: 100%;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.7);
+}
     </style>
 </head>
 <body>
@@ -639,7 +700,7 @@ if (!$conn) {
             <tr class="<?php echo $is_leading ? 'leading' : ''; ?>">
               <td>
                 <div class="candidate-info-cell">
-                  <div class="candidate-photo">
+                  <div class="candidate-photo" onclick="openImageModal(this)">
                     <?php if (!empty($candidate['image'])): ?>
                       <img src="<?php echo htmlspecialchars($candidate['image']); ?>" 
                            alt="<?php echo htmlspecialchars($candidate['name']); ?>">
@@ -685,6 +746,13 @@ if (!$conn) {
     </nav>
 </footer>
 
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal">
+    <span class="modal-close" onclick="closeImageModal()">&times;</span>
+    <img class="modal-content" id="modalImage">
+    <div id="modalCaption" class="modal-caption"></div>
+</div>
+
 <script>
 window.addEventListener('scroll', function() {
     const header = document.querySelector('header');
@@ -710,6 +778,39 @@ setInterval(function() {
     });
     document.getElementById('last-update').textContent = timeString;
 }, 60000); // Update every minute
+
+// Image Modal Functions
+function openImageModal(element) {
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImage");
+    const captionText = document.getElementById("modalCaption");
+    const img = element.querySelector('img');
+    
+    if (img) {
+        modal.style.display = "block";
+        modalImg.src = img.src;
+        captionText.innerHTML = img.alt;
+    }
+}
+
+function closeImageModal() {
+    document.getElementById("imageModal").style.display = "none";
+}
+
+// Close modal when clicking outside the image
+window.onclick = function(event) {
+    const modal = document.getElementById("imageModal");
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === "Escape") {
+        document.getElementById("imageModal").style.display = "none";
+    }
+});
 </script>
 </body>
 </html>

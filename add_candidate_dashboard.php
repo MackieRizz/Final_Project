@@ -727,6 +727,12 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       overflow: hidden;
       background: #4a1010;
       border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .candidate-image:hover {
+      transform: scale(1.05);
     }
 
     .candidate-image img {
@@ -1082,6 +1088,61 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
     .fa-plus-circle:hover {
       transform: scale(1.1);
     }
+
+    /* Image Modal Styles */
+    .image-modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .modal-content {
+      position: relative;
+      max-width: 90%;
+      max-height: 90vh;
+      margin: auto;
+      display: block;
+      top: 50%;
+      transform: translateY(-50%);
+      object-fit: contain;
+      width: auto;
+      height: auto;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 35px;
+      color: #FDDE54;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .modal-close:hover {
+      color: #C46B02;
+    }
+
+    .modal-caption {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #FDDE54;
+      font-size: 1.2em;
+      text-align: center;
+      width: 100%;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.7);
+    }
   </style>
 </head>
 
@@ -1201,7 +1262,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
               while ($candidate = $candidates_result->fetch_assoc()) {
                 ?>
                 <div class="candidate-card">
-                  <div class="candidate-image">
+                  <div class="candidate-image" onclick="openImageModal(this)">
                     <?php if (!empty($candidate['image'])): ?>
                       <img src="<?php echo htmlspecialchars($candidate['image']); ?>"
                         alt="<?php echo htmlspecialchars($candidate['name']); ?>">
@@ -1306,6 +1367,13 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       </div>
       <button onclick="closeVotingFormPreview()" style="background: #666; margin-top: 20px;">Close</button>
     </div>
+  </div>
+
+  <!-- Image Modal -->
+  <div id="imageModal" class="image-modal">
+    <span class="modal-close" onclick="closeImageModal()">&times;</span>
+    <img class="modal-content" id="modalImage">
+    <div id="modalCaption" class="modal-caption"></div>
   </div>
 
   <script>
@@ -1464,6 +1532,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
           <input type="hidden" name="existing_image[]" value="${candidate.image || ''}">
           <input type="hidden" name="candidate_id[]" value="${candidate.id}">
           <input type="hidden" name="is_new[]" value="0">
+          <input type="hidden" name="position_id" value="${positionId}">
           <button type="button" class="remove-field-btn" onclick="removeNameField(this)" ${candidates.length === 1 ? 'style=\"display:none;\"' : ''}>×</button>
 
         `;
@@ -1714,6 +1783,9 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
         return;
       }
 
+      // Close the scanner settings modal immediately
+      closeScannerSettings();
+
       // Show confirmation dialog
       Swal.fire({
         title: 'Save Settings & Voting Form',
@@ -1771,7 +1843,6 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
                       Start: ${new Date(startDateTime).toLocaleString()}<br>
                       End: ${new Date(endDateTime).toLocaleString()}`
               });
-              closeScannerSettings();
               
               // Update the view settings if modal is open
               document.getElementById('viewStartDateTime').textContent = 
@@ -1933,6 +2004,39 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
     function closeVotingFormPreview() {
       document.getElementById('votingFormPreviewModal').style.display = 'none';
     }
+
+    // Image Modal Functions
+    function openImageModal(element) {
+      const modal = document.getElementById("imageModal");
+      const modalImg = document.getElementById("modalImage");
+      const captionText = document.getElementById("modalCaption");
+      const img = element.querySelector('img');
+      
+      if (img) {
+        modal.style.display = "block";
+        modalImg.src = img.src;
+        captionText.innerHTML = img.alt;
+      }
+    }
+
+    function closeImageModal() {
+      document.getElementById("imageModal").style.display = "none";
+    }
+
+    // Close modal when clicking outside the image
+    window.onclick = function(event) {
+      const modal = document.getElementById("imageModal");
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === "Escape") {
+        document.getElementById("imageModal").style.display = "none";
+      }
+    });
 
   </script>
 </body>

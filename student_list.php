@@ -545,14 +545,17 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
               <th>Year & Section</th>
               <th>Email</th>
               <th>Gender</th>
+              <th>Voting Status</th>
             </tr>
           </thead>
           <tbody>
             <?php
               include 'db.php';
-              $sql = "SELECT student_id, fullname, department, program, section, email, gender               
-              FROM students_registration 
-                     ORDER BY student_id DESC";
+              $sql = "SELECT s.student_id, s.fullname, s.department, s.program, s.section, s.email, s.gender, 
+                     COALESCE(v.status, 'Not Voted') as voting_status
+                     FROM students_registration s
+                     LEFT JOIN student_votes v ON s.student_id = v.student_id
+                     ORDER BY s.student_id DESC";
               $result = $conn->query($sql);
 
               if ($result->num_rows > 0) {
@@ -566,10 +569,11 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
                   echo "<td>" . htmlspecialchars($row['section']) . "</td>";
                   echo "<td>" . htmlspecialchars($row['email']) . "</td>";
                   echo "<td>" . htmlspecialchars($row['gender']) . "</td>";
+                  echo "<td>" . htmlspecialchars($row['voting_status']) . "</td>";
                   echo "</tr>";
                 }
               } else {
-                echo "<tr><td colspan='7'>No students found</td></tr>";
+                echo "<tr><td colspan='9'>No students found</td></tr>";
               }
               $conn->close();
             ?>
@@ -663,7 +667,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
 
         for (let row of rows) {
           const cells = row.getElementsByTagName('td');
-          if (cells.length < 7) continue; // Skip if not a data row
+          if (cells.length < 9) continue; // Skip if not a data row
 
           // Adjusted indices due to added checkbox column
           const studentId = cells[1].textContent.toLowerCase();
@@ -672,13 +676,15 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
           const program = cells[4].textContent;
           const section = cells[5].textContent;
           const gender = cells[6].textContent;
+          const votingStatus = cells[7].textContent;
 
           const matchesSearch = studentId.includes(searchTerm) || 
                               fullName.includes(searchTerm) ||
                               department.toLowerCase().includes(searchTerm) ||
                               program.toLowerCase().includes(searchTerm) ||
                               section.toLowerCase().includes(searchTerm) ||
-                              gender.toLowerCase().includes(searchTerm);
+                              gender.toLowerCase().includes(searchTerm) ||
+                              votingStatus.toLowerCase().includes(searchTerm);
 
           const matchesDepartment = !departmentFilter || department === departmentFilter;
           const matchesProgram = !programFilter || program === programFilter;
