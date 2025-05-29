@@ -12,7 +12,7 @@ if (!$conn) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>EVSU Dashboard</title>
+    <title>EVSU Election Results - Official Tally</title>
     <link rel="icon" type="image/png" href="Images/EvsuLogo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -65,12 +65,12 @@ if (!$conn) {
     }
 
     header.scrolled {
-      width: calc(100% - 40px);    /* leave padding space */
-        margin: 10px 10px;           /* float away from edges */
+      width: calc(100% - 40px);
+        margin: 10px 10px;
         padding: 0px 95px;
         background: rgba(0,0,0,0.8);
         border-radius: 12px;
-        border-bottom: none;         /* hide the yellow line */
+        border-bottom: none;
         box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     }
 
@@ -160,7 +160,6 @@ if (!$conn) {
         }
     }
 
-
     #back-icon-container {
         position: fixed;
         margin-top: 20px;
@@ -170,7 +169,6 @@ if (!$conn) {
 
     #back-icon-container .back-icon {
         position: fixed;
-        
         left: 15px;
         z-index: 200;
         background: rgba(253, 222, 84, 0.85);
@@ -270,156 +268,286 @@ if (!$conn) {
         }
     }
 
+   /* Official Results Header */
+.results-header {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid #FDDE54;
+    margin-top: 120px;
+    margin-bottom: 20px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.results-header h1 {
+    color: #FDDE54;
+    font-size: 1.6em;
+    font-weight: 700;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.results-header .official-seal {
+    color: #C46B02;
+    font-size: 0.9em;
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.results-header .disclaimer {
+    color: #FDDE54;
+    font-size: 0.8em;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+/* Results Container */
+.results-container {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 95%;
+}
+
+/* Position Results Table */
+.position-results {
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #FDDE54;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.position-header {
+    background: linear-gradient(135deg, #C46B02 0%, #800000 100%);
+    padding: 12px 15px;
+    border-bottom: 2px solid #FDDE54;
+}
+
+.position-header h2 {
+    color: #FDDE54;
+    font-size: 1.3em;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Results Table */
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.results-table thead {
+    background: rgba(196, 107, 2, 0.3);
+}
+
+.results-table th {
+    padding: 12px 10px;
+    color: #FDDE54;
+    font-weight: 700;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border-bottom: 2px solid rgba(253, 222, 84, 0.3);
+    text-align: left;
+}
+
+.results-table th:last-child {
+    text-align: center;
+    width: 100px;
+}
+
+.results-table tbody tr {
+    border-bottom: 1px solid rgba(253, 222, 84, 0.2);
+    transition: background 0.3s ease;
+}
+
+.results-table tbody tr:hover {
+    background: rgba(253, 222, 84, 0.1);
+}
+
+.results-table tbody tr.leading {
+    background: rgba(253, 222, 84, 0.15);
+    border-left: 4px solid #FDDE54;
+}
+
+.results-table td {
+    padding: 12px 10px;
+    color: #fff;
+    vertical-align: middle;
+}
+
+/* Candidate Info Cell */
+.candidate-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.candidate-photo {
+    width: 50px;
+    height: 50px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba(45, 8, 8, 0.8);
+    border: 2px solid rgba(253, 222, 84, 0.3);
+    flex-shrink: 0;
+}
+
+.candidate-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.candidate-photo .no-photo {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FDDE54;
+    font-size: 0.7em;
+}
+
+.candidate-details {
+    flex: 1;
+}
+
+.candidate-name {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #FDDE54;
+    margin-bottom: 2px;
+}
+
+.candidate-program {
+    color: #C46B02;
+    font-weight: 600;
+    font-size: 0.85em;
+    margin-bottom: 1px;
+}
+
+.candidate-year {
+    color: rgba(253, 222, 84, 0.8);
+    font-size: 0.8em;
+}
+
+.candidate-id {
+    color: rgba(253, 222, 84, 0.6);
+    font-size: 0.75em;
+    font-style: italic;
+}
+
+/* Vote Count Cell */
+.vote-count-cell {
+    text-align: center;
+    position: relative;
+}
+
+.vote-number {
+    font-size: 1.6em;
+    font-weight: 800;
+    color: #FDDE54;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.vote-label {
+    color: rgba(253, 222, 84, 0.8);
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.leading-indicator {
+    position: absolute;
+    top: 5px;
+    right: 39px;
+    color: #FDDE54;
+    font-size: 1.2em;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
 
 
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .results-table th,
+    .results-table td {
+        padding: 10px 8px;
+    }
+    
+    .candidate-info-cell {
+        gap: 10px;
+    }
+    
+    .candidate-photo {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .vote-number {
+        font-size: 1.4em;
+    }
+}
 
-     /* Standings Styles */
-    .standings-container {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 95%;
-      margin-top: 100px;
-      transition: all 0.3s ease;
+@media (max-width: 768px) {
+    .results-header h1 {
+        font-size: 1.4em;
+    }
+    
+    .results-table {
+        font-size: 0.85em;
+    }
+    
+    .candidate-info-cell {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+    
+    .candidate-photo {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .vote-number {
+        font-size: 1.2em;
+    }
+    
+    .status-bar {
+        flex-direction: column;
+        gap: 8px;
+        padding: 8px 15px;
     }
 
-    .position-standings {
-      background: rgba(45, 8, 8, 0.8);
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    .leading-indicator{
+        top: 20px;
     }
-
-    .position-standings:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    }
-
-    .position-title {
-      color: #FDDE54;
-      text-align: center;
-      font-size: 1.8em;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid rgba(253, 222, 84, 0.3);
-    }
-
-    .candidates-standings {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .candidate-standing {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(74, 16, 16, 0.6);
-      padding: 15px;
-      border-radius: 10px;
-      transition: all 0.3s ease;
-    }
-
-    .candidate-standing:hover {
-      transform: translateX(10px);
-      background: rgba(74, 16, 16, 0.8);
-    }
-
-    .candidate-standing.leading {
-      background: linear-gradient(90deg, rgba(74, 16, 16, 0.8) 0%, rgba(253, 222, 84, 0.2) 100%);
-      border: 1px solid rgba(253, 222, 84, 0.3);
-    }
-
-    .candidate-info {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex: 1;
-    }
-
-    .candidate-image {
-      width: 80px;
-      height: 80px;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #2d0808;
-    }
-
-    .candidate-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .candidate-details {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .candidate-details h3 {
-      color: #fff;
-      margin: 0;
-      font-size: 1.2em;
-    }
-
-    .candidate-details p {
-      margin: 0;
-      color: #FDDE54;
-      font-size: 0.9em;
-    }
-
-    .vote-count {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-      min-width: 100px;
-    }
-
-    .vote-count .count {
-      font-size: 2em;
-      font-weight: bold;
-      color: #FDDE54;
-    }
-
-    .vote-count .label {
-      color: #fff;
-      font-size: 0.9em;
-    }
-
-    .leading-icon {
-      color: #FDDE54;
-      font-size: 1.5em;
-      margin-top: 5px;
-    }
-
-    .no-image {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #FDDE54;
-      font-style: italic;
-      font-size: 0.8em;
-    }
+}
     </style>
 </head>
 <body>
 
-
 <header class="entrance-animate">
-  <!-- Back Icon Button -->
- <div id="back-icon-container" class="entrance-animate">
-<a href="Homepage.html" class="back-icon entrance-animate" id="back" title="Back to Homepage">
-    <i class="fas fa-arrow-left"></i>
-</a>
-</div>
+  <div id="back-icon-container" class="entrance-animate">
+    <a href="Homepage.html" class="back-icon entrance-animate" id="back" title="Back to Homepage">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+  </div>
   <nav>
     <div class="menu-toggle">&#9776;</div>
     <div class="logo">
@@ -434,94 +562,121 @@ if (!$conn) {
     </ul>
   </nav>
 </header>
- <!-- Standings Display -->
-    <div class="standings-container entrance-animate">
-      <?php
-      include 'db.php';
 
-      // Get all positions
-      $positions_query = "SELECT DISTINCT position_id, position FROM candidate_positions ORDER BY position_id";
-      $positions_result = $conn->query($positions_query);
+<!-- Official Results Header -->
+<div class="results-header entrance-animate">
+    <div class="official-seal">
+        <i class="fas fa-certificate"></i> OFFICIAL ELECTION RESULTS
+    </div>
+    <h1>EVSU Student Government Election</h1>
+    <div class="disclaimer">
+        Real-time results - Final certification pending
+    </div>
+</div>
 
-      while ($position = $positions_result->fetch_assoc()) {
-        $position_id = $position['position_id'];
-        $position_name = $position['position'];
-        ?>
-        <div class="position-standings">
-          <h2 class="position-title"><?php echo htmlspecialchars($position_name); ?></h2>
-          <div class="candidates-standings">
-            <?php
-            // Get candidates and their vote counts for this position
-            $candidates_query = "
-              SELECT 
-                cp.id,
-                cp.candidate_id,
-                cp.name,
-                cp.year,
-                cp.program,
-                cp.image,
-                COUNT(v.id) as vote_count
-              FROM candidate_positions cp
-              LEFT JOIN votes v ON cp.candidate_id = v.candidate_id AND cp.position_id = v.position_id
-              WHERE cp.position_id = ?
-              GROUP BY cp.id, cp.candidate_id, cp.name, cp.year, cp.program, cp.image
-              ORDER BY vote_count DESC
-            ";
-            
-            $stmt = $conn->prepare($candidates_query);
-            $stmt->bind_param("i", $position_id);
-            $stmt->execute();
-            $candidates_result = $stmt->get_result();
+<!-- Results Display -->
+<div class="results-container entrance-animate">
+  <?php
+  include 'db.php';
 
-            $max_votes = 0;
-            $candidates_data = array();
+  // Get all positions
+  $positions_query = "SELECT DISTINCT position_id, position FROM candidate_positions ORDER BY position_id";
+  $positions_result = $conn->query($positions_query);
 
-            while ($candidate = $candidates_result->fetch_assoc()) {
-              $candidates_data[] = $candidate;
-              if ($candidate['vote_count'] > $max_votes) {
-                $max_votes = $candidate['vote_count'];
-              }
+  while ($position = $positions_result->fetch_assoc()) {
+    $position_id = $position['position_id'];
+    $position_name = $position['position'];
+    ?>
+    <div class="position-results">
+      <div class="position-header">
+        <h2><?php echo htmlspecialchars($position_name); ?></h2>
+      </div>
+      
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th><i class="fas fa-user"></i> Candidate Information</th>
+            <th><i class="fas fa-vote-yea"></i> Vote Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+          // Get candidates and their vote counts for this position
+          $candidates_query = "
+            SELECT 
+              cp.id,
+              cp.candidate_id,
+              cp.name,
+              cp.year,
+              cp.program,
+              cp.image,
+              COUNT(v.id) as vote_count
+            FROM candidate_positions cp
+            LEFT JOIN votes v ON cp.candidate_id = v.candidate_id AND cp.position_id = v.position_id
+            WHERE cp.position_id = ?
+            GROUP BY cp.id, cp.candidate_id, cp.name, cp.year, cp.program, cp.image
+            ORDER BY vote_count DESC
+          ";
+          
+          $stmt = $conn->prepare($candidates_query);
+          $stmt->bind_param("i", $position_id);
+          $stmt->execute();
+          $candidates_result = $stmt->get_result();
+
+          $max_votes = 0;
+          $candidates_data = array();
+
+          while ($candidate = $candidates_result->fetch_assoc()) {
+            $candidates_data[] = $candidate;
+            if ($candidate['vote_count'] > $max_votes) {
+              $max_votes = $candidate['vote_count'];
             }
+          }
 
-            foreach ($candidates_data as $candidate) {
-              $is_leading = $candidate['vote_count'] == $max_votes && $max_votes > 0;
-              ?>
-              <div class="candidate-standing <?php echo $is_leading ? 'leading' : ''; ?>">
-                <div class="candidate-info">
-                  <div class="candidate-image">
+          foreach ($candidates_data as $candidate) {
+            $is_leading = $candidate['vote_count'] == $max_votes && $max_votes > 0;
+            ?>
+            <tr class="<?php echo $is_leading ? 'leading' : ''; ?>">
+              <td>
+                <div class="candidate-info-cell">
+                  <div class="candidate-photo">
                     <?php if (!empty($candidate['image'])): ?>
                       <img src="<?php echo htmlspecialchars($candidate['image']); ?>" 
                            alt="<?php echo htmlspecialchars($candidate['name']); ?>">
                     <?php else: ?>
-                      <div class="no-image">No Image</div>
+                      <div class="no-photo">
+                        <i class="fas fa-user"></i>
+                      </div>
                     <?php endif; ?>
                   </div>
                   <div class="candidate-details">
-                    <h3><?php echo htmlspecialchars($candidate['name']); ?></h3>
-                    <p class="program"><?php echo htmlspecialchars($candidate['program']); ?></p>
-                    <p class="year"><?php echo htmlspecialchars($candidate['year']); ?> Year</p>
-                    <p class="candidate-number">Candidate #<?php echo htmlspecialchars($candidate['candidate_id']); ?></p>
+                    <div class="candidate-name"><?php echo htmlspecialchars($candidate['name']); ?></div>
+                    <div class="candidate-program"><?php echo htmlspecialchars($candidate['program']); ?></div>
+                    <div class="candidate-year"><?php echo htmlspecialchars($candidate['year']); ?> Year</div>
+                    <div class="candidate-id">Candidate #<?php echo htmlspecialchars($candidate['candidate_id']); ?></div>
                   </div>
                 </div>
-                <div class="vote-count">
-                  <span class="count"><?php echo $candidate['vote_count']; ?></span>
-                  <span class="label">votes</span>
-                  <?php if ($is_leading): ?>
-                    <i class="fas fa-trophy leading-icon"></i>
-                  <?php endif; ?>
-                </div>
-              </div>
-              <?php
-            }
-            $stmt->close();
-            ?>
-          </div>
-        </div>
-        <?php
-      }
-      $conn->close();
-      ?>
+              </td>
+              <td class="vote-count-cell">
+                <span class="vote-number"><?php echo number_format($candidate['vote_count']); ?></span>
+                <span class="vote-label">Votes</span>
+                <?php if ($is_leading): ?>
+                  <i class="fas fa-crown leading-indicator" title="Leading"></i>
+                <?php endif; ?>
+              </td>
+            </tr>
+            <?php
+          }
+          $stmt->close();
+          ?>
+        </tbody>
+      </table>
     </div>
+    <?php
+  }
+  $conn->close();
+  ?>
+</div>
 
 <footer class="entrance-animate">
     <p>&copy; 2025 EVSU Voting System. All rights reserved.</p>
@@ -529,25 +684,32 @@ if (!$conn) {
         <a href="#">Privacy Policy</a> | <a href="#">Terms of Use</a> | <a href="#">Help</a>
     </nav>
 </footer>
+
 <script>
 window.addEventListener('scroll', function() {
     const header = document.querySelector('header');
-    const containers = document.querySelectorAll('.position-standings');
     
     if (window.scrollY > 50) {
         header.classList.add('scrolled');
-        containers.forEach(container => {
-            container.style.transform = 'translateY(-5px)';
-            container.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.3)';
-        });
     } else {
         header.classList.remove('scrolled');
-        containers.forEach(container => {
-            container.style.transform = 'translateY(0)';
-            container.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
-        });
     }
 });
+
+// Auto-refresh timestamp (visual only - no actual refresh)
+setInterval(function() {
+    const now = new Date();
+    const timeString = now.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
+    }) + ' - ' + now.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit', 
+        hour12: true 
+    });
+    document.getElementById('last-update').textContent = timeString;
+}, 60000); // Update every minute
 </script>
 </body>
 </html>
