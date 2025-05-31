@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 29, 2025 at 04:23 AM
+-- Generation Time: May 31, 2025 at 09:16 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,7 +43,8 @@ CREATE TABLE `admin` (
 
 INSERT INTO `admin` (`id`, `email`, `username`, `password`, `profile_pic`, `otp`, `status`) VALUES
 (1, 'almackieandrew.bangalao@evsu.edu.ph', 'SARJAGA', '$2y$10$5Rq2ddj3IdR5y5sBXGjntusyez6rPrLb1fou3NO/6O6L5Rep0POwO', 'uploads/profile_pics/profile_6837646f755bf.jpg', NULL, 'verified'),
-(2, 'maaltheabhea.daza@evsu.edu.ph', 'Altiya', '$2y$10$S/ksVdcL3hBIuZq8FWz7/ui9MrB7zUL.conU5UMvaOsulseM1VORe', 'uploads/profile_pics/profile_6837b8a109b67.jpg', NULL, 'verified');
+(4, 'maaltheabhea.daza@evsu.edu.ph', 'Altiya', '$2y$10$svD9mZUEdSt27AWdLEQ4UOHpRZDaG1xluzHnORCQY/zLmLggQ9UI.', 'uploads/profile_pics/profile_6838a7debc568.jpg', NULL, 'verified'),
+(5, 'stephanieangel.nudalo@evsu.edu.ph', 'stefhany', '$2y$10$1w4ljUNeGKBfeVhKcOCsQuB5Trk3p5YLXvIeYD/56Z3GEBgNmvJxu', 'uploads/profile_pics/profile_68394ccf23e63.jpg', NULL, 'verified');
 
 -- --------------------------------------------------------
 
@@ -86,11 +87,16 @@ CREATE TABLE `candidate_positions` (
 --
 
 INSERT INTO `candidate_positions` (`id`, `candidate_id`, `position_id`, `position`, `name`, `year`, `program`, `image`) VALUES
-(1, 1, 1, 'President', 'Tirzo Charles Apuya', '4th', 'Bachelor of Seriousness', 'uploads/candidate_6837bd29e7112_6100661114942636632.jpg'),
-(2, 2, 1, 'President', 'Almackie Andrew Bangalao', '4th', 'Bachelor of Nananadiva is a Male Version of a Hustler', 'uploads/candidate_6837bd29e8281_6312061879152919153.jpg'),
-(3, 1, 2, 'Vice-President', 'Stephanie Angel Nudalo', '4th', 'Bachelor of Wattpad', 'uploads/candidate_6837bf1aa5677_6143427105036290165.jpg'),
-(4, 2, 2, 'Vice-President', 'Ma. Althea Bhea Daza', '4th', 'Bachelor of Overreacting', 'uploads/candidate_6837bf1aa686f_6143427105036290191.jpg'),
-(5, 1, 3, 'Secretary', 'Daog Na Ni', '4th', 'Bachelor of Winning', 'uploads/candidate_6837c3915d9d0_6100661114942636645.jpg');
+(1, 1, 1, 'President', 'Marc Fritz Aseo', '1st', 'Bachelor of Handsomeness', 'uploads/candidate_683a98977e97a_6312061879152919097.jpg'),
+(2, 2, 1, 'President', 'Edward Bertulfo', '2nd', 'Bachelor of Hagbogness', 'uploads/candidate_683957e868b0a_IMG_0177.JPG'),
+(3, 1, 2, 'Vice-President', 'Joseph Jaymel Morpos', '2nd', 'Bachelor of EducTour', 'uploads/candidate_6839588d315c5_IMG_0175.JPG'),
+(4, 2, 2, 'Vice-President', 'Jeffry Ocay', '2nd', 'Bachelor of Gardenness', 'uploads/candidate_6839588d32572_IMG_0194.JPG'),
+(5, 1, 3, 'Secretary', 'Fiona', '3rd', 'Bachelor of Kupit', 'uploads/candidate_68395900b74b3_IMG_0218.JPG'),
+(6, 2, 3, 'Secretary', 'Tae', '3rd', 'Bachelor of Makapungot', 'uploads/candidate_68395900b874c_IMG_0195.JPG'),
+(7, 1, 4, 'Treasurer', 'Ms. Registrar', '4th', 'Bachelor of Money', 'uploads/candidate_683959601cea3_6190663219782205145.jpg'),
+(8, 2, 4, 'Treasurer', 'Ms. Cashier Office', '4th', 'Bachelor of Bank', 'uploads/candidate_683959601e42b_6289303272653178459.jpg'),
+(9, 1, 5, 'Auditor', 'Jollibee', '1st', 'Bachelor of Mix&Match', 'uploads/candidate_683959f574903_1741087355605.jpg'),
+(10, 2, 5, 'Auditor', 'McDonalds', '1st', 'Bachelor of ChickenJoy', 'uploads/candidate_683959f575da3_6215005827400581132.jpg');
 
 -- --------------------------------------------------------
 
@@ -111,7 +117,7 @@ CREATE TABLE `scanner_settings` (
 --
 
 INSERT INTO `scanner_settings` (`id`, `start_datetime`, `end_datetime`, `created_at`, `updated_at`) VALUES
-(14, '2025-05-29 10:17:00', '2025-05-29 17:00:00', '2025-05-29 02:17:56', '2025-05-29 02:17:56');
+(27, '2025-05-31 15:09:00', '2025-05-31 22:10:00', '2025-05-31 07:14:18', '2025-05-31 07:14:18');
 
 -- --------------------------------------------------------
 
@@ -139,9 +145,12 @@ CREATE TABLE `students_registration` (
 --
 
 INSERT INTO `students_registration` (`id`, `fullname`, `student_id`, `email`, `department`, `program`, `qr_code_path`, `gender`, `section`, `created_at`, `otp`, `status`) VALUES
-(59, 'Stephanie Angel  A. Nudalo', '2022-31997', 'stephanieangel.nudalo@evsu.edu.ph', 'Engineering Department', 'Bachelor of Science in Civil Engineering (BSCE)', '../qr_codes/QRCode_2022-31997.png', 'Female', '3B', '2025-05-28 17:39:37', NULL, 'pending'),
-(61, 'Almackie Andrew Bangalao', '2022-30424', 'almackieandrew.bangalao@evsu.edu.ph', 'Computer Studies Department', 'Bachelor of Science in Information Technology (BSIT)', '../qr_codes/QRCode_2022-30424.png', 'Male', '3C', '2025-05-28 19:00:48', '856147', 'verified'),
-(63, 'Ma. Althea Bhea Daza', '2022-30383', 'maaltheabhea.daza@evsu.edu.ph', 'Engineering Department', 'Bachelor of Science in Civil Engineering (BSCE)', '../qr_codes/QRCode_2022-30383.png', 'Female', '3C', '2025-05-29 01:52:20', '698344', 'verified');
+(66, 'Tirzo Charles Apuya', '2022-31913', 'tirzocharles.apuya@evsu.edu.ph', 'Computer Studies Department', 'Bachelor of Science in Information Technology (BSIT)', '../qr_codes/QRCode_2022-31913.png', 'Male', '3B', '2025-05-30 06:39:56', '264734', 'verified'),
+(67, 'Reyna Marie G. Boyboy', '2022-32000', 'reynamarie.boyboy@evsu.edu.ph', 'Business and Management Department', 'Bachelor of Science in Hospitality Management (BSHM)', '../qr_codes/QRCode_2022-32000.png', 'Female', '3A', '2025-05-30 06:43:09', '318642', 'verified'),
+(68, 'Almackie Bangalao', '2022-30424', 'almackieandrew.bangalao@evsu.edu.ph', 'Engineering Department', 'Bachelor of Science in Civil Engineering (BSCE)', '../qr_codes/QRCode_2022-30424.png', 'Male', '3B', '2025-05-30 06:45:57', '342432', 'verified'),
+(69, 'Stephanie Angel Nudalo', '2022-31997', 'stephanieangel.nudalo@evsu.edu.ph', 'Industrial Technology Department', 'Bachelor of Industrial Technology (BIT) with major in Culinary Arts (CA)', '../qr_codes/QRCode_2022-31997.png', 'Female', '3A', '2025-05-30 06:50:42', '318269', 'verified'),
+(70, 'Ruby Tinunga', '2022-30222', 'ruby.tinunga@evsu.edu.ph', 'Teacher Education Department', 'Bachelor of Technical-Vocational Teacher Education (BTVTEd)', '../qr_codes/QRCode_2022-30222.png', 'Female', '3C', '2025-05-30 06:53:13', '485101', 'verified'),
+(71, 'Jenica Tayab', '2022-31408', 'jenica.tayab@evsu.edu.ph', 'Teacher Education Department', 'Bachelor of Secondary Education (BSEd) major in Science', '../qr_codes/QRCode_2022-31408.png', 'Female', '3C', '2025-05-30 06:55:34', '365737', 'verified');
 
 -- --------------------------------------------------------
 
@@ -162,8 +171,7 @@ CREATE TABLE `student_votes` (
 --
 
 INSERT INTO `student_votes` (`id`, `student_id`, `scan_time`, `vote_time`, `status`) VALUES
-(4, '2022-31997', '2025-05-29 01:40:16', '2025-05-28 19:40:28', 'Voted'),
-(6, '2022-30383', '2025-05-29 09:52:43', '2025-05-29 03:59:10', 'Voted');
+(9, '2022-32000', '2025-05-31 13:53:41', NULL, 'Didn\'t vote yet');
 
 -- --------------------------------------------------------
 
@@ -178,29 +186,6 @@ CREATE TABLE `votes` (
   `position_id` int(11) NOT NULL,
   `vote_time` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `votes`
---
-
-INSERT INTO `votes` (`id`, `student_id`, `candidate_id`, `position_id`, `vote_time`) VALUES
-(1, '2022-30383', 3, 1, '2025-05-28 05:47:18'),
-(2, '2022-30383', 3, 2, '2025-05-28 05:47:18'),
-(3, '2022-30383', 1, 3, '2025-05-28 05:47:18'),
-(4, '2022-37643', 3, 1, '2025-05-28 05:55:27'),
-(5, '2022-37643', 2, 2, '2025-05-28 05:55:27'),
-(6, '2022-37643', 1, 3, '2025-05-28 05:55:27'),
-(7, '2022-35473', 1, 1, '2025-05-28 05:58:40'),
-(8, '2022-35473', 2, 2, '2025-05-28 05:58:40'),
-(9, '2022-35473', 2, 3, '2025-05-28 05:58:40'),
-(10, '2022-31997', 2, 1, '2025-05-28 19:40:28'),
-(11, '2022-31997', 2, 2, '2025-05-28 19:40:28'),
-(12, '2022-31997', 1, 3, '2025-05-28 19:40:28'),
-(13, '2022-30383', 1, 1, '2025-05-29 03:36:30'),
-(14, '2022-30383', 2, 2, '2025-05-29 03:36:30'),
-(15, '2022-30383', 1, 3, '2025-05-29 03:36:30'),
-(16, '2022-30383', 1, 1, '2025-05-29 03:59:10'),
-(17, '2022-30383', 1, 2, '2025-05-29 03:59:10');
 
 --
 -- Indexes for dumped tables
@@ -248,31 +233,31 @@ ALTER TABLE `votes`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `scanner_settings`
 --
 ALTER TABLE `scanner_settings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `students_registration`
 --
 ALTER TABLE `students_registration`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 
 --
 -- AUTO_INCREMENT for table `student_votes`
 --
 ALTER TABLE `student_votes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `votes`
 --
 ALTER TABLE `votes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- Constraints for dumped tables
