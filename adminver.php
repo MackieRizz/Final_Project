@@ -10,10 +10,14 @@ $maxAttempts = 3;
 if (!isset($_SESSION['admin_attempts'])) {
     $_SESSION['admin_attempts'] = 0;
 }
+if (!isset($_SESSION['admin_lockout_time'])) {
+    $_SESSION['admin_lockout_time'] = null;
+}
 
 $error = '';
 $lockout = false;
 $showAlert = false;
+$lockoutSecondsLeft = 0;
 
 // Get passcode from database
 $stmt = $conn->prepare("SELECT passcode FROM admin_passcode WHERE id = 1");
@@ -24,7 +28,19 @@ $passcode = $row['passcode'] ?? '12345678'; // Fallback to default if not found
 $stmt->close();
 
 if ($_SESSION['admin_attempts'] >= $maxAttempts) {
-    $lockout = true;
+    // Check if lockout time is set and if 3 minutes have passed
+    if (!isset($_SESSION['admin_lockout_time']) || $_SESSION['admin_lockout_time'] === null) {
+        $_SESSION['admin_lockout_time'] = time();
+    }
+    $elapsed = time() - $_SESSION['admin_lockout_time'];
+    if ($elapsed < 180) {
+        $lockout = true;
+        $lockoutSecondsLeft = 180 - $elapsed;
+    } else {
+        // Reset after 3 minutes
+        $_SESSION['admin_attempts'] = 0;
+        $_SESSION['admin_lockout_time'] = null;
+    }
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $digits = '';
     for ($i = 1; $i <= 8; $i++) {
@@ -55,13 +71,16 @@ if ($_SESSION['admin_attempts'] >= $maxAttempts) {
     if (empty($error)) {
         if ($digits === $passcode) {
             unset($_SESSION['admin_attempts']);
+            unset($_SESSION['admin_lockout_time']);
             $_SESSION['admin_verified'] = true;
             header('Location: admin_auth.php');
             exit;
         } else {
             $_SESSION['admin_attempts']++;
             if ($_SESSION['admin_attempts'] >= $maxAttempts) {
+                $_SESSION['admin_lockout_time'] = time();
                 $lockout = true;
+                $lockoutSecondsLeft = 180;
             } else {
                 $error = "Invalid code. Attempts left: " . ($maxAttempts - $_SESSION['admin_attempts']);
                 $showAlert = true;
@@ -371,7 +390,7 @@ footer p {
     <div class="form-section">
       <div class="admin-icon"><i class="bx bxs-check-shield"></i></div>
       <h4 class="mb-4 text-center">Enter Admin Code</h4>
-      <form method="POST" action="adminver.php">
+      <form method="POST" action="adminver.php" id="adminForm">
         <div class="input-field mb-3">
           <input name="digit1" type="password" maxlength="1" />
           <input name="digit2" type="password" maxlength="1" />
@@ -385,6 +404,7 @@ footer p {
         <div id="recaptchaBox" class="g-recaptcha" data-sitekey="6LcWBTsrAAAAAACTAfiByoo40so_poPc4r8M7c5Z" style="display:none;"></div>
         <button type="submit" class="btn btn-primary w-100">VERIFY</button>
       </form>
+      <div id="lockout-timer" style="color:#7F0404;font-weight:bold;margin-top:18px;display:none;"></div>
     </div>
   </div>
 </div>
@@ -399,19 +419,34 @@ footer p {
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         <?php if (!empty($lockout)): ?>
+            // Lockout active: show timer, disable form
+            const form = document.getElementById('adminForm');
+            const timerDiv = document.getElementById('lockout-timer');
+            if (form) {
+                Array.from(form.elements).forEach(el => el.disabled = true);
+            }
+            timerDiv.style.display = 'block';
+            let secondsLeft = <?php echo (int)$lockoutSecondsLeft; ?>;
+            function updateTimer() {
+                if (secondsLeft > 0) {
+                    const min = Math.floor(secondsLeft / 60);
+                    const sec = secondsLeft % 60;
+                    timerDiv.textContent = `You are locked out. Try again in ${min}:${sec.toString().padStart(2,'0')}`;
+                    secondsLeft--;
+                    setTimeout(updateTimer, 1000);
+                } else {
+                    timerDiv.textContent = 'You can try again now. Reloading...';
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1500);
+                }
+            }
+            updateTimer();
             Swal.fire({
                 icon: 'error',
-                title: 'Access Denied',
-                text: 'Too many failed attempts. Redirecting to Home page...'
-            }).then(function() {
-                window.location.href = 'Homepage.html';
+                title: 'Locked Out',
+                text: 'Too many failed attempts. Please wait 3 minutes before trying again.'
             });
-        <?php 
-        // Reset attempts after lockout so user can try again after redirect
-        if (!empty($lockout)) {
-            $_SESSION['admin_attempts'] = 0;
-        }
-        ?>
         <?php elseif (!empty($showAlert)): ?>
             Swal.fire({
                 icon: 'error',
@@ -430,6 +465,11 @@ footer p {
                 if (!allFilled && window.grecaptcha) grecaptcha.reset();
             });
         });
+
+        // Lockout timer countdown
+        const lockoutTimer = document.getElementById('lockout-timer');
+        // Remove duplicate/inconsistent timer message
+        // The main timer message is already handled above with min:sec format
     });
 </script>
 </body>
