@@ -14,7 +14,7 @@ $positions = array (
         'name' => 'Marc Fritz Aseo',
         'year' => '1st',
         'program' => 'Bachelor of Handsomeness',
-        'image' => 'uploads/candidate_683a98977e97a_6312061879152919097.jpg',
+        'image' => 'uploads/candidate_683e864805700_aseo-283x300.jpg',
         'background' => '- Graduated Summa Cum Laude
 - Most Awardee in Most Handsome Category
 - Amazing awardee',

@@ -329,31 +329,31 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(8px);
     z-index: 1000;
     animation: fadeIn 0.3s ease;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 .modal-content {
-    background-color: #2d0808;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d0808 100%);
     color: #FDDE54;
     margin: 0;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 20px;
-    border: 1px solid #FDDE54;
-    width: 80%;
+    padding: 0;
+    border: 1px solid rgba(253, 222, 84, 0.2);
+    width: 90%;
     max-width: 600px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     overflow: hidden;
 }
 
@@ -371,16 +371,19 @@ body::before {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 32px 32px 20px;
+    padding: 32px 40px 24px;
     margin: 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid rgba(253, 222, 84, 0.1);
+    background: rgba(253, 222, 84, 0.05);
 }
 
 .modal-title {
     color: #FDDE54;
-    font-size: 1.5rem;
-    font-weight: 400;
+    font-size: 1.75rem;
+    font-weight: 500;
     margin: 0;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .close-modal {
@@ -391,39 +394,80 @@ body::before {
     cursor: pointer;
     padding: 8px;
     border-radius: 50%;
-    width: 52px;
-    height: 52px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     transition: all 0.2s ease;
+    opacity: 0.8;
 }
 
 .close-modal:hover,
 .close-modal:focus {
-    color: #fff;
-    background: none;
+    opacity: 1;
+    background: rgba(253, 222, 84, 0.1);
+    transform: rotate(90deg);
 }
 
 .vote-summary {
-    padding: 32px;
+    padding: 32px 40px;
     margin: 0;
     max-height: 400px;
     overflow-y: auto;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.vote-summary::-webkit-scrollbar {
+    width: 8px;
+}
+
+.vote-summary::-webkit-scrollbar-track {
+    background: rgba(253, 222, 84, 0.1);
+    border-radius: 4px;
+}
+
+.vote-summary::-webkit-scrollbar-thumb {
+    background: rgba(253, 222, 84, 0.3);
+    border-radius: 4px;
+}
+
+.vote-summary::-webkit-scrollbar-thumb:hover {
+    background: rgba(253, 222, 84, 0.4);
 }
 
 .vote-summary-item {
     margin-bottom: 20px;
-    padding: 20px;
-    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    padding: 24px;
+    background: rgba(253, 222, 84, 0.05);
     border-radius: 12px;
-    border-left: 4px solid #800000;
-    transition: all 0.2s ease;
+    border-left: 4px solid #C46B02;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.vote-summary-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(253, 222, 84, 0.03), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.vote-summary-item:hover::before {
+    transform: translateX(100%);
 }
 
 .vote-summary-item:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    border-left-color: #FDDE54;
 }
 
 .vote-summary-item:last-child {
@@ -431,64 +475,67 @@ body::before {
 }
 
 .position-name {
-    color: #800000;
+    color: #FDDE54;
     font-weight: 600;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
+    opacity: 0.9;
 }
 
 .candidate-selected {
-    color: #1a1a1a;
+    color: #ffffff;
     font-size: 1.1rem;
     font-weight: 500;
+    line-height: 1.4;
 }
 
 .modal-buttons {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
-    padding: 20px 32px 32px;
-    border-top: 1px solid #f0f0f0;
-    background: #fafafa;
+    gap: 16px;
+    padding: 24px 40px;
+    border-top: 1px solid rgba(253, 222, 84, 0.1);
+    background: rgba(0, 0, 0, 0.3);
 }
 
 .modal-btn {
-    padding: 12px 28px;
+    padding: 12px 32px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-weight: 500;
-    font-size: 0.9rem;
+    font-weight: 600;
+    font-size: 0.95rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
 }
 
 .confirm-btn {
-    background: linear-gradient(135deg, #800000 0%, #C46B02 100%);
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(128, 0, 0, 0.3);
+    background: linear-gradient(135deg, #FDDE54 0%, #C46B02 100%);
+    color: #2d0808;
+    box-shadow: 0 4px 12px rgba(253, 222, 84, 0.3);
 }
 
 .confirm-btn:hover {
-    background: linear-gradient(135deg, #a00000 0%, #d47b02 100%);
-    box-shadow: 0 6px 16px rgba(128, 0, 0, 0.4);
+    background: linear-gradient(135deg, #C46B02 0%, #FDDE54 100%);
+    box-shadow: 0 6px 20px rgba(253, 222, 84, 0.4);
     transform: translateY(-2px);
 }
 
 .cancel-btn {
     background: transparent;
-    color: #800000;
-    border: 2px solid #e0e0e0;
+    color: #FDDE54;
+    border: 2px solid rgba(253, 222, 84, 0.3);
 }
 
 .cancel-btn:hover {
-    background: #f8f8f8;
-    border-color: #800000;
+    background: rgba(253, 222, 84, 0.1);
+    border-color: #FDDE54;
+    transform: translateY(-2px);
 }
 
 /* All Background Modal Text Colors */
@@ -560,21 +607,24 @@ body::before {
     }
     
     .modal-content {
+        width: 95%;
         margin: 20px;
-        width: calc(100% - 40px);
-        margin-left: 50px;
     }
     
     .modal-header,
     .vote-summary,
     .modal-buttons {
-        padding-left: 20px;
-        padding-right: 20px;
+        padding: 24px;
     }
     
-    .selected-indicator {
-        top: 22px;
-     }
+    .modal-title {
+        font-size: 1.5rem;
+    }
+    
+    .modal-btn {
+        padding: 10px 24px;
+        font-size: 0.9rem;
+    }
 }
 .background-btn {
     background: #FDDE54;

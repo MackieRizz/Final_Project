@@ -1,6 +1,9 @@
 <?php
 session_start();
 include 'db.php';
+require 'vendor/autoload.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 // Check if user is logged in and has scanned QR
 if (!isset($_SESSION['student_id']) || !isset($_SESSION['has_scanned'])) {
@@ -32,7 +35,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vote'])) {
         
         // Commit transaction
         $conn->commit();
-        
+
+        // Fetch student email and name
+        $stmt = $conn->prepare("SELECT fullname, email FROM students_registration WHERE student_id = ? LIMIT 1");
+        $stmt->bind_param("s", $student_id);
+        $stmt->execute();
+        $stmt->bind_result($fullname, $email);
+        $stmt->fetch();
+        $stmt->close();
+
+        // Prepare vote summary
+        require_once 'voting_form_data.php';
+        $summary = "<h2>EVSU Student Council Elections - Vote Receipt</h2>";
+        $summary .= "<p>Dear <b>" . htmlspecialchars($fullname) . "</b>,<br>Thank you for voting! Here is your vote receipt:</p><ul>";
+        foreach ($positions as $position) {
+            $pos_id = $position['position_id'];
+            $pos_name = $position['position'];
+            $selected_cand_id = isset($votes[$pos_id]) ? $votes[$pos_id] : null;
+            $cand_name = $cand_program = $cand_year = '';
+            if ($selected_cand_id) {
+                foreach ($position['candidates'] as $candidate) {
+                    if ($candidate['candidate_id'] == $selected_cand_id) {
+                        $cand_name = $candidate['name'];
+                        $cand_program = $candidate['program'];
+                        $cand_year = $candidate['year'];
+                        break;
+                    }
+                }
+            }
+            $summary .= "<li><b>" . htmlspecialchars($pos_name) . ":</b> ";
+            if ($cand_name) {
+                $summary .= htmlspecialchars($cand_name) . " (" . htmlspecialchars($cand_program) . ", " . htmlspecialchars($cand_year) . ")";
+            } else {
+                $summary .= "No vote recorded.";
+            }
+            $summary .= "</li>";
+        }
+        $summary .= "</ul><p style='color:#888;font-size:0.95em;'>This is an official voting receipt. If you did not vote, please contact the election committee immediately.</p>";
+
+        // Send email using PHPMailer
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'memorawebnote@gmail.com'; // Use your sender email
+            $mail->Password = 'dypl dsxz kweq ejew'; // Use your app password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
+            $mail->setFrom('memorawebnote@gmail.com', 'EVSU Voting System');
+            $mail->addAddress($email, $fullname);
+            $mail->isHTML(true);
+            $mail->Subject = 'Your EVSU Vote Receipt';
+            $mail->Body = $summary;
+            $mail->send();
+        } catch (Exception $e) {
+            // Optionally log or ignore email errors
+        }
+
         // Clear session and redirect to success page
         session_destroy();
         header('Location: vote_success.php');
@@ -48,4 +108,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vote'])) {
     header('Location: voting_form.php');
     exit;
 }
-?> 
+?>
