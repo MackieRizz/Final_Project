@@ -1,5 +1,6 @@
 <?php
 session_start();
+date_default_timezone_set('Asia/Manila');
 include 'db.php';
 require 'vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
@@ -47,7 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vote'])) {
         // Prepare vote summary
         require_once 'voting_form_data.php';
         $summary = "<h2>EVSU Student Council Elections - Vote Receipt</h2>";
-        $summary .= "<p>Dear <b>" . htmlspecialchars($fullname) . "</b>,<br>Thank you for voting! Here is your vote receipt:</p><ul>";
+        $summary .= "<p>Dear <b>" . htmlspecialchars($fullname) . "</b>,<br>Thank you for voting! Here is your vote receipt:</p>";
+        $summary .= "<p><b>Date & Time of Voting:</b> " . date('F j, Y \a\t g:i A', strtotime($current_time)) . "</p>";
+        $summary .= "<ul>";
         foreach ($positions as $position) {
             $pos_id = $position['position_id'];
             $pos_name = $position['position'];
