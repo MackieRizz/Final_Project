@@ -46,8 +46,8 @@ $positions = array (
         'year' => '2nd',
         'program' => 'Bachelor of EducTour',
         'image' => 'uploads/candidate_6839588d315c5_IMG_0175.JPG',
-        'background' => 'Computer Head
-Most Leadering in Educ Tour',
+        'background' => '- Computer Headening
+- Most Leadering in Educ Tour',
       ),
       1 => 
       array (
@@ -57,12 +57,41 @@ Most Leadering in Educ Tour',
         'year' => '2nd',
         'program' => 'Bachelor of Gardenness',
         'image' => 'uploads/candidate_6839588d32572_IMG_0194.JPG',
-        'background' => 'Garden Head
-Most Flowery',
+        'background' => '- Garden Head
+- Most Flowery',
       ),
     ),
   ),
   2 => 
+  array (
+    'position_id' => '3',
+    'position' => 'Secretary',
+    'candidates' => 
+    array (
+      0 => 
+      array (
+        'id' => 9,
+        'candidate_id' => 1,
+        'name' => 'Sung Jin Woo',
+        'year' => '4th',
+        'program' => 'Bachelor of Solo Leveling',
+        'image' => 'uploads/candidate_683e850d997b2_1394862.jpg',
+        'background' => '- Okay na okay na
+- sana all okay',
+      ),
+      1 => 
+      array (
+        'id' => 10,
+        'candidate_id' => 2,
+        'name' => 'Pogi',
+        'year' => '4th',
+        'program' => 'Bachelor of Meowing',
+        'image' => 'uploads/candidate_683e854d01d59_aseo-283x300.jpg',
+        'background' => '- Most Handsome',
+      ),
+    ),
+  ),
+  3 => 
   array (
     'position_id' => '4',
     'position' => 'Auditor',
@@ -76,7 +105,9 @@ Most Flowery',
         'year' => '4th',
         'program' => 'Bachelor of Solo Leveling',
         'image' => 'uploads/candidate_683d39064729d_sung-jinwoo-8k-7680x4320-14673.jpg',
-        'background' => 'Most Stronging in the Whole Anime ',
+        'background' => '- Most Stronging in the Whole Anime 
+- Most Powerful
+- Tralalelo',
       ),
       1 => 
       array (
@@ -86,7 +117,7 @@ Most Flowery',
         'year' => '4th',
         'program' => 'Bachelor of Meowing',
         'image' => 'uploads/candidate_683d39064908a_6300610637348322142.jpg',
-        'background' => 'Most Meowing Awardee',
+        'background' => '- Most Meowing Awardee',
       ),
     ),
   ),

@@ -1239,7 +1239,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
               <input type="text" name="year[]" placeholder="Year" required>
               <input type="text" name="program[]" placeholder="Program" required>
               <input type="file" name="image[]" accept="image/*" required>
-              <textarea name="background[]" placeholder="Background and Achievements" rows="2" style="width:100%;margin-bottom:8px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+              <textarea name="background[]" placeholder="Background and Achievements" rows="2" style="width:100%;margin-bottom:8px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required></textarea>
               <input type="hidden" name="is_new[]" value="1">
             </div>
           </div>
@@ -1462,7 +1462,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       <input type="text" name="year[]" placeholder="Year" required>
       <input type="text" name="program[]" placeholder="Program" required>
       <input type="file" name="image[]" accept="image/*" required>
-      <textarea name="background[]" placeholder="Background and Achievements" rows="2" style="width:100%;margin-bottom:8px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+      <textarea name="background[]" placeholder="Background and Achievements" rows="2" style="width:100%;margin-bottom:8px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required></textarea>
       <input type="hidden" name="is_new[]" value="1">
     </div>
   `;
@@ -1484,7 +1484,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       <input type="text" name="year[]" placeholder="Year" required>
       <input type="text" name="program[]" placeholder="Program" required>
       <input type="file" name="image[]" accept="image/*" required>
-      <textarea name="background[]" placeholder="Background and Achievements" rows="2" style="width:100%;margin-bottom:8px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+      <textarea name="background[]" placeholder="Background and Achievements" rows="2" style="width:100%;margin-bottom:8px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required></textarea>
       <input type="hidden" name="is_new[]" value="1">
     </div>
   `;
@@ -1503,7 +1503,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
     <input type="text" name="year[]" placeholder="Year" required>
     <input type="text" name="program[]" placeholder="Program" required>
     <input type="file" name="image[]" accept="image/*" required>
-    <textarea name="background[]" placeholder="Background and Achievements" rows="2" style="width:100%;margin-bottom:8px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+    <textarea name="background[]" placeholder="Background and Achievements" rows="2" style="width:100%;margin-bottom:8px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required></textarea>
     <input type="hidden" name="is_new[]" value="1">
     <button type="button" class="remove-field" onclick="removeNameField(this)" style="position:absolute;top:5px;right:5px;background:none;border:none;color:#FDDE54;font-size:18px;cursor:pointer;">&times;</button>
 

@@ -1,0 +1,59 @@
+
+[2025-06-03 07:15:29] Script started
+[2025-06-03 07:15:29] Database connected
+[2025-06-03 07:15:29] Inside try block
+[2025-06-03 07:15:29] Upload directory checked/created
+[2025-06-03 07:15:29] Transaction started
+[2025-06-03 07:15:29] Statements prepared
+[2025-06-03 07:15:29] Processing candidate index 0 Name: Sung Jin Woo
+[2025-06-03 07:15:29] Handling existing candidate at index 0
+[2025-06-03 07:15:29] Candidate Sung Jin Woo updated successfully
+[2025-06-03 07:15:29] Processing candidate index 1 Name: Meow
+[2025-06-03 07:15:29] Handling existing candidate at index 1
+[2025-06-03 07:15:29] Candidate Meow updated successfully
+[2025-06-03 07:15:29] Transaction committed
+[2025-06-03 07:15:29] Database connection closed
+[2025-06-03 07:15:29] Script finished
+
+[2025-06-03 07:15:57] Script started
+[2025-06-03 07:15:57] Database connected
+[2025-06-03 07:15:57] Inside try block
+[2025-06-03 07:15:57] Upload directory checked/created
+[2025-06-03 07:15:57] Transaction started
+[2025-06-03 07:15:57] Statements prepared
+[2025-06-03 07:15:57] Processing candidate index 0 Name: Sung Jin Woo
+[2025-06-03 07:15:57] Handling new candidate at index 0
+[2025-06-03 07:15:57] Image moved to uploads/candidate_683e850d997b2_1394862.jpg
+[2025-06-03 07:15:57] Insert statement bound for index 0
+[2025-06-03 07:15:57] Candidate Sung Jin Woo added successfully
+[2025-06-03 07:15:57] Transaction committed
+[2025-06-03 07:15:57] Database connection closed
+[2025-06-03 07:15:57] Script finished
+
+[2025-06-03 07:16:18] Script started
+[2025-06-03 07:16:18] Database connected
+[2025-06-03 07:16:18] Inside try block
+[2025-06-03 07:16:18] Upload directory checked/created
+[2025-06-03 07:16:18] Transaction started
+[2025-06-03 07:16:18] Statements prepared
+[2025-06-03 07:16:18] Processing candidate index 0 Name: Sung Jin Woo
+[2025-06-03 07:16:18] Handling existing candidate at index 0
+[2025-06-03 07:16:18] Candidate Sung Jin Woo updated successfully
+[2025-06-03 07:16:18] Transaction committed
+[2025-06-03 07:16:18] Database connection closed
+[2025-06-03 07:16:18] Script finished
+
+[2025-06-03 07:17:00] Script started
+[2025-06-03 07:17:00] Database connected
+[2025-06-03 07:17:00] Inside try block
+[2025-06-03 07:17:00] Upload directory checked/created
+[2025-06-03 07:17:01] Transaction started
+[2025-06-03 07:17:01] Statements prepared
+[2025-06-03 07:17:01] Processing candidate index 0 Name: Pogi
+[2025-06-03 07:17:01] Handling new candidate at index 0
+[2025-06-03 07:17:01] Image moved to uploads/candidate_683e854d01d59_aseo-283x300.jpg
+[2025-06-03 07:17:01] Insert statement bound for index 0
+[2025-06-03 07:17:01] Candidate Pogi added successfully
+[2025-06-03 07:17:01] Transaction committed
+[2025-06-03 07:17:01] Database connection closed
+[2025-06-03 07:17:01] Script finished
