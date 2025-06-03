@@ -222,8 +222,8 @@ body::before {
 }
 
 .candidate-info {
-    color: #666666;
-    font-size: 0.9rem;
+    color: #e9c97a;
+    font-size: 0.93rem;
     margin: 0;
     line-height: 1.4;
     display: flex;
@@ -240,12 +240,14 @@ body::before {
 
 .selected-indicator {
     position: absolute;
-    top: 49px;
+    top: 50%;
     right: 16px;
     color: #800000;
     font-size: 1.5rem;
     display: none;
     animation: checkmark 0.3s ease;
+    transform: translateY(-50%);
+    z-index: 2;
 }
 
 .candidate-card.selected .selected-indicator {
@@ -264,6 +266,7 @@ body::before {
     transform: translateY(-50%);
     background: #ffffff;
     transition: all 0.2s ease;
+    z-index: 1;
 }
 
 .submit-btn {
@@ -338,22 +341,20 @@ body::before {
 }
 
 .modal-content {
-    background: #ffffff;
-    margin: 5% auto;
-    padding: 0;
-    border-radius: 16px;
-    width: 90%;
-    max-width: 650px;
-    position: relative;
-    color: #1a1a1a;
-    box-shadow: 0 16px 64px rgba(0, 0, 0, 0.2);
-    animation: slideUp 0.3s ease;
+    background-color: #2d0808;
+    color: #FDDE54;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    border: 1px solid #FDDE54;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     overflow: hidden;
-}
-
-@keyframes slideUp {
-    from { transform: translateY(50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
 }
 
 .modal-content::before {
@@ -376,31 +377,33 @@ body::before {
 }
 
 .modal-title {
-    color: #1a1a1a;
+    color: #FDDE54;
     font-size: 1.5rem;
     font-weight: 400;
     margin: 0;
 }
 
 .close-modal {
-    color: #666;
-    font-size: 1.5rem;
-    cursor: pointer;
+    color: #FDDE54;
     background: none;
     border: none;
+    outline: none;
+    cursor: pointer;
     padding: 8px;
     border-radius: 50%;
-    width: 44px;
-    height: 44px;
+    width: 52px;
+    height: 52px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 2.2rem;
     transition: all 0.2s ease;
 }
 
-.close-modal:hover {
-    background: #f5f5f5;
-    color: #800000;
+.close-modal:hover,
+.close-modal:focus {
+    color: #fff;
+    background: none;
 }
 
 .vote-summary {
@@ -488,6 +491,44 @@ body::before {
     border-color: #800000;
 }
 
+/* All Background Modal Text Colors */
+#allBackgroundModal .modal-content {
+    color: #FDDE54;
+}
+#allBackgroundModal .candidate-bg-section {
+    margin-bottom: 24px;
+}
+#allBackgroundModal .candidate-bg-position {
+    font-weight: 700;
+    font-size: 1.1em;
+    color: #FDDE54;
+    margin-bottom: 8px;
+    border-bottom: 1.5px solid #C46B02;
+    padding-bottom: 4px;
+}
+#allBackgroundModal .candidate-bg-card {
+    margin-bottom: 18px;
+    padding: 14px 18px;
+    background: rgba(253,222,84,0.07);
+    border-radius: 8px;
+}
+#allBackgroundModal .candidate-bg-name {
+    font-weight: 600;
+    color: #FDDE54;
+    font-size: 1em;
+}
+#allBackgroundModal .candidate-bg-program {
+    color: #ffe680;
+    font-weight: 400;
+    font-size: 0.98em;
+    margin-left: 6px;
+}
+#allBackgroundModal .candidate-bg-info {
+    margin-top: 6px;
+    color: #f8f8f8;
+    font-size: 0.98em;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .voting-container {
@@ -535,11 +576,33 @@ body::before {
         top: 22px;
      }
 }
+.background-btn {
+    background: #FDDE54;
+    color: #7F0404;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 0.93em;
+    font-weight: 600;
+    margin-top: 6px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    box-shadow: 0 2px 8px rgba(253,222,84,0.08);
+}
+.background-btn:hover {
+    background: #800000;
+    color: #FDDE54;
+}
     </style>
 </head>
 <body>
     <div class="voting-container">
-        <h1 class="page-title">EVSU Student Council Elections</h1>
+        <h1 class="page-title" style="position:relative;">
+            EVSU Student Council Elections
+            <button type="button" id="viewAllBackgroundBtn" style="position:absolute;top:22px;right:24px;background:#FDDE54;color:#7F0404;font-weight:600;padding:7px 14px;border:none;border-radius:7px;box-shadow:0 2px 8px rgba(253,222,84,0.13);font-size:0.93rem;cursor:pointer;transition:background 0.2s;z-index:10;">
+                <i class="fas fa-users"></i> View All Background Information
+            </button>
+        </h1>
         <form id="votingForm" action="submit_vote.php" method="POST">
             <div class="positions-container">
                 <?php foreach ($positions as $position): ?>
@@ -557,9 +620,14 @@ body::before {
                                 <img src="<?php echo htmlspecialchars($candidate['image']); ?>" 
                                      alt="<?php echo htmlspecialchars($candidate['name']); ?>">
                             </div>
-                            <h3 class="candidate-name"><?php echo htmlspecialchars($candidate['name']); ?></h3>
-                            <p class="candidate-info"><?php echo htmlspecialchars($candidate['program']); ?></p>
-                            <p class="candidate-info"><?php echo htmlspecialchars($candidate['year']); ?> Year</p>
+                            <div class="candidate-info-wrapper">
+                                <h3 class="candidate-name"><?php echo htmlspecialchars($candidate['name']); ?></h3>
+                                <p class="candidate-info"><?php echo htmlspecialchars($candidate['program']); ?></p>
+                                <p class="candidate-info"><?php echo htmlspecialchars($candidate['year']); ?> Year</p>
+                                <?php if (!empty($candidate['background'])): ?>
+                                    <button type="button" class="background-btn" data-background="<?php echo htmlspecialchars($candidate['background'], ENT_QUOTES); ?>" data-name="<?php echo htmlspecialchars($candidate['name'], ENT_QUOTES); ?>" onclick="event.stopPropagation(); showBackgroundModal(this);">Background Information</button>
+                                <?php endif; ?>
+                            </div>
                             <i class="fas fa-check-circle selected-indicator"></i>
                         </label>
                         <?php endforeach; ?>
@@ -585,6 +653,28 @@ body::before {
                 <button class="modal-btn cancel-btn" id="cancelVote">Cancel</button>
                 <button class="modal-btn confirm-btn" id="confirmVote">Confirm Votes</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Background Modal -->
+    <div id="backgroundModal" class="modal" style="display:none;z-index:2000;">
+        <div class="modal-content" style="max-width:500px;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="backgroundModalTitle">Background Information</h2>
+                <button class="close-modal" id="closeBackgroundModal">&times;</button>
+            </div>
+            <div class="vote-summary" id="backgroundModalBody" style="padding:24px 32px 32px 32px;font-size:1.05em;"></div>
+        </div>
+    </div>
+
+    <!-- All Background Modal -->
+    <div id="allBackgroundModal" class="modal" style="display:none;z-index:3000;">
+        <div class="modal-content" style="max-width:700px;">
+            <div class="modal-header">
+                <h2 class="modal-title">All Candidates' Background Information</h2>
+                <button class="close-modal" id="closeAllBackgroundModal">&times;</button>
+            </div>
+            <div class="vote-summary" id="allBackgroundBody" style="padding:24px 32px 32px 32px;font-size:1.05em;max-height:60vh;overflow-y:auto;"></div>
         </div>
     </div>
 
@@ -680,6 +770,59 @@ body::before {
                 modal.style.display = 'none';
             }
         });
+
+        // Background modal logic
+        function showBackgroundModal(btn) {
+            const name = btn.getAttribute('data-name');
+            const background = btn.getAttribute('data-background');
+            document.getElementById('backgroundModalTitle').textContent = name + " - Background Information";
+            document.getElementById('backgroundModalBody').innerHTML = background.replace(/\n/g, '<br>');
+            document.getElementById('backgroundModal').style.display = 'block';
+        }
+
+        document.getElementById('closeBackgroundModal').onclick = function() {
+            document.getElementById('backgroundModal').style.display = 'none';
+        };
+        window.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('backgroundModal')) document.getElementById('backgroundModal').style.display = 'none';
+        });
+
+        // View All Background Information logic
+        document.getElementById('viewAllBackgroundBtn').onclick = function() {
+            const allBgBody = document.getElementById('allBackgroundBody');
+            allBgBody.innerHTML = '';
+            const positions = document.querySelectorAll('.position-section');
+            positions.forEach(position => {
+                const positionTitle = position.querySelector('.position-title').textContent;
+                const candidates = position.querySelectorAll('.candidate-card');
+                let hasBg = false;
+                let sectionHtml = `<div class='candidate-bg-section'><div class='candidate-bg-position'>${positionTitle}</div>`;
+                candidates.forEach(card => {
+                    const name = card.querySelector('.candidate-name').textContent;
+                    const program = card.querySelector('.candidate-info').textContent;
+                    const year = card.querySelectorAll('.candidate-info')[1]?.textContent || '';
+                    const bgBtn = card.querySelector('.background-btn');
+                    if (bgBtn) {
+                        hasBg = true;
+                        const background = bgBtn.getAttribute('data-background');
+                        sectionHtml += `<div class='candidate-bg-card'>
+                            <div class='candidate-bg-name'>${name} <span class='candidate-bg-program'>(${program}, <span class='candidate-bg-program'>${year}</span>)</span></div>
+                            <div class='candidate-bg-info'>${background.replace(/\n/g,'<br>')}</div>
+                        </div>`;
+                    }
+                });
+                sectionHtml += '</div>';
+                if (hasBg) allBgBody.innerHTML += sectionHtml;
+            });
+            if (!allBgBody.innerHTML) allBgBody.innerHTML = '<div style="color:#fff;text-align:center;">No background information available for any candidate.</div>';
+            document.getElementById('allBackgroundModal').style.display = 'block';
+        };
+        document.getElementById('closeAllBackgroundModal').onclick = function() {
+            document.getElementById('allBackgroundModal').style.display = 'none';
+        };
+        window.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('allBackgroundModal')) document.getElementById('allBackgroundModal').style.display = 'none';
+        });
     </script>
 </body>
-</html> 
+</html>

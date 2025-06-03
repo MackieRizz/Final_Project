@@ -585,6 +585,91 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       margin-top: 0.5em;
       letter-spacing: 0.5px;
     }
+
+    .background-btn {
+      background: #FDDE54;
+      color: #800000;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 16px;
+      font-size: 0.95em;
+      font-weight: 600;
+      margin-top: 6px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      box-shadow: 0 2px 8px rgba(253,222,84,0.08);
+    }
+    .background-btn:hover {
+      background: #800000;
+      color: #FDDE54;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0,0,0);
+      background-color: rgba(0,0,0,0.4);
+      padding-top: 60px;
+    }
+
+    .modal-content {
+      background-color: #2d0808;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #FDDE54;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 500px;
+      color: #FDDE54;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .close-modal {
+      color: #FDDE54;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      background: none;
+      border: none;
+      outline: none;
+    }
+
+    .close-modal:hover,
+    .close-modal:focus {
+      color: #fff;
+      text-decoration: none;
+      cursor: pointer;
+      background: none;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(253, 222, 84, 0.3);
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 1.5em;
+      color: #FDDE54;
+    }
+
+    .vote-summary {
+      font-size: 1.1em;
+      line-height: 1.4;
+      color: #FDDE54;
+    }
   </style>
 </head>
 <body>
@@ -658,7 +743,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
               LEFT JOIN votes v ON cp.candidate_id = v.candidate_id AND cp.position_id = v.position_id
               WHERE cp.position_id = ?
               GROUP BY cp.id, cp.candidate_id, cp.name, cp.year, cp.program, cp.image
-              ORDER BY vote_count DESC
+              ORDER BY cp.candidate_id ASC
             ";
             
             $stmt = $conn->prepare($candidates_query);
@@ -690,10 +775,22 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
                     <?php endif; ?>
                   </div>
                   <div class="candidate-details">
-                    <h3><?php echo htmlspecialchars($candidate['name']); ?></h3>
-                    <p class="program"><?php echo htmlspecialchars($candidate['program']); ?></p>
-                    <p class="year"><?php echo htmlspecialchars($candidate['year']); ?> Year</p>
-                    <p class="candidate-number">Candidate #<?php echo htmlspecialchars($candidate['candidate_id']); ?></p>
+                    <div class="candidate-name"><?php echo htmlspecialchars($candidate['name']); ?></div>
+                    <div class="candidate-program"><?php echo htmlspecialchars($candidate['program']); ?></div>
+                    <div class="candidate-year"><?php echo htmlspecialchars($candidate['year']); ?> Year</div>
+                    <div class="candidate-id">Candidate #<?php echo htmlspecialchars($candidate['candidate_id']); ?></div>
+                    <?php
+                      // Fetch background for this candidate
+                      $bg_stmt = $conn->prepare("SELECT background FROM candidate_positions WHERE id = ?");
+                      $bg_stmt->bind_param("i", $candidate['id']);
+                      $bg_stmt->execute();
+                      $bg_stmt->bind_result($background);
+                      $bg_stmt->fetch();
+                      $bg_stmt->close();
+                      if (!empty($background)) {
+                    ?>
+                      <button type="button" class="background-btn" data-background="<?php echo htmlspecialchars($background, ENT_QUOTES); ?>" data-name="<?php echo htmlspecialchars($candidate['name'], ENT_QUOTES); ?>">Background Information</button>
+                    <?php } ?>
                   </div>
                 </div>
                 <div class="vote-count">
@@ -745,6 +842,17 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
           <input type="text" maxlength="1" class="passcode-input" />
         </div>
         <button class="update-passcode-btn" onclick="updatePasscode()">Update Passcode</button>
+      </div>
+    </div>
+
+    <!-- Background Modal -->
+    <div id="backgroundModal" class="modal" style="display:none;z-index:2000;">
+      <div class="modal-content" style="max-width:500px;">
+        <div class="modal-header">
+          <h2 class="modal-title" id="backgroundModalTitle">Background Information</h2>
+          <button class="close-modal" id="closeBackgroundModal">&times;</button>
+        </div>
+        <div class="vote-summary" id="backgroundModalBody" style="padding:24px 32px 32px 32px;font-size:1.05em;"></div>
       </div>
     </div>
 
@@ -932,14 +1040,37 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
     function refreshStandings() {
       const refreshBtn = document.querySelector('.refresh-btn i');
       refreshBtn.classList.add('loading');
-      
+
       // Fetch the latest standings
       fetch('get_standings.php')
-        .then(response => response.text())
-        .then(html => {
-          document.querySelector('.standings-container').innerHTML = html;
+        .then(response => {
+          // Check if response is JSON (for not_logged_in)
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.indexOf('application/json') !== -1) {
+            return response.json();
+          } else {
+            return response.text();
+          }
+        })
+        .then(data => {
+          if (typeof data === 'object' && data.not_logged_in) {
+            // If not logged in, redirect to adminver.php
+            window.location.href = 'adminver.php';
+            return;
+          }
+          // Otherwise, update standings
+          document.querySelector('.standings-container').innerHTML = data;
           refreshBtn.classList.remove('loading');
-          
+          // Re-attach background info button listeners
+          document.querySelectorAll('.background-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+              const name = this.getAttribute('data-name');
+              const background = this.getAttribute('data-background');
+              document.getElementById('backgroundModalTitle').textContent = name + " - Background Information";
+              document.getElementById('backgroundModalBody').innerHTML = background.replace(/\n/g, '<br>');
+              document.getElementById('backgroundModal').style.display = 'block';
+            });
+          });
           // Show success message
           Swal.fire({
             icon: 'success',
@@ -954,7 +1085,6 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
         .catch(error => {
           console.error('Error:', error);
           refreshBtn.classList.remove('loading');
-          
           // Show error message
           Swal.fire({
             icon: 'error',
@@ -967,6 +1097,22 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
           });
         });
     }
+
+    document.querySelectorAll('.background-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        const name = this.getAttribute('data-name');
+        const background = this.getAttribute('data-background');
+        document.getElementById('backgroundModalTitle').textContent = name + " - Background Information";
+        document.getElementById('backgroundModalBody').innerHTML = background.replace(/\n/g, '<br>');
+        document.getElementById('backgroundModal').style.display = 'block';
+      });
+    });
+    document.getElementById('closeBackgroundModal').onclick = function() {
+      document.getElementById('backgroundModal').style.display = 'none';
+    };
+    window.addEventListener('click', function(e) {
+      if (e.target === document.getElementById('backgroundModal')) document.getElementById('backgroundModal').style.display = 'none';
+    });
   </script>
 </body>
 </html>

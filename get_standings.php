@@ -1,6 +1,15 @@
 <?php
+session_start();
+if (!isset($_SESSION['admin_username'])) {
+    header('Content-Type: application/json');
+    echo json_encode(['not_logged_in' => true]);
+    exit;
+}
 include 'db.php';
-
+?>
+<div class="election-header">EVSU Student Council Elections</div>
+<div class="election-subheader">Official Standings and Results</div>
+<?php
 // Get all positions
 $positions_query = "SELECT DISTINCT position_id, position FROM candidate_positions ORDER BY position_id";
 $positions_result = $conn->query($positions_query);
@@ -63,6 +72,18 @@ while ($position = $positions_result->fetch_assoc()) {
                             <p class="program"><?php echo htmlspecialchars($candidate['program']); ?></p>
                             <p class="year"><?php echo htmlspecialchars($candidate['year']); ?> Year</p>
                             <p class="candidate-number">Candidate #<?php echo htmlspecialchars($candidate['candidate_id']); ?></p>
+                            <?php
+                            // Fetch background for this candidate
+                            $bg_stmt = $conn->prepare("SELECT background FROM candidate_positions WHERE id = ?");
+                            $bg_stmt->bind_param("i", $candidate['id']);
+                            $bg_stmt->execute();
+                            $bg_stmt->bind_result($background);
+                            $bg_stmt->fetch();
+                            $bg_stmt->close();
+                            if (!empty($background)) {
+                            ?>
+                                <button type="button" class="background-btn" data-background="<?php echo htmlspecialchars($background, ENT_QUOTES); ?>" data-name="<?php echo htmlspecialchars($candidate['name'], ENT_QUOTES); ?>">Background Information</button>
+                            <?php } ?>
                         </div>
                     </div>
                     <div class="vote-count">
@@ -82,4 +103,4 @@ while ($position = $positions_result->fetch_assoc()) {
     <?php
 }
 $conn->close();
-?> 
+?>

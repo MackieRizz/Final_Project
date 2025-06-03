@@ -527,6 +527,50 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       background: #ffd700;
     }
 
+    .input-group textarea[name="background[]"] {
+      width: 100%;
+      padding: 8px;
+      background: #662d2d;
+      border: none;
+      border-radius: 5px;
+      color: #FDDE54;
+      margin-bottom: 8px;
+      font-size: 1em;
+      resize: vertical;
+      min-height: 38px;
+      box-sizing: border-box;
+      transition: background 0.2s, color 0.2s;
+      autocomplete="off";
+      autocorrect="off";
+      autocapitalize="off";
+      spellcheck="false";
+    }
+
+    /* Remove the clear (X) button from textarea in Microsoft Edge/IE */
+    .input-group textarea[name="background[]"]::-ms-clear {
+      display: none;
+    }
+    /* Remove the clear (X) button from textarea in Chrome (if any) */
+    .input-group textarea[name="background[]"]::-webkit-search-cancel-button {
+      display: none;
+    }
+    /* Remove the clear (X) button from all textareas (universal fallback) */
+    .input-group textarea[name="background[]"]::-webkit-clear-button {
+      display: none;
+    }
+    .input-group textarea[name="background[]"]::-webkit-input-clear-button {
+      display: none;
+    }
+    .input-group textarea[name="background[]"]::-webkit-input-placeholder {
+      color: #FDDE54;
+    }
+
+    .input-group textarea[name="background[]"]:focus {
+      outline: none;
+      background: #4a1010;
+      color: #fff;
+    }
+
     .add-field {
       background: #662d2d;
       color: #FDDE54;
@@ -781,28 +825,8 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       margin-bottom: 2px;
     }
 
-    .no-positions {
-      text-align: center;
-      color: #FDDE54;
-      font-size: 1.2em;
-      padding: 40px;
-      background: #4a1010;
-      border-radius: 10px;
-    }
-
-    .year {
-      color: #FDDE54 !important;
-
-    }
-
-    .program {
-      color: #FDDE54 !important;
-    }
-
-    .candidate-number {
-      color: #FDDE54 !important;
-      font-size: 0.8em;
-      margin-top: 2px;
+    .candidate-info {
+      margin-top: 4px;
     }
 
     .candidate-card .delete-icon {
@@ -1215,6 +1239,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
               <input type="text" name="year[]" placeholder="Year" required>
               <input type="text" name="program[]" placeholder="Program" required>
               <input type="file" name="image[]" accept="image/*" required>
+              <textarea name="background[]" placeholder="Background and Achievements" rows="2" style="width:100%;margin-bottom:8px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
               <input type="hidden" name="is_new[]" value="1">
             </div>
           </div>
@@ -1274,6 +1299,9 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
                     <h2><?php echo htmlspecialchars($candidate['name']); ?></h2>
                     <p class="program"><?php echo htmlspecialchars($candidate['program']); ?></p>
                     <p class="year"><?php echo htmlspecialchars($candidate['year']); ?> Year</p>
+                    <?php if (!empty($candidate['background'])): ?>
+                      <p class="candidate-info" style="color:#FDDE54;background:#4a1010;padding:6px 10px;border-radius:6px;margin-top:4px;max-width:400px;white-space:pre-line;"><strong>Background:</strong> <?php echo nl2br(htmlspecialchars($candidate['background'])); ?></p>
+                    <?php endif; ?>
                     <p class="candidate-number">Candidate #<?php echo htmlspecialchars($candidate['candidate_id']); ?></p>
                   </div>
                   <i class="fas fa-trash delete-icon"
@@ -1434,6 +1462,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       <input type="text" name="year[]" placeholder="Year" required>
       <input type="text" name="program[]" placeholder="Program" required>
       <input type="file" name="image[]" accept="image/*" required>
+      <textarea name="background[]" placeholder="Background and Achievements" rows="2" style="width:100%;margin-bottom:8px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
       <input type="hidden" name="is_new[]" value="1">
     </div>
   `;
@@ -1455,6 +1484,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       <input type="text" name="year[]" placeholder="Year" required>
       <input type="text" name="program[]" placeholder="Program" required>
       <input type="file" name="image[]" accept="image/*" required>
+      <textarea name="background[]" placeholder="Background and Achievements" rows="2" style="width:100%;margin-bottom:8px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
       <input type="hidden" name="is_new[]" value="1">
     </div>
   `;
@@ -1473,6 +1503,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
     <input type="text" name="year[]" placeholder="Year" required>
     <input type="text" name="program[]" placeholder="Program" required>
     <input type="file" name="image[]" accept="image/*" required>
+    <textarea name="background[]" placeholder="Background and Achievements" rows="2" style="width:100%;margin-bottom:8px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     <input type="hidden" name="is_new[]" value="1">
     <button type="button" class="remove-field" onclick="removeNameField(this)" style="position:absolute;top:5px;right:5px;background:none;border:none;color:#FDDE54;font-size:18px;cursor:pointer;">&times;</button>
 
@@ -1529,6 +1560,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
           <input type="text" name="program[]" placeholder="Program" value="${candidate.program}" required>
           <input type="file" name="image[]" accept="image/*">
           ${candidate.image ? `<small>Current image: ${candidate.image}</small>` : ''}
+          <textarea name="background[]" placeholder="Background and Achievements" rows="2" style="width:100%;margin-bottom:8px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">${candidate.background ? candidate.background : ''}</textarea>
           <input type="hidden" name="existing_image[]" value="${candidate.image || ''}">
           <input type="hidden" name="candidate_id[]" value="${candidate.id}">
           <input type="hidden" name="is_new[]" value="0">

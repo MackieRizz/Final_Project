@@ -17,7 +17,8 @@ if (isset($_GET['position_id'])) {
             'name' => $row['name'],
             'year' => $row['year'],
             'program' => $row['program'],
-            'image' => $row['image']
+            'image' => $row['image'],
+            'background' => $row['background']
         );
     }
     
@@ -31,4 +32,4 @@ if (isset($_GET['position_id'])) {
 }
 
 $conn->close();
-?> 
+?>

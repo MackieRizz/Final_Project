@@ -17,7 +17,7 @@ if (!file_exists($upload_dir)) {
 }
 
 // Prepare update statement
-$update_query = "UPDATE candidate_positions SET name = ?, year = ?, program = ?, image = ? WHERE id = ? AND position_id = ?";
+$update_query = "UPDATE candidate_positions SET name = ?, year = ?, program = ?, image = ?, background = ? WHERE id = ? AND position_id = ?";
 $update_stmt = $conn->prepare($update_query);
 
 $response = array('success' => true, 'messages' => array());
@@ -27,6 +27,7 @@ try {
     $year = $_POST['year'];
     $program = $_POST['program'];
     $existing_image = $_POST['existing_image'];
+    $background = isset($_POST['background']) ? $_POST['background'] : '';
     
     // Initialize image path with existing image
     $image_path = $existing_image;
@@ -54,11 +55,12 @@ try {
     }
     
     // Update candidate
-    $update_stmt->bind_param("ssssss",
+    $update_stmt->bind_param("sssssis",
         $name,
         $year,
         $program,
         $image_path,
+        $background,
         $candidate_id,
         $position_id
     );
@@ -81,4 +83,4 @@ $conn->close();
 // Return JSON response
 header('Content-Type: application/json');
 echo json_encode($response);
-?> 
+?>

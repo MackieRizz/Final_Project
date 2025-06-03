@@ -25,7 +25,7 @@ if ($result && $row = $result->fetch_assoc()) {
 }
 
 // Prepare insert statement
-$insert_query = "INSERT INTO candidate_positions (id, position_id, position, name, year, program, image) VALUES (?, ?, ?, ?, ?, ?, ?)";
+$insert_query = "INSERT INTO candidate_positions (id, position_id, position, name, year, program, image, background) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 $insert_stmt = $conn->prepare($insert_query);
 
 $response = array('success' => true, 'messages' => array());
@@ -34,14 +34,16 @@ $response = array('success' => true, 'messages' => array());
 $names = isset($_POST['name']) ? $_POST['name'] : array();
 $years = isset($_POST['year']) ? $_POST['year'] : array();
 $programs = isset($_POST['program']) ? $_POST['program'] : array();
+$backgrounds = isset($_POST['background']) ? $_POST['background'] : array();
 
 // Validate that we have the same number of entries for each field
 $count_names = count($names);
 $count_years = count($years);
 $count_programs = count($programs);
+$count_backgrounds = count($backgrounds);
 $count_files = isset($_FILES['image']['name']) ? count($_FILES['image']['name']) : 0;
 
-if ($count_names !== $count_years || $count_names !== $count_programs || $count_names !== $count_files) {
+if ($count_names !== $count_years || $count_names !== $count_programs || $count_names !== $count_files || $count_names !== $count_backgrounds) {
     $response['success'] = false;
     $response['messages'][] = "Mismatch in the number of inputs. Please ensure all fields are filled for each candidate.";
     echo json_encode($response);
@@ -94,14 +96,16 @@ foreach ($names as $index => $name) {
             $new_candidate_id = $max_candidate_id;
             
             // Insert new candidate
-            $insert_stmt->bind_param("iisssss",
+            $insert_stmt = $conn->prepare("INSERT INTO candidate_positions (id, position_id, position, name, year, program, image, background) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $insert_stmt->bind_param("iissssss",
                 $new_candidate_id,
                 $position_id,
                 $position,
                 $name,
                 $years[$index],
                 $programs[$index],
-                $image_path
+                $image_path,
+                $backgrounds[$index]
             );
             
             if (!$insert_stmt->execute()) {
@@ -129,4 +133,4 @@ $conn->close();
 // Return JSON response
 header('Content-Type: application/json');
 echo json_encode($response);
-?> 
+?>

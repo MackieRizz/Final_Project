@@ -560,13 +560,14 @@ if (!$conn) {
 }
 
 .modal-content {
-    position: relative;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
     max-width: 90%;
     max-height: 90vh;
-    margin: auto;
     display: block;
-    top: 50%;
-    transform: translateY(-50%);
     object-fit: contain;
     width: auto;
     height: auto;
@@ -598,6 +599,87 @@ if (!$conn) {
     width: 100%;
     padding: 10px;
     background: rgba(0, 0, 0, 0.7);
+}
+
+/* Background Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.8);
+  padding: 0;
+}
+
+.modal-content {
+  background-color: #2d0808;
+  color: #FDDE54;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  border: 1px solid #FDDE54;
+  width: 80%;
+  max-width: 600px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close-modal {
+  color: #FDDE54;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+  color: #C46B02;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.5em;
+  color: #FDDE54;
+}
+
+.vote-summary {
+  margin-top: 10px;
+  font-size: 1.1em;
+  color: #FDDE54;
+  line-height: 1.4;
+}
+
+/* Button Styles */
+.background-btn {
+  background: #FDDE54;
+  color: #800000;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-size: 0.95em;
+  font-weight: 600;
+  margin-top: 6px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  box-shadow: 0 2px 8px rgba(253,222,84,0.08);
+}
+.background-btn:hover {
+  background: #800000;
+  color: #FDDE54;
 }
     </style>
 </head>
@@ -676,7 +758,7 @@ if (!$conn) {
             LEFT JOIN votes v ON cp.candidate_id = v.candidate_id AND cp.position_id = v.position_id
             WHERE cp.position_id = ?
             GROUP BY cp.id, cp.candidate_id, cp.name, cp.year, cp.program, cp.image
-            ORDER BY vote_count DESC
+            ORDER BY cp.candidate_id ASC
           ";
           
           $stmt = $conn->prepare($candidates_query);
@@ -715,6 +797,18 @@ if (!$conn) {
                     <div class="candidate-program"><?php echo htmlspecialchars($candidate['program']); ?></div>
                     <div class="candidate-year"><?php echo htmlspecialchars($candidate['year']); ?> Year</div>
                     <div class="candidate-id">Candidate #<?php echo htmlspecialchars($candidate['candidate_id']); ?></div>
+                    <?php
+                      // Fetch background for this candidate
+                      $bg_stmt = $conn->prepare("SELECT background FROM candidate_positions WHERE id = ?");
+                      $bg_stmt->bind_param("i", $candidate['id']);
+                      $bg_stmt->execute();
+                      $bg_stmt->bind_result($background);
+                      $bg_stmt->fetch();
+                      $bg_stmt->close();
+                      if (!empty($background)) {
+                    ?>
+                      <button type="button" class="background-btn" data-background="<?php echo htmlspecialchars($background, ENT_QUOTES); ?>" data-name="<?php echo htmlspecialchars($candidate['name'], ENT_QUOTES); ?>">Background Information</button>
+                    <?php } ?>
                   </div>
                 </div>
               </td>
@@ -751,6 +845,17 @@ if (!$conn) {
     <span class="modal-close" onclick="closeImageModal()">&times;</span>
     <img class="modal-content" id="modalImage">
     <div id="modalCaption" class="modal-caption"></div>
+</div>
+
+<!-- Background Modal -->
+<div id="backgroundModal" class="modal" style="display:none;z-index:2000;">
+  <div class="modal-content" style="max-width:500px;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="backgroundModalTitle">Background Information</h2>
+      <button class="close-modal" id="closeBackgroundModal">&times;</button>
+    </div>
+    <div class="vote-summary" id="backgroundModalBody" style="padding:24px 32px 32px 32px;font-size:1.05em;"></div>
+  </div>
 </div>
 
 <script>
@@ -810,6 +915,22 @@ document.addEventListener('keydown', function(event) {
     if (event.key === "Escape") {
         document.getElementById("imageModal").style.display = "none";
     }
+});
+
+document.querySelectorAll('.background-btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    const name = this.getAttribute('data-name');
+    const background = this.getAttribute('data-background');
+    document.getElementById('backgroundModalTitle').textContent = name + " - Background Information";
+    document.getElementById('backgroundModalBody').innerHTML = background.replace(/\n/g, '<br>');
+    document.getElementById('backgroundModal').style.display = 'block';
+  });
+});
+document.getElementById('closeBackgroundModal').onclick = function() {
+  document.getElementById('backgroundModal').style.display = 'none';
+};
+window.addEventListener('click', function(e) {
+  if (e.target === document.getElementById('backgroundModal')) document.getElementById('backgroundModal').style.display = 'none';
 });
 </script>
 </body>

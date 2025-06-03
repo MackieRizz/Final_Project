@@ -20,6 +20,7 @@ try {
     $is_new = $_POST['is_new'] ?? array();
     $existing_images = isset($_POST['existing_image']) ? $_POST['existing_image'] : array();
     $candidate_ids = isset($_POST['candidate_id']) ? $_POST['candidate_id'] : array();
+    $backgrounds = $_POST['background'] ?? array();
 
     // Create uploads directory if it doesn't exist
     $upload_dir = 'uploads/';
@@ -51,8 +52,8 @@ try {
     $conn->begin_transaction();
 
     // Prepare statements
-    $insert_stmt = $conn->prepare("INSERT INTO candidate_positions (id, candidate_id, position_id, position, name, year, program, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $update_stmt = $conn->prepare("UPDATE candidate_positions SET name = ?, year = ?, program = ?, image = ? WHERE id = ? AND position_id = ?");
+    $insert_stmt = $conn->prepare("INSERT INTO candidate_positions (id, candidate_id, position_id, position, name, year, program, image, background) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $update_stmt = $conn->prepare("UPDATE candidate_positions SET name = ?, year = ?, program = ?, image = ?, background = ? WHERE id = ? AND position_id = ?");
 
     // Track processed candidates
     $processed_ids = array();
@@ -98,6 +99,19 @@ try {
                 $programs[$index],
                 $image_path
             );
+            // Add background to insert
+            $insert_stmt = $conn->prepare("INSERT INTO candidate_positions (id, candidate_id, position_id, position, name, year, program, image, background) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $insert_stmt->bind_param("iiissssss",
+                $max_id,
+                $max_candidate_id,
+                $position_id,
+                $position,
+                $name,
+                $years[$index],
+                $programs[$index],
+                $image_path,
+                $backgrounds[$index]
+            );
 
             if (!$insert_stmt->execute()) {
                 throw new Exception("Failed to insert candidate: " . $insert_stmt->error);
@@ -128,11 +142,12 @@ try {
             }
 
             // Update existing candidate
-            $update_stmt->bind_param("ssssss",
+            $update_stmt->bind_param("sssssis",
                 $name,
                 $years[$index],
                 $programs[$index],
                 $image_path,
+                $backgrounds[$index],
                 $candidate_id,
                 $position_id
             );
@@ -169,4 +184,3 @@ $conn->close();
 header('Content-Type: application/json');
 echo json_encode($response);
 ?>
-   

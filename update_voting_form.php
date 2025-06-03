@@ -29,7 +29,7 @@ try {
         $position = $row['position'];
         
         // Get candidates for this position
-        $candidates_query = "SELECT id, candidate_id, name, year, program, image FROM candidate_positions 
+        $candidates_query = "SELECT id, candidate_id, name, year, program, image, background FROM candidate_positions 
                            WHERE position_id = ? ORDER BY id";
         $stmt = $conn->prepare($candidates_query);
         if (!$stmt) {
@@ -51,7 +51,8 @@ try {
                 'name' => $candidate['name'],
                 'year' => $candidate['year'],
                 'program' => $candidate['program'],
-                'image' => $candidate['image']
+                'image' => $candidate['image'],
+                'background' => $candidate['background']
             );
         }
         
@@ -110,4 +111,4 @@ try {
 }
 
 $conn->close();
-?> 
+?>
