@@ -531,7 +531,24 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
         </div>
       </div>
 
-      <button id="deleteSelected" style="background:#ff4d4d;color:#fff;padding:8px 16px;border:none;border-radius:5px;cursor:pointer;margin-bottom:10px;">Delete Selected</button>
+      <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+        <button id="deleteSelected" style="background:#ff4d4d;color:#fff;padding:8px 16px;border:none;border-radius:5px;cursor:pointer;">Delete Selected</button>
+        <button id="sortByStatus" style="background:#4a1010;color:#FDDE54;padding:8px 16px;border:none;border-radius:5px;cursor:pointer;">
+          <i class="fas fa-filter"></i> Show Non-Voters Only
+        </button>
+      </div>
+
+      <div id="reminderSection" style="display: none; margin-bottom: 10px;">
+        <div style="background: rgba(253, 222, 84, 0.1); padding: 15px; border-radius: 5px; margin-bottom: 10px;">
+          <p style="margin: 0; color: #FDDE54;">
+            <i class="fas fa-info-circle"></i> 
+            Showing only students who haven't voted yet. You can send them a reminder email.
+          </p>
+        </div>
+        <button id="sendReminder" style="background:#FDDE54;color:#2d0808;padding:8px 16px;border:none;border-radius:5px;cursor:pointer;">
+          <i class="fas fa-envelope"></i> Send Email Reminder
+        </button>
+      </div>
 
       <div class="table-container">
         <table id="studentTable">
@@ -552,10 +569,15 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
             <?php
               include 'db.php';
               $sql = "SELECT s.student_id, s.fullname, s.department, s.program, s.section, s.email, s.gender, 
-                     COALESCE(v.status, 'Not Voted') as voting_status
+                     CASE 
+                         WHEN v.status = 'Voted' THEN 'Voted'
+                         WHEN v.status = 'Didn''t vote yet' THEN 'Didn''t vote yet'
+                         ELSE 'Haven''t voted'
+                     END as voting_status
                      FROM students_registration s
                      LEFT JOIN student_votes v ON s.student_id = v.student_id
                      ORDER BY s.student_id DESC";
+              
               $result = $conn->query($sql);
 
               if ($result->num_rows > 0) {
@@ -658,6 +680,265 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       const table = document.getElementById('studentTable');
       const tbody = table.getElementsByTagName('tbody')[0];
       const rows = tbody.getElementsByTagName('tr');
+      const reminderSection = document.getElementById('reminderSection');
+      let isShowingNonVoters = false;
+
+      // Sort by Status button functionality
+      document.getElementById('sortByStatus').addEventListener('click', function() {
+        if (!isShowingNonVoters) {
+          // Show loading state
+          Swal.fire({
+            title: 'Loading...',
+            text: 'Fetching non-voters list',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+
+          // Fetch non-voters from database
+          fetch('get_non_voters.php')
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                const tbody = document.querySelector('#studentTable tbody');
+                tbody.innerHTML = ''; // Clear existing rows
+
+                data.students.forEach(student => {
+                  const row = document.createElement('tr');
+                  row.innerHTML = `
+                    <td><input type="checkbox" class="select-student" value="${student.student_id}"></td>
+                    <td>${student.student_id}</td>
+                    <td>${student.fullname}</td>
+                    <td>${student.department}</td>
+                    <td>${student.program}</td>
+                    <td>${student.section}</td>
+                    <td>${student.email}</td>
+                    <td>${student.gender}</td>
+                    <td>${student.voting_status}</td>
+                  `;
+                  tbody.appendChild(row);
+                });
+
+                if (data.students.length === 0) {
+                  Swal.fire({
+                    icon: 'info',
+                    title: 'No Non-Voters Found',
+                    text: 'All students have already voted!',
+                    confirmButtonColor: '#FDDE54'
+                  });
+                  return;
+                }
+
+                this.innerHTML = '<i class="fas fa-undo"></i> Show All Students';
+                reminderSection.style.display = 'block';
+                isShowingNonVoters = true;
+
+                Swal.close();
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Failed to fetch non-voters list',
+                  confirmButtonColor: '#FDDE54'
+                });
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to fetch non-voters list',
+                confirmButtonColor: '#FDDE54'
+              });
+            });
+        } else {
+          // Show loading state
+          Swal.fire({
+            title: 'Loading...',
+            text: 'Fetching all students',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+
+          // Fetch all students
+          fetch('get_all_students.php')
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                const tbody = document.querySelector('#studentTable tbody');
+                tbody.innerHTML = ''; // Clear existing rows
+
+                data.students.forEach(student => {
+                  const row = document.createElement('tr');
+                  row.innerHTML = `
+                    <td><input type="checkbox" class="select-student" value="${student.student_id}"></td>
+                    <td>${student.student_id}</td>
+                    <td>${student.fullname}</td>
+                    <td>${student.department}</td>
+                    <td>${student.program}</td>
+                    <td>${student.section}</td>
+                    <td>${student.email}</td>
+                    <td>${student.gender}</td>
+                    <td>${student.voting_status}</td>
+                  `;
+                  tbody.appendChild(row);
+                });
+
+                this.innerHTML = '<i class="fas fa-filter"></i> Show Non-Voters Only';
+                reminderSection.style.display = 'none';
+                isShowingNonVoters = false;
+
+                Swal.close();
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Failed to fetch students list',
+                  confirmButtonColor: '#FDDE54'
+                });
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to fetch students list',
+                confirmButtonColor: '#FDDE54'
+              });
+            });
+        }
+      });
+
+      // Send reminder functionality
+      document.getElementById('sendReminder').addEventListener('click', function() {
+        const selectedIds = [];
+        document.querySelectorAll('.select-student:checked').forEach(checkbox => {
+            selectedIds.push(checkbox.value);
+        });
+
+        if (selectedIds.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No Students Selected',
+                text: 'Please select at least one student to send a reminder.',
+                confirmButtonColor: '#FDDE54'
+            });
+            return;
+        }
+
+        // Show loading state
+        Swal.fire({
+            title: 'Sending Reminders',
+            text: 'Please wait while we send the reminders...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Send reminder emails
+        fetch('send_reminder.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'student_ids=' + JSON.stringify(selectedIds)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: data.message,
+                    confirmButtonColor: '#FDDE54'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading state
+                        Swal.fire({
+                            title: 'Loading...',
+                            text: 'Refreshing student list',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        // Fetch all students
+                        fetch('get_all_students.php')
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    const tbody = document.querySelector('#studentTable tbody');
+                                    tbody.innerHTML = ''; // Clear existing rows
+
+                                    data.students.forEach(student => {
+                                        const row = document.createElement('tr');
+                                        row.innerHTML = `
+                                            <td><input type="checkbox" class="select-student" value="${student.student_id}"></td>
+                                            <td>${student.student_id}</td>
+                                            <td>${student.fullname}</td>
+                                            <td>${student.department}</td>
+                                            <td>${student.program}</td>
+                                            <td>${student.section}</td>
+                                            <td>${student.email}</td>
+                                            <td>${student.gender}</td>
+                                            <td>${student.voting_status}</td>
+                                        `;
+                                        tbody.appendChild(row);
+                                    });
+
+                                    // Reset the UI state
+                                    const sortByStatusBtn = document.getElementById('sortByStatus');
+                                    sortByStatusBtn.innerHTML = '<i class="fas fa-filter"></i> Show Non-Voters Only';
+                                    document.getElementById('reminderSection').style.display = 'none';
+                                    isShowingNonVoters = false;
+
+                                    Swal.close();
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Failed to refresh student list',
+                                        confirmButtonColor: '#FDDE54'
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Failed to refresh student list',
+                                    confirmButtonColor: '#FDDE54'
+                                });
+                            });
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message,
+                    confirmButtonColor: '#FDDE54'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to send reminders. Please try again.',
+                confirmButtonColor: '#FDDE54'
+            });
+        });
+      });
 
       function filterTable() {
         const searchTerm = searchInput.value.toLowerCase();
@@ -666,31 +947,34 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
         const sectionFilter = sectionSort.value;
 
         for (let row of rows) {
-          const cells = row.getElementsByTagName('td');
-          if (cells.length < 9) continue; // Skip if not a data row
+          if (row.cells.length < 9) continue;
 
-          // Adjusted indices due to added checkbox column
-          const studentId = cells[1].textContent.toLowerCase();
-          const fullName = cells[2].textContent.toLowerCase();
-          const department = cells[3].textContent;
-          const program = cells[4].textContent;
-          const section = cells[5].textContent;
-          const gender = cells[6].textContent;
-          const votingStatus = cells[7].textContent;
+          const studentId = row.cells[1].textContent.toLowerCase();
+          const fullName = row.cells[2].textContent.toLowerCase();
+          const department = row.cells[3].textContent;
+          const program = row.cells[4].textContent;
+          const section = row.cells[5].textContent;
+          const gender = row.cells[7].textContent;
 
           const matchesSearch = studentId.includes(searchTerm) || 
                               fullName.includes(searchTerm) ||
                               department.toLowerCase().includes(searchTerm) ||
                               program.toLowerCase().includes(searchTerm) ||
                               section.toLowerCase().includes(searchTerm) ||
-                              gender.toLowerCase().includes(searchTerm) ||
-                              votingStatus.toLowerCase().includes(searchTerm);
+                              gender.toLowerCase().includes(searchTerm);
 
           const matchesDepartment = !departmentFilter || department === departmentFilter;
           const matchesProgram = !programFilter || program === programFilter;
           const matchesSection = !sectionFilter || section === sectionFilter;
 
-          row.style.display = (matchesSearch && matchesDepartment && matchesProgram && matchesSection) ? '' : 'none';
+          if (isShowingNonVoters) {
+            const votingStatus = row.cells[8].textContent.trim().toLowerCase();
+            const isNonVoter = votingStatus === "haven't voted" || 
+                              votingStatus === "didn't vote yet";
+            row.style.display = (matchesSearch && matchesDepartment && matchesProgram && matchesSection && isNonVoter) ? '' : 'none';
+          } else {
+            row.style.display = (matchesSearch && matchesDepartment && matchesProgram && matchesSection) ? '' : 'none';
+          }
         }
       }
 
