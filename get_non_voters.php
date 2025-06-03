@@ -4,13 +4,16 @@ include 'db.php';
 header('Content-Type: application/json');
 
 try {
-    // Query to get students who haven't voted, starting from student_votes table
+    // Query to get students who haven't voted (both statuses)
     $sql = "SELECT s.student_id, s.fullname, s.department, s.program, s.section, s.email, s.gender,
-            v.status as voting_status, v.scan_time, v.vote_time
-            FROM student_votes v
-            INNER JOIN students_registration s ON v.student_id = s.student_id
-            WHERE v.status = 'Didn''t vote yet'
-            ORDER BY v.scan_time DESC";
+            CASE 
+                WHEN v.status = 'Didn''t vote yet' THEN 'Didn''t vote yet'
+                ELSE 'Haven''t voted'
+            END as voting_status, v.scan_time, v.vote_time
+            FROM students_registration s
+            LEFT JOIN student_votes v ON s.student_id = v.student_id
+            WHERE v.status = 'Didn''t vote yet' OR v.status IS NULL
+            ORDER BY s.student_id DESC";
     
     $result = $conn->query($sql);
     
@@ -39,4 +42,4 @@ try {
     ]);
 }
 
-$conn->close(); 
+$conn->close();

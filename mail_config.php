@@ -46,5 +46,5 @@ if ($config['username'] !== $config['from_email']) {
 }
 
 return $config;
-?> 
+?>
 

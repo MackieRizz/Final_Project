@@ -68,7 +68,7 @@ try {
             FROM students_registration sr
             LEFT JOIN student_votes sv ON sr.student_id = sv.student_id
             WHERE sr.student_id IN ($placeholders)
-            AND (sv.status IS NULL OR sv.status = 'Didn''t vote yet')";
+            AND (sv.status IS NULL OR sv.status = 'Didn''t vote yet' OR sv.status = 'Haven''t voted')";
 
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
@@ -205,4 +205,4 @@ try {
 header('Content-Type: application/json');
 echo json_encode($response);
 $conn->close();
-?> 
+?>
