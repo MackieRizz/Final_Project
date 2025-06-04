@@ -802,28 +802,33 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
     const pieCtx = document.getElementById('pieChart').getContext('2d');
     <?php
       include 'db.php';
+           // Get count for each voting status from student_votes table
+      $statusQuery = "SELECT status, COUNT(*) as count FROM student_votes GROUP BY status";
+      $statusResult = $conn->query($statusQuery);
       
-      // Get total number of students
-      $totalStudentsQuery = "SELECT COUNT(*) as total FROM students_registration";
-      $totalStudentsResult = $conn->query($totalStudentsQuery);
-      $totalStudents = $totalStudentsResult->fetch_assoc()['total'];
+      $votedCount = 0;
+      $notVotedCount = 0;
       
-      // Get number of students who voted
-      $votedStudentsQuery = "SELECT COUNT(DISTINCT student_id) as voted FROM student_votes";
-      $votedStudentsResult = $conn->query($votedStudentsQuery);
-      $votedStudents = $votedStudentsResult->fetch_assoc()['voted'];
+      while($row = $statusResult->fetch_assoc()) {
+          if($row['status'] === 'Voted') {
+              $votedCount = $row['count'];
+          } else {
+              $notVotedCount += $row['count'];
+          }
+      }
       
-      // Calculate students who didn't vote
-      $notVotedStudents = $totalStudents - $votedStudents;
+      // Debug output
+      error_log("Voted count: " . $votedCount);
+      error_log("Not voted count: " . $notVotedCount);
       
       $conn->close();
     ?>
     new Chart(pieCtx, {
       type: 'pie',
       data: {
-        labels: ['Voted', 'Did Not Vote'],
+        labels: ['Voted', 'Not Voted'],
         datasets: [{
-          data: [<?php echo $votedStudents; ?>, <?php echo $notVotedStudents; ?>],
+          data: [<?php echo $votedCount; ?>, <?php echo $notVotedCount; ?>],
           backgroundColor: ['#FDDE54', '#4a1010']
         }]
       },
@@ -852,7 +857,7 @@ $profile_pic = $_SESSION['admin_profile_pic'] ?? 'https://i.pinimg.com/564x/b4/b
       </div>
       <div style="color: #fff; display: flex; align-items: center;">
         <span style="display: inline-block; width: 10px; height: 10px; background: #4a1010; margin-right: 6px; border-radius: 2px;"></span>
-        <span>Did Not Vote</span>
+        <span>Not Voted</span>
       </div>
     `;
     
